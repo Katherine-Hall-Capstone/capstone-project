@@ -20,7 +20,7 @@ model User {
   username              String          @unique
   password              String
   role                  Role
-  servicesOffered       String?
+  servicesOffered       String[]
   availabilities        Availibility[]
   clientAppointments    Appointment[]   @relation("ClientAppointments")
   providerAppointments  Appointment[]   @relation("ProviderAppointments")

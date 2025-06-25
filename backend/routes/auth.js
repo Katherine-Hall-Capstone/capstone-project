@@ -3,7 +3,7 @@ const prisma = new PrismaClient()
 const router = require('express').Router()
 const bcrypt = require("bcrypt");
 
-router.post('/auth/signup', async(req, res) => {
+router.post('/auth/signup', async (req, res) => {
     const { username, password, name, role } = req.body
     if(!username || !password) {
         return res.status(400).json({ error: "Username and password are required." })
@@ -28,7 +28,7 @@ router.post('/auth/signup', async(req, res) => {
     }
 })
 
-router.post('/auth/login', async(req, res) => {
+router.post('/auth/login', async (req, res) => {
     const { username, password } = req.body
     if(!username || !password) {
         return res.status(400).json({ error: "Username and password are required." })
@@ -55,8 +55,19 @@ router.post('/auth/login', async(req, res) => {
     }
 })
 
+router.post("/auth/logout", async (req, res) => {
+    req.session.destroy((error) => {
+        if (error) {
+            return res.status(500).json({ error: "Failed to log out" });
+        }
+        res.clearCookie("connect.sid"); 
+        res.json({ message: "Logged out successfully" });
+    });
+});
+
+
 // Checks who is currently logged in 
-router.post('/auth/me', async(req, res) => {
+router.post('/auth/me', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ message: "Not logged in" });
     }
