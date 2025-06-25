@@ -1,0 +1,30 @@
+{
+  "name": "capstone-project",
+  "version": "1.0.0",
+  "description": "Appointment Booker Application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Katherine-Hall-Capstone/capstone-project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Katherine-Hall-Capstone/capstone-project/issues"
+  },
+  "homepage": "https://github.com/Katherine-Hall-Capstone/capstone-project#readme",
+  "dependencies": {
+    "@prisma/client": "^6.10.1",
+    "bcrypt": "^6.0.0",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "pg": "^8.16.2"
+  },
+  "devDependencies": {
+    "prisma": "^6.10.1"
+  }
+}
