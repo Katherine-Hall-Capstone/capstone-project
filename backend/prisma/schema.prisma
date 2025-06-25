@@ -30,8 +30,8 @@ model User {
 
 model Availibility {
   id                    Int             @id @default(autoincrement())
-  userId                Int 
-  user                  User            @relation(fields: [userId], references: [id])            
+  providerId            Int 
+  provider              User            @relation(fields: [providerId], references: [id])            
   startDateTime         DateTime
   endDateTime           DateTime
 }
@@ -64,6 +64,8 @@ enum Role {
 }
 
 enum AppointmentStatus {
+  PENDING
   BOOKED
+  REJECTED
   CANCELLED
 }

@@ -23,7 +23,7 @@ app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)
 })
 
-//GET all providers
+// GET all providers
 app.get('/providers', async (req, res) => {
     try {
         const providers = await prisma.user.findMany({
@@ -42,7 +42,7 @@ app.get('/providers', async (req, res) => {
     }
 }) 
 
-//GET all clients
+// GET all clients
 app.get('/clients', async (req, res) => {
     try {
         const clients = await prisma.user.findMany({
