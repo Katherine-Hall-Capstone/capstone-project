@@ -55,11 +55,8 @@ router.get('/providers/:id/availability', async (req, res) => {
         const availabilities = await prisma.availability.findMany({
             where: { providerId }
         })
-        if(!availabilities || availabilities.length === 0) {
-            return res.status(404).json({ error: 'No availabilities found' })
-        }
 
-        res.json(availabilities)
+        res.status(200).json(availabilities)
     } catch(error) {
         res.status(500).send('Server error');
     }
@@ -73,6 +70,13 @@ router.post('/providers/:id/availability', async (req, res) => {
 
     const { startDateTime, endDateTime } = req.body
 
+    const start = new Date(startDateTime)
+    const end = new Date(endDateTime)
+
+    if (end <= start) {
+        return res.status(400).json({ error: 'End time must be after start time' });
+    }
+
     try {
         const user = await prisma.user.findUnique({
             where: { id: req.session.userId }
@@ -84,8 +88,8 @@ router.post('/providers/:id/availability', async (req, res) => {
         const availability = await prisma.availability.create({
             data: {
                 providerId: req.session.userId,
-                startDateTime: new Date(startDateTime),
-                endDateTime: new Date(endDateTime)
+                startDateTime: start,
+                endDateTime: end
             }
         })
 
