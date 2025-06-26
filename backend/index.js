@@ -6,6 +6,9 @@ const session = require('express-session')
 const PORT = 3000
 
 const authRouter = require('./routes/auth')
+const appointmentRouter = require('./routes/appointments')
+const providersRouter = require('./routes/providers')
+const reviewsRouter = require('./routes/reviews')
 
 const app = express()
 app.use(express.json())
@@ -18,45 +21,10 @@ app.use(session({
 }))
 
 app.use(authRouter)
+app.use(appointmentRouter)
+app.use(providersRouter)
+app.use(reviewsRouter)
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)
 })
-
-//GET all providers
-app.get('/providers', async (req, res) => {
-    try {
-        const providers = await prisma.user.findMany({
-            where: {
-                role: 'PROVIDER'
-            },
-            include: {
-                availabilities: true,
-                providerAppointments: true,
-                reviewsRecieved: true
-            } 
-        })
-        res.json(providers)
-    } catch (error) {
-        res.status(500).send('An error occurred while fetching the providers.');        
-    }
-}) 
-
-//GET all clients
-app.get('/clients', async (req, res) => {
-    try {
-        const clients = await prisma.user.findMany({
-            where: {
-                role: 'CLIENT'
-            },
-            include: {
-                servicesOffered: false,
-                clientAppointments: true,
-                reviewsWritten: true
-            } 
-        })
-        res.json(clients)
-    } catch (error) {
-        res.status(500).send('An error occurred while fetching the clients.');        
-    }
-}) 

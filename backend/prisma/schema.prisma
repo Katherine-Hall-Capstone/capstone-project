@@ -20,18 +20,18 @@ model User {
   username              String          @unique
   password              String
   role                  Role
-  servicesOffered       String?
-  availabilities        Availibility[]
+  servicesOffered       String[]
+  availabilities        Availability[]
   clientAppointments    Appointment[]   @relation("ClientAppointments")
   providerAppointments  Appointment[]   @relation("ProviderAppointments")
   reviewsWritten        Review[]        @relation("ClientReviews")
   reviewsRecieved       Review[]        @relation("ProviderReviews")
 }
 
-model Availibility {
+model Availability {
   id                    Int             @id @default(autoincrement())
-  userId                Int 
-  user                  User            @relation(fields: [userId], references: [id])            
+  providerId            Int 
+  provider              User            @relation(fields: [providerId], references: [id])            
   startDateTime         DateTime
   endDateTime           DateTime
 }
@@ -64,6 +64,8 @@ enum Role {
 }
 
 enum AppointmentStatus {
+  PENDING
   BOOKED
+  REJECTED
   CANCELLED
 }
