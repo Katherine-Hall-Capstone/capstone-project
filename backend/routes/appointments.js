@@ -24,7 +24,7 @@ router.get('/appointments', async (req, res) => {
                     provider: {
                         select: {
                             name: true,
-                            username: true
+                            username: true,
                         }
                     }
                 }
@@ -58,6 +58,7 @@ router.post('/appointments', async (req, res) => {
     }
 
     const { providerId, dateTime, serviceType, notes } = req.body
+
     try {
         const user = await prisma.user.findUnique({
             where: { id: req.session.userId }
@@ -135,7 +136,7 @@ router.put('/appointments/:id', async (req, res) => {
 // DELETE single appointment
 router.delete('/appointments/:id', async (req, res) => {
     if(!req.session.userId) {
-        return res.status(401).json({ error: 'Log in to edit an appointment!' })
+        return res.status(401).json({ error: 'Log in to delete an appointment!' })
     }
 
     const appointmentId = parseInt(req.params.id)

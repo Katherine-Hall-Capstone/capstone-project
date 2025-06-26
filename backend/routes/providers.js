@@ -9,16 +9,130 @@ router.get('/providers', async (req, res) => {
             where: {
                 role: 'PROVIDER'
             },
-            include: {
-                availabilities: true,
-                providerAppointments: true,
-                reviewsRecieved: true
-            } 
+            select: {
+                id: true,
+                name: true,
+                servicesOffered: true
+            }
         })
         res.json(providers)
     } catch (error) {
-        res.status(500).send('An error occurred while fetching the providers.');        
+        res.status(500).send('Server error');        
     }
 }) 
 
+// GET single provider
+router.get('/providers/:id', async (req, res) => {
+    const providerId = parseInt(req.params.id)
+
+    try {
+        const provider = await prisma.user.findFirst({
+            where: {
+                id: providerId,
+                role: 'PROVIDER'
+            },
+            select: {
+                id: true,
+                name: true,
+                servicesOffered: true
+            }
+        })
+        if(!provider) {
+            return res.status(404).json({ error: 'Provider not found' })
+        }
+
+        res.json(provider)
+    } catch(error) {
+        res.status(500).send('Server error');
+    }
+})
+
+// GET single provider's availability 
+router.get('/providers/:id/availability', async (req, res) => {
+    const providerId = parseInt(req.params.id)
+
+    try {
+        const availabilities = await prisma.availability.findMany({
+            where: { providerId }
+        })
+        if(!availabilities || availabilities.length === 0) {
+            return res.status(404).json({ error: 'No availabilities found' })
+        }
+
+        res.json(availabilities)
+    } catch(error) {
+        res.status(500).send('Server error');
+    }
+})
+
+// ADD an availability 
+router.post('/providers/:id/availability', async (req, res) => {
+    if(!req.session.userId) {
+        return res.status(401).json({ error: 'Log in to add an availability!' })
+    }
+
+    const { startDateTime, endDateTime } = req.body
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.session.userId }
+        })
+        if(!user || user.role !== 'PROVIDER') {
+            return res.status(403).json({ error: 'Only service providers can add availabilities' })
+        }
+
+        const availability = await prisma.availability.create({
+            data: {
+                providerId: req.session.userId,
+                startDateTime: new Date(startDateTime),
+                endDateTime: new Date(endDateTime)
+            }
+        })
+
+        res.status(201).json(availability)
+    } catch(error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// DELETE an availability
+router.delete('/providers/:id/availability/:id', async (req, res) => {
+    if(!req.session.userId) {
+        return res.status(401).json({ error: 'Log in to delete an availability!' })
+    }
+
+    const availabilityId = parseInt(req.params.id)
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.session.userId }
+        })
+        if(!user || user.role !== 'PROVIDER') {
+            return res.status(403).json({ error: 'Only service providers can modify availabilities' })
+        }
+
+        const availability = await prisma.availability.findUnique({
+            where: { id: availabilityId }
+        })
+        if(!availability) {
+            return res.status(404).json({ error: 'Availability not found' })
+        }
+        
+        if(availability.providerId !== req.session.userId) {
+            return res.status(403).json({ error: 'Unauthorized' })
+        }
+
+        await prisma.availability.delete({
+            where: { id: availabilityId }
+        })
+
+        res.status(200).json({ message: 'Availability deleted successfully'})
+    } catch(error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Server error' })
+    }
+})
+
 module.exports = router;
+

@@ -21,14 +21,14 @@ model User {
   password              String
   role                  Role
   servicesOffered       String[]
-  availabilities        Availibility[]
+  availabilities        Availability[]
   clientAppointments    Appointment[]   @relation("ClientAppointments")
   providerAppointments  Appointment[]   @relation("ProviderAppointments")
   reviewsWritten        Review[]        @relation("ClientReviews")
   reviewsRecieved       Review[]        @relation("ProviderReviews")
 }
 
-model Availibility {
+model Availability {
   id                    Int             @id @default(autoincrement())
   providerId            Int 
   provider              User            @relation(fields: [providerId], references: [id])            
