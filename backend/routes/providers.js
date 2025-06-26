@@ -90,7 +90,7 @@ router.post('/providers/:id/availability', async (req, res) => {
 
         const availability = await prisma.availability.create({
             data: {
-                providerId: req.session.userId,
+                providerId: user.id,
                 startDateTime: start,
                 endDateTime: end
             }
