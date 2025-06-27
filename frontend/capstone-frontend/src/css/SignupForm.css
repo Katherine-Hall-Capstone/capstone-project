@@ -1,0 +1,16 @@
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 20rem;
+}
+
+.submit-button {
+    width: 5rem;
+    align-self: center;
+}
+
+.success-msg {
+    color: green;
+    align-self: center;
+}

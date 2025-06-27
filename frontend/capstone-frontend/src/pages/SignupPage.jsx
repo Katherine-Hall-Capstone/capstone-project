@@ -1,9 +1,15 @@
+import '../css/SignupPage.css'
+import SignupForm from "../AuthComponents/SignupForm"
+
 function SignupPage() {
 
     return(
-        <>
-            <h1>Signup Page</h1>
-        </>
+        <div className="signup-page">
+            <div className="form-container">
+                <h1 className="signup-title">Signup Page</h1>
+                <SignupForm></SignupForm>
+            </div>
+        </div>
     )
 }
 
