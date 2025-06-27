@@ -1,9 +1,15 @@
+import '../css/LoginPage.css'
+import LoginForm from "../AuthComponents/LoginForm"
+
 function LoginPage() {
 
     return(
-        <>
-            <h1>Login Page</h1>
-        </>
+        <div className="login-page">
+            <div className="form-container">
+                <h1 className="login-title">Log In</h1>
+                <LoginForm></LoginForm>
+            </div>
+        </div>
     )
 }
 
