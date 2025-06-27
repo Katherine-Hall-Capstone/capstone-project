@@ -17,7 +17,8 @@ router.get('/providers', async (req, res) => {
         })
         res.json(providers)
     } catch (error) {
-        res.status(500).send('Server error');        
+        console.log(error);
+        return res.status(500).json({ error: 'Server error' })  
     }
 }) 
 
@@ -43,7 +44,8 @@ router.get('/providers/:id', async (req, res) => {
 
         res.json(provider)
     } catch(error) {
-        res.status(500).send('Server error');
+        console.log(error);
+        return res.status(500).json({ error: 'Server error' })
     }
 })
 
@@ -58,7 +60,8 @@ router.get('/providers/:id/availability', async (req, res) => {
 
         res.status(200).json(availabilities)
     } catch(error) {
-        res.status(500).send('Server error');
+        console.log(error);
+        return res.status(500).json({ error: 'Server error' })
     }
 })
 
@@ -87,7 +90,7 @@ router.post('/providers/:id/availability', async (req, res) => {
 
         const availability = await prisma.availability.create({
             data: {
-                providerId: req.session.userId,
+                providerId: user.id,
                 startDateTime: start,
                 endDateTime: end
             }
@@ -135,6 +138,67 @@ router.delete('/providers/:id/availability/:id', async (req, res) => {
     } catch(error) {
         console.log(error);
         return res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// ADD provider's offered services
+router.post('/providers/:id/services', async (req, res) => {
+    if(!req.session.userId) {
+        return res.status(401).json({ error: 'Log in to add services!' })
+    }
+
+    const providerId = parseInt(req.params.id)
+    if(req.session.userId !== providerId) {
+        return res.status(403).json({ error: 'Unauthorized' })
+    }
+
+    const { servicesOffered } = req.body
+
+    if(!Array.isArray(servicesOffered)) {
+        return res.status(400).json({ error: 'Services must be in an array '})
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.session.userId }
+        })
+
+        if(!user || user.role !== 'PROVIDER') {
+            return res.status(403).json({ error: 'Only service providers can add services' })
+        }
+
+        const updatedProvider = await prisma.user.update({
+            where: { id: providerId },
+            data: { servicesOffered }
+        })
+
+        res.status(200).json({ message: 'Services updated'})
+    } catch(error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// GET provider's reviews 
+router.get('/providers/:id/reviews', async (req, res) => {
+    const providerId = parseInt(req.params.id)
+
+    try {
+        const reviews = await prisma.review.findMany({
+            where: { providerId },
+            include: {
+                client: {
+                    select: {
+                        name: true,
+                        username: true
+                    }
+                }
+            }
+        })
+        res.json(reviews)
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Server error' })  
     }
 })
 
