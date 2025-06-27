@@ -1,21 +1,27 @@
+import '../css/LandingPage.css'
 import { useNavigate } from 'react-router';
-import { useUser } from '../UserContext'
 
 function LandingPage() {
     const navigate = useNavigate();
-    const { user } = useUser();
 
     return(
         <>
-            <h1>Landing Page</h1>
-            {user ? (
-                <p>Welcome, {user.username}!</p>
-            ) : (
-                <>
-                <button onClick={() => navigate('/signup')}>Sign Up</button>
-                <button onClick={() => navigate('/login')}>Log In</button>
-                </>
-            )}
+            <header className="site-header">
+                <h2>Header</h2>
+            </header>
+
+            <div className="landing-container">
+                <h1>Welcome!</h1>
+                
+                <div className="landing-btns">
+                    <button onClick={() => navigate('/signup')}>Sign Up</button>
+                    <button onClick={() => navigate('/login')}>Log In</button>
+                </div>
+            </div>
+
+            <footer className="site-footer">
+                <h3>Footer</h3>
+            </footer>
         </>
     )
 }
