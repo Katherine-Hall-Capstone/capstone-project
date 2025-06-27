@@ -1,11 +1,14 @@
 import '../css/LoginForm.css'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
+import { useUser } from '../UserContext'
+
 
 function LoginForm() {
     const [formData, setFormData] = useState({ username: "", password: "" })
     const [errorMessage, setErrorMessage] = useState('')
     const navigate = useNavigate()
+    const { setUser } = useUser()
 
     function handleChange(event) {
         const { name, value } = event.target
@@ -31,9 +34,10 @@ function LoginForm() {
                 return response.json()
             })
             .then(data => {
+                setUser(data)
                 setFormData({ username: "", password: "" })
                 console.log("Login Success!")
-                // Navigate to account's dashboard
+                navigate('/') // TODO: (Placeholder for now) Navigate to account's dashboard
             })
             .catch(error => {
                 setErrorMessage("Invalid username or password")
