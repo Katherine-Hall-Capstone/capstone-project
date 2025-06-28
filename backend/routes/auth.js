@@ -49,7 +49,7 @@ router.post('/auth/login', async (req, res) => {
         }
 
         req.session.userId = user.id;
-        res.json({ message: "Login successful!" })
+        res.json({ id: user.id, username: user.username, role: user.role })
     } catch(error) {
         console.log(error);  
         res.status(500).json({ error: 'Server error' });
@@ -75,7 +75,7 @@ router.get('/auth/me', async (req, res) => {
     try{
         const user = await prisma.user.findUnique({
             where: { id: req.session.userId },
-            select: { username: true } 
+            select: { id: true, username: true, role: true } 
         });
 
         res.json({ id: req.session.userId, username: user.username });

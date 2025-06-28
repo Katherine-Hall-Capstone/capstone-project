@@ -10,7 +10,7 @@ export const UserProvider = ({ children }) => {
         .then(response => response.json())
         .then(data => {
             if (data.id) {
-            setUser(data);
+                setUser(data);
             }
         })
     }, [])

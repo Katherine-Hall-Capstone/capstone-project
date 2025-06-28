@@ -37,7 +37,7 @@ function LoginForm() {
                 setUser(data)
                 setFormData({ username: "", password: "" })
                 console.log("Login Success!")
-                navigate('/') // TODO: (Placeholder for now) Navigate to account's dashboard
+                navigate('/dashboard') 
             })
             .catch(error => {
                 setErrorMessage("Invalid username or password")
