@@ -2,15 +2,17 @@ const { PrismaClient } = require('./generated/prisma')
 const prisma = new PrismaClient()
 const path = require('path')
 const express = require('express')
+const cors = require('cors')
 const session = require('express-session')
 const PORT = 3000
 
-const authRouter = require('./routes/auth')
-const appointmentRouter = require('./routes/appointments')
-const providersRouter = require('./routes/providers')
-const reviewsRouter = require('./routes/reviews')
-
 const app = express()
+
+app.use(cors({
+    origin: 'http://localhost:5173', 
+    credentials: true
+}));
+
 app.use(express.json())
 
 app.use(session({
@@ -19,6 +21,11 @@ app.use(session({
     saveUninitialized: false,
     cookie: { secure: false } 
 }))
+
+const authRouter = require('./routes/auth')
+const appointmentRouter = require('./routes/appointments')
+const providersRouter = require('./routes/providers')
+const reviewsRouter = require('./routes/reviews')
 
 app.use(authRouter)
 app.use(appointmentRouter)

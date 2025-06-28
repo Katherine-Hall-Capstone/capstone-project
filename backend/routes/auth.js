@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 
 router.post('/auth/signup', async (req, res) => {
     const { username, password, name, role } = req.body
+
     if(!username || !password) {
         return res.status(400).json({ error: 'Username and password are required.' })
     }
@@ -67,7 +68,7 @@ router.post("/auth/logout", async (req, res) => {
 
 
 // Checks who is currently logged in 
-router.post('/auth/me', async (req, res) => {
+router.get('/auth/me', async (req, res) => {
     if (!req.session.userId) {
         return res.status(401).json({ message: 'Not logged in' });
     }
