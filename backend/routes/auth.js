@@ -78,7 +78,7 @@ router.get('/auth/me', async (req, res) => {
             select: { id: true, username: true, role: true } 
         });
 
-        res.json({ id: req.session.userId, username: user.username });
+        res.json(user);
     } catch(error) {
         console.log(error);  
         res.status(500).json({ error: 'Server error' });
