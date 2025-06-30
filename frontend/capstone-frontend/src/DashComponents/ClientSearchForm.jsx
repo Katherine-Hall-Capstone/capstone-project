@@ -14,7 +14,7 @@ function ClientSearchForm() {
         }
 
         try {   
-            const res = await fetch(`http://localhost:3000/providers?search=${encodeURIComponent(query)}`)
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/providers?search=${encodeURIComponent(query)}`)
             
             if(res.ok) {
                 const data = await res.json()

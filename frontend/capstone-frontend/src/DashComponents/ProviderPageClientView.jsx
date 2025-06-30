@@ -7,7 +7,7 @@ function ProviderPageClientView() {
 
     async function fetchProvider(){
         try {
-            const res = await fetch(`http://localhost:3000/providers/${id}`)
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/providers/${id}`)
 
             if(res.ok) {
                 const data = await res.json()
