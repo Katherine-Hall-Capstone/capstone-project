@@ -5,7 +5,7 @@ function ProviderPageClientView() {
     const { id } = useParams()
     const [provider, setProvider] = useState(null)
 
-    const fetchProvider = async () => {
+    async function fetchProvider(){
         try {
             const res = await fetch(`http://localhost:3000/providers/${id}`)
 
