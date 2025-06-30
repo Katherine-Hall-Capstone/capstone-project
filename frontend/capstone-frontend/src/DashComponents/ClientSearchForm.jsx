@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router'
 
 function ClientSearchForm() {
     const [query, setQuery] = useState('')
     const [results, setResults] = useState([])
     const [searched, setSearched] = useState(false)
+    const navigate = useNavigate()
 
     async function handleSearch(event) {
         event.preventDefault()
@@ -11,10 +13,21 @@ function ClientSearchForm() {
             return
         }
 
-        const res = await fetch(`http://localhost:3000/providers?search=${encodeURIComponent(query)}`)
-        const data = await res.json()
-        setResults(data)
-        setSearched(true)
+        try {   
+            const res = await fetch(`http://localhost:3000/providers?search=${encodeURIComponent(query)}`)
+            
+            if(res.ok) {
+                const data = await res.json()
+                setResults(data)
+                setSearched(true)
+            } else {
+                console.error('Failed to search for providers')
+            }
+        } catch(error) {
+            console.error(error)
+            setResults([])
+            setSearched(true)
+        }
     }
 
     function handleClear() {
@@ -42,6 +55,7 @@ function ClientSearchForm() {
                 {results.map(provider => (
                 <li key={provider.id}>
                     {provider.name} – {provider.servicesOffered?.join(', ')}
+                    <button onClick={() => navigate(`/providers/${provider.id}`)}>See More</button>
                 </li>
                 ))}
             </ul>

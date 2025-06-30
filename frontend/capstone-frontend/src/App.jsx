@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import DashPage from './pages/DashPage'
 import ProtectedRoute from './ProtectedRoute'
+import ProviderPageClientView from './DashComponents/ProviderPageClientView'
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
           <DashPage />
         </ProtectedRoute>
       } />
+      <Route path="/providers/:id" element={<ProviderPageClientView />} />
     </Routes>
   )
 }
