@@ -1,9 +1,14 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useUser } from '../UserContext'
+import ProviderAvailability from '../DashComponents/ProviderAvailability'
+import ProviderAppointments from '../DashComponents/ProviderAppointments'
+import ProviderReviews from '../DashComponents/ProviderReviews'
 
 function ProviderDashPage() {
     const navigate = useNavigate()
     const { setUser } = useUser()
+    const [activeTab, setActiveTab] = useState('appointments')
 
     async function handleLogout() {
         try {
@@ -28,7 +33,15 @@ function ProviderDashPage() {
         <>  
             <button onClick={handleLogout}>Logout</button>
 
-            <h2>Welcome Provider</h2>
+            <nav>
+                <button onClick={() => setActiveTab('availability')}>Set Availability</button>
+                <button onClick={() => setActiveTab('appointments')}>Upcoming Appointments</button>
+                <button onClick={() => setActiveTab('reviews')}>My Reviews</button>
+            </nav>
+
+            {activeTab === 'availability' && <ProviderAvailability />}
+            {activeTab === 'appointments' && <ProviderAppointments />}
+            {activeTab === 'reviews' && <ProviderReviews />}
         </>
     )
 }
