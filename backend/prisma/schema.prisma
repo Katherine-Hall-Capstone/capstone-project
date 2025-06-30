@@ -21,31 +21,23 @@ model User {
   password              String
   role                  Role
   servicesOffered       String[]
-  availabilities        Availability[]
   clientAppointments    Appointment[]   @relation("ClientAppointments")
   providerAppointments  Appointment[]   @relation("ProviderAppointments")
   reviewsWritten        Review[]        @relation("ClientReviews")
   reviewsRecieved       Review[]        @relation("ProviderReviews")
 }
 
-model Availability {
-  id                    Int             @id @default(autoincrement())
-  providerId            Int 
-  provider              User            @relation(fields: [providerId], references: [id])            
-  startDateTime         DateTime
-  endDateTime           DateTime
-}
-
 model Appointment {
   id                    Int             @id @default(autoincrement())
-  clientId              Int  
-  client                User            @relation("ClientAppointments", fields: [clientId], references: [id]) 
+  clientId              Int?  
+  client                User?            @relation("ClientAppointments", fields: [clientId], references: [id]) 
   providerId            Int 
   provider              User            @relation("ProviderAppointments", fields: [providerId], references: [id])
   dateTime              DateTime
   status                AppointmentStatus
   serviceType           String
   notes                 String?
+  isNew                 Boolean          @default(true)
 }
 
 model Review {
@@ -64,8 +56,7 @@ enum Role {
 }
 
 enum AppointmentStatus {
-  PENDING
+  AVAILABLE
   BOOKED
-  REJECTED
   CANCELLED
 }

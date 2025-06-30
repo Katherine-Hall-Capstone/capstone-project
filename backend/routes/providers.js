@@ -52,36 +52,33 @@ router.get('/providers/:id', async (req, res) => {
     }
 })
 
-// GET single provider's availability 
+// GET single provider's available appointments 
 router.get('/providers/:id/availability', async (req, res) => {
     const providerId = parseInt(req.params.id)
 
     try {
-        const availabilities = await prisma.availability.findMany({
-            where: { providerId }
+        const availableAppointments = await prisma.appointment.findMany({
+            where: { 
+                providerId,
+                status: 'AVAILABLE' 
+            }
         })
 
-        res.status(200).json(availabilities)
+        res.status(200).json(availableAppointments)
     } catch(error) {
         console.log(error);
         return res.status(500).json({ error: 'Server error' })
     }
 })
 
-// ADD an availability 
+// ADD an available appointment 
 router.post('/providers/:id/availability', async (req, res) => {
     if(!req.session.userId) {
         return res.status(401).json({ error: 'Log in to add an availability!' })
     }
 
-    const { startDateTime, endDateTime } = req.body
-
-    const start = new Date(startDateTime)
-    const end = new Date(endDateTime)
-
-    if (end <= start) {
-        return res.status(400).json({ error: 'End time must be after start time' });
-    }
+    const { dateTime } = req.body
+    const parsedDate = new Date(dateTime)
 
     try {
         const user = await prisma.user.findUnique({
@@ -91,53 +88,16 @@ router.post('/providers/:id/availability', async (req, res) => {
             return res.status(403).json({ error: 'Only service providers can add availabilities' })
         }
 
-        const availability = await prisma.availability.create({
+        const availableAppointment = await prisma.appointment.create({
             data: {
                 providerId: user.id,
-                startDateTime: start,
-                endDateTime: end
+                dateTime: parsedDate, 
+                status: 'AVAILABLE',
+                isNew: true
             }
         })
 
-        res.status(201).json(availability)
-    } catch(error) {
-        console.log(error);
-        return res.status(500).json({ error: 'Server error' })
-    }
-})
-
-// DELETE an availability
-router.delete('/providers/:id/availability/:id', async (req, res) => {
-    if(!req.session.userId) {
-        return res.status(401).json({ error: 'Log in to delete an availability!' })
-    }
-
-    const availabilityId = parseInt(req.params.id)
-
-    try {
-        const user = await prisma.user.findUnique({
-            where: { id: req.session.userId }
-        })
-        if(!user || user.role !== 'PROVIDER') {
-            return res.status(403).json({ error: 'Only service providers can modify availabilities' })
-        }
-
-        const availability = await prisma.availability.findUnique({
-            where: { id: availabilityId }
-        })
-        if(!availability) {
-            return res.status(404).json({ error: 'Availability not found' })
-        }
-        
-        if(availability.providerId !== req.session.userId) {
-            return res.status(403).json({ error: 'Unauthorized' })
-        }
-
-        await prisma.availability.delete({
-            where: { id: availabilityId }
-        })
-
-        res.status(200).json({ message: 'Availability deleted successfully'})
+        res.status(201).json(availableAppointment)
     } catch(error) {
         console.log(error);
         return res.status(500).json({ error: 'Server error' })
