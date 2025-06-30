@@ -4,10 +4,13 @@ const router = require('express').Router()
 
 // GET all providers
 router.get('/providers', async (req, res) => {
+    const { search } = req.query
+
     try {
         const providers = await prisma.user.findMany({
             where: {
-                role: 'PROVIDER'
+                role: 'PROVIDER',
+                name: { contains: search, mode: 'insensitive' }
             },
             select: {
                 id: true,
