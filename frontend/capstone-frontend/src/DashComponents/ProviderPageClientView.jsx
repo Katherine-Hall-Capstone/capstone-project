@@ -55,7 +55,7 @@ function ProviderPageClientView() {
     }
 
     return(
-        <div>
+        <div className="profile-page">
             <h2>Provider Profile</h2>
             <p>ID: {provider.id}</p>
             <p>Name: {provider.name}</p>
@@ -65,11 +65,13 @@ function ProviderPageClientView() {
             {appointments.length ===  0 ? (
                 <p>No available appointments</p>
             ) : (
-                appointments.map((appointment) => (
-                    <button key={appointment.id} onClick={() => handleClickAppointment(appointment)}>
-                        {new Date(appointment.dateTime).toLocaleString()}
-                    </button>
-                ))
+                <div className="appointment-grid">
+                    {appointments.map((appointment) => (
+                        <button key={appointment.id} onClick={() => handleClickAppointment(appointment)}>
+                            {new Date(appointment.dateTime).toLocaleString()}
+                        </button>
+                    ))}
+                </div>
             )}
 
             {showModal && (
