@@ -43,32 +43,44 @@ function ClientBookingForm({ provider, selectedAppointment, onClose, onBookingSu
     return (
         <div className="modal-overlay">
             <div className="modal-content">
+                <button className="close-button" onClick={onClose}>x</button>
+
                 <h3>Book Appointment</h3>
                 <form onSubmit={handleSubmit} className="booking-form">
-                    <label>Provider: {provider.name}</label>
+                    <div>
+                        <strong>Provider: </strong> 
+                        {provider.name}
+                    </div>
 
-                    <label>When? {new Date(selectedAppointment.dateTime).toLocaleString()}</label>
+                    <div>
+                        <strong>When? </strong>
+                        {new Date(selectedAppointment.dateTime).toLocaleString(undefined, {
+                            year: 'numeric',
+                            month: 'short', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true  
+                        })}
+                    </div>
 
-                    <label>
-                        Service Type:
+                    <div>
+                        <strong>Service Type: </strong>
                         <select name="serviceType" value={formData.serviceType} onChange={handleChange} required>
                             <option value="">Select a service</option>
                             {provider.servicesOffered.map((service, index) => (
                                 <option key={index} value={service}>{service}</option>
                             ))}
                         </select>
-                    </label>
+                    </div>
 
                     <div className="notes">
-                        <label>Notes (Optional):</label>
+                        <strong>Notes (Optional):</strong>
                         <textarea name="notes" value={formData.notes} onChange={handleChange} />
                     </div>
                     
-                    <div className="buttons">
-                        <button type="submit">Confirm Appointment</button>
-                        <button type="button" onClick={onClose}>Cancel</button>
-                    </div>
-
+                    <button type="submit">Confirm Appointment</button>
+                    
                     {successMessage && <p>{successMessage}</p>}
                 </form>
             </div>

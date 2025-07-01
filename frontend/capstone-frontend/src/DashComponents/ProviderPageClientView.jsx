@@ -68,7 +68,14 @@ function ProviderPageClientView() {
                 <div className="appointment-grid">
                     {appointments.map((appointment) => (
                         <button key={appointment.id} onClick={() => handleClickAppointment(appointment)}>
-                            {new Date(appointment.dateTime).toLocaleString()}
+                            {new Date(appointment.dateTime).toLocaleString(undefined, {
+                                year: 'numeric',
+                                month: 'short', 
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true  
+                            })}
                         </button>
                     ))}
                 </div>

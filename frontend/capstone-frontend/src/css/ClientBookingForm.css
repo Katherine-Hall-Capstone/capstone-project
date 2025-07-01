@@ -16,6 +16,7 @@
     padding: 2rem;
     border-radius: 0.7rem;
     box-shadow: 0 0 1.3rem white;
+    position: relative;
 
     display: flex;
     flex-direction: column;
@@ -36,4 +37,21 @@
 .notes {
     display: flex;
     flex-direction: column;
+}
+
+.notes textarea {
+    width: 100%;
+    min-height: 5rem;
+    max-height: 8rem;   
+    resize: none;
+    overflow-y: auto;
+}
+
+.close-button {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
 }
