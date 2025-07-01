@@ -4,19 +4,21 @@ const UserContext = createContext()
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null)
+    const [loading , setLoading] = useState(true)
 
     useEffect(() => {
-        fetch("http://localhost:3000/auth/me", { credentials: "include" })
+        fetch(`${import.meta.env.VITE_API_URL}/auth/me`, { credentials: "include" })
         .then(response => response.json())
         .then(data => {
             if (data.id) {
-            setUser(data);
+                setUser(data);
             }
         })
+        .finally(() => setLoading(false))
     }, [])
 
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider value={{ user, setUser, loading }}>
             {children}
         </UserContext.Provider>
     )

@@ -19,7 +19,7 @@ function LoginForm() {
         event.preventDefault()
         setErrorMessage('')
         
-        fetch("http://localhost:3000/auth/login", {
+        fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -37,7 +37,7 @@ function LoginForm() {
                 setUser(data)
                 setFormData({ username: "", password: "" })
                 console.log("Login Success!")
-                navigate('/') // TODO: (Placeholder for now) Navigate to account's dashboard
+                navigate('/dashboard') 
             })
             .catch(error => {
                 setErrorMessage("Invalid username or password")
