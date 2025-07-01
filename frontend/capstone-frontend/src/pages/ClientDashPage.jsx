@@ -1,36 +1,16 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
-import { useUser } from '../UserContext'
+import { useLogout } from '../hooks/useLogout'
 import ClientSearchForm from '../DashComponents/ClientSearchForm'
 import ClientAppointments from '../DashComponents/ClientAppointments'
 import ClientReviews from '../DashComponents/ClientReviews'
 
 function ClientDashPage() {
-    const navigate = useNavigate()
-    const { setUser } = useUser()
+    const logout = useLogout()
     const [activeTab, setActiveTab] = useState('appointments')
-
-    async function handleLogout() {
-        try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
-                method: 'POST',
-                credentials: 'include',
-            })
-
-            if(res.ok) {
-                setUser(null)
-                navigate('/')
-            } else {
-                console.error('Logout failed')
-            }
-        } catch(error) {
-            console.error(error)
-        }
-    }
 
     return(
         <div>
-            <button onClick={handleLogout}>Logout</button>
+            <button onClick={logout}>Logout</button>
 
             <nav>
                 <button onClick={() => setActiveTab('search')}>Search</button>
