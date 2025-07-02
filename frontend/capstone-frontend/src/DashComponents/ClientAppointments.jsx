@@ -48,7 +48,6 @@ function ClientAppointments() {
                     </li>
                 ))}
             </ul>
-
         </div>
     )
 }
