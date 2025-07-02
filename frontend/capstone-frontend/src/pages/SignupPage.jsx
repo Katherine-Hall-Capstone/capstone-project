@@ -2,7 +2,6 @@ import '../css/SignupPage.css'
 import SignupForm from "../AuthComponents/SignupForm"
 
 function SignupPage() {
-
     return(
         <div className="signup-page">
             <div className="form-container">

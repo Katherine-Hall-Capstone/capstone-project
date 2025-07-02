@@ -144,6 +144,38 @@ router.put('/appointments/:id', async (req, res) => {
     }
 })
 
+// Provider marks appointment as read
+router.put('/appointments/:id/read', async (req, res) => {
+    if(!req.session.userId) {
+        return res.status(401).json({ error: 'Log in!' })
+    }
+
+    const appointmentId = parseInt(req.params.id)
+
+    try {
+        const appointment = await prisma.appointment.findUnique({
+            where: { id: appointmentId }
+        })
+        if(!appointment) {
+            return res.status(404).json({ error: 'Appointment not found' })
+        }
+
+        if(appointment.providerId !== req.session.userId) {
+            return res.status(403).json({ error: 'Unauthorized' })
+        }
+
+        const updated = await prisma.appointment.update({
+            where: { id: appointmentId },
+            data: { isNew: !appointment.isNew }
+        })
+        
+        res.status(200).json(updated)
+    } catch(error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Server error' })
+    }
+})
+
 // DELETE single appointment
 router.delete('/appointments/:id', async (req, res) => {
     if(!req.session.userId) {

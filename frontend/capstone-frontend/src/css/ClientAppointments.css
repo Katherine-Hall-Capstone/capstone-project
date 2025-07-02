@@ -1,0 +1,12 @@
+.appointment-container {
+    border: solid black;
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.upcoming-appointment-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin: 0 4em
+}

@@ -10,13 +10,17 @@ function ClientDashPage() {
 
     return(
         <div>
-            <button onClick={logout}>Logout</button>
+            <div className="header-bar">
+                <p>[Logo]</p>
 
-            <nav>
-                <button onClick={() => setActiveTab('search')}>Search</button>
-                <button onClick={() => setActiveTab('appointments')}>Upcoming Appointments</button>
-                <button onClick={() => setActiveTab('reviews')}>My Reviews</button>
-            </nav>
+                <nav>
+                    <button onClick={() => setActiveTab('search')}>Search</button>
+                    <button onClick={() => setActiveTab('appointments')}>Upcoming Appointments</button>
+                    <button onClick={() => setActiveTab('reviews')}>My Reviews</button>
+                </nav>
+
+                <button onClick={logout}>Logout</button>
+            </div>
 
             {activeTab === 'search' && <ClientSearchForm />}
             {activeTab === 'appointments' && <ClientAppointments />}
