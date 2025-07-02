@@ -32,24 +32,26 @@ function ProviderAppointments() {
             {status === 'success' && appointments.length === 0 && <p>No upcoming appointments.</p>}
 
             <h2>Upcoming Appointments</h2>
-            {bookedAppointments.map(appointment => (
-                <div key={appointment.id} className={`appointment-container ${appointment.isNew ? 'new-appointment' : ''}`}>
-                    <p>Date: {new Date(appointment.dateTime).toLocaleString(undefined, {
-                                month: 'short', 
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: true  
-                            })}
-                    </p>
-                    <p>Service: {appointment.serviceType}</p>
-                    <p>Client: {appointment.client.name}</p>
-                    
-                    <button onClick={() => markReadUnread(appointment.id)}>
-                        {appointment.isNew ? "Mark as Read" : "Mark as Unread"}
-                    </button>
-                </div>
-            ))}
+            <div className="upcoming-appointment-grid">
+                {bookedAppointments.map(appointment => (
+                    <div key={appointment.id} className={`appointment-container ${appointment.isNew ? 'new-appointment' : ''}`}>
+                        <p>Date: {new Date(appointment.dateTime).toLocaleString(undefined, {
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: true  
+                                })}
+                        </p>
+                        <p>Service: {appointment.serviceType}</p>
+                        <p>Client: {appointment.client.name}</p>
+
+                        <button onClick={() => markReadUnread(appointment.id)}>
+                            {appointment.isNew ? "Mark as Read" : "Mark as Unread"}
+                        </button>
+                    </div>
+                ))}
+            </div>
         </div>
     )
 }
