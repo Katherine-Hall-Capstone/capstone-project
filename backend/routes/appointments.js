@@ -52,12 +52,13 @@ router.get('/appointments', async (req, res) => {
 })
 
 // Client books an appointment
-router.post('/appointments', async (req, res) => {
+router.put('/appointments/:id/book', async (req, res) => {
     if(!req.session.userId) {
         return res.status(401).json({ error: 'Log in to book an appointment!' })
     }
 
-    const { providerId, dateTime, serviceType, notes } = req.body
+    const appointmentId = parseInt(req.params.id)
+    const { serviceType, notes } = req.body
 
     try {
         const user = await prisma.user.findUnique({
@@ -67,18 +68,18 @@ router.post('/appointments', async (req, res) => {
             return res.status(403).json({ error: 'Only clients can book appointments' })
         }
 
-        const appointment = await prisma.appointment.create({
+        const updatedAppointment = await prisma.appointment.update({
+            where: { id: appointmentId },
             data: {
                 clientId: user.id,
-                providerId,
-                dateTime: new Date(dateTime),
-                status: 'PENDING',  // Initial state of appointment
+                status: 'BOOKED', 
                 serviceType,
-                notes
+                notes,
+                isNew: true
             }
         })
 
-        res.status(201).json(appointment)
+        res.status(201).json(updatedAppointment)
     } catch(error) {
         console.log(error)
         res.status(500).json({ error: 'Server error' })
@@ -92,7 +93,7 @@ router.put('/appointments/:id', async (req, res) => {
     }
 
     const appointmentId = parseInt(req.params.id)
-    const { notes, status } = req.body
+    const { notes, serviceType, status } = req.body
 
     try {
         const appointment = await prisma.appointment.findUnique({
@@ -105,19 +106,27 @@ router.put('/appointments/:id', async (req, res) => {
         const user = await prisma.user.findUnique({ 
             where: { id: req.session.userId } 
         })
-        // Client can edit appointment notes 
+        // Client can edit appointment 
         if(user.role === 'CLIENT') {
             if(appointment.clientId !== user.id) {
                 return res.status(403).json({ error: 'Unauthorized' })
             }
+
+            const newData = {}
+            if(serviceType !== undefined) {
+                newData.serviceType = serviceType
+            }
+            if(notes !== undefined) {
+                newData.notes = notes
+            }
             const updated = await prisma.appointment.update({
                 where: { id: appointmentId },
-                data: { notes }
+                data: { ...newData }
             })
 
             return res.json(updated)
         }
-        // Provider can edit appointment status
+        // Provider can edit appointment status (cancelling)
         if(user.role === 'PROVIDER') {
             if(appointment.providerId !== user.id) {
                 return res.status(403).json({ error: 'Unauthorized' })
@@ -151,7 +160,7 @@ router.delete('/appointments/:id', async (req, res) => {
             return res.status(404).json({ error: 'Appointment not found' })
         }
 
-        if(appointment.clientId !== req.session.userId && appointment.providerId !== req.session.userId) {
+        if(appointment.providerId !== req.session.userId) {
             return res.status(403).json({ error: 'Unauthorized' })
         }
 
