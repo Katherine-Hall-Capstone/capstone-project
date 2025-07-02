@@ -67,7 +67,6 @@ function ClientSearchForm() {
                     ))}
                 </ul>
             )}  
-                
         </div>
     )
 }

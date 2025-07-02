@@ -8,7 +8,6 @@ import ProtectedRoute from './ProtectedRoute'
 import ProviderPageClientView from './DashComponents/ProviderPageClientView'
 
 function App() {
-
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
