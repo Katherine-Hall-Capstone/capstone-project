@@ -57,7 +57,6 @@ function ProviderPageClientView() {
     return(
         <div className="profile-page">
             <h2>Provider Profile</h2>
-            <p>ID: {provider.id}</p>
             <p>Name: {provider.name}</p>
             <p>Services: {provider.servicesOffered?.join(', ')}</p>
 
