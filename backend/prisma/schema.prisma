@@ -41,7 +41,7 @@ model Appointment {
   status                AppointmentStatus
   serviceType           String
   notes                 String?
-  isNew                 Boolean         @default(true)
+  isUnread              Boolean         @default(true)
 }
 
 model Review {
