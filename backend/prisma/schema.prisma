@@ -25,6 +25,10 @@ model User {
   providerAppointments  Appointment[]   @relation("ProviderAppointments")
   reviewsWritten        Review[]        @relation("ClientReviews")
   reviewsRecieved       Review[]        @relation("ProviderReviews")
+  googleAccessToken     String?
+  googleRefreshToken    String?
+  googleTokenExpiry     DateTime?
+  googleConnected       Boolean         @default(false)
 }
 
 model Appointment {
@@ -37,7 +41,7 @@ model Appointment {
   status                AppointmentStatus
   serviceType           String
   notes                 String?
-  isNew                 Boolean          @default(true)
+  isNew                 Boolean         @default(true)
 }
 
 model Review {
