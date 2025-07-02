@@ -1,10 +1,14 @@
+import '../css/ProviderPageClientView.css'
 import { useParams } from 'react-router'
 import { useEffect, useState } from 'react'
+import ClientBookingForm from './ClientBookingForm'
 
 function ProviderPageClientView() {
     const { id } = useParams()
     const [provider, setProvider] = useState(null)
     const [appointments, setAppointments] = useState([])
+    const [selectedAppointment, setSelectedAppointment] = useState(null)
+    const [showModal, setShowModal] = useState(false)
 
     async function fetchProvider(){
         try {
@@ -36,6 +40,11 @@ function ProviderPageClientView() {
         }
     }
 
+    function handleClickAppointment(appointment) {
+        setSelectedAppointment(appointment)
+        setShowModal(true)
+    }
+
     useEffect(() => {
         fetchProvider()
         fetchAvailableAppointments()
@@ -46,9 +55,8 @@ function ProviderPageClientView() {
     }
 
     return(
-        <div>
+        <div className="profile-page">
             <h2>Provider Profile</h2>
-            <p>ID: {provider.id}</p>
             <p>Name: {provider.name}</p>
             <p>Services: {provider.servicesOffered?.join(', ')}</p>
 
@@ -56,11 +64,29 @@ function ProviderPageClientView() {
             {appointments.length ===  0 ? (
                 <p>No available appointments</p>
             ) : (
-                appointments.map((appointment) => (
-                    <button key={appointment.id}>
-                        {new Date(appointment.dateTime).toLocaleString()}
-                    </button>
-                ))
+                <div className="appointment-grid">
+                    {appointments.map((appointment) => (
+                        <button key={appointment.id} onClick={() => handleClickAppointment(appointment)}>
+                            {new Date(appointment.dateTime).toLocaleString(undefined, {
+                                year: 'numeric',
+                                month: 'short', 
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true  
+                            })}
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {showModal && (
+                <ClientBookingForm 
+                    provider={provider}
+                    selectedAppointment={selectedAppointment}
+                    onClose={() => setShowModal(false)}
+                    onBookingSuccess={fetchAvailableAppointments}
+                />
             )}
         </div>
     )
