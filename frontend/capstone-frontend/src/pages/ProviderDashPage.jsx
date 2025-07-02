@@ -1,11 +1,13 @@
 import '../css/ProviderDashPage.css'
 import { useState } from 'react'
 import { useLogout } from '../hooks/useLogout'
+import { useUser } from '../UserContext'
 import ProviderAvailability from '../DashComponents/ProviderAvailability'
 import ProviderAppointments from '../DashComponents/ProviderAppointments'
 import ProviderReviews from '../DashComponents/ProviderReviews'
 
 function ProviderDashPage() {
+    const user = useUser()
     const logout = useLogout()
     const [activeTab, setActiveTab] = useState('appointments')
 
@@ -21,6 +23,15 @@ function ProviderDashPage() {
                 </nav>
 
                 <button onClick={logout}>Logout</button>
+            </div>
+
+            <div className="calendar-status">
+                {user.googleConnected ? 
+                    (<p>Calendar connected</p>) : 
+                    (<a href={`${import.meta.env.VITE_API_URL}/auth/google`}>
+                        <button>Connect Google Calendar</button>
+                    </a>)
+                }
             </div>
 
             {activeTab === 'availability' && <ProviderAvailability />}
