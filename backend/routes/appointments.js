@@ -147,7 +147,7 @@ router.put('/appointments/:id', async (req, res) => {
 // Provider marks appointment as read
 router.put('/appointments/:id/read', async (req, res) => {
     if(!req.session.userId) {
-        return res.status(401).json({ error: 'Log in to delete an appointment!' })
+        return res.status(401).json({ error: 'Log in!' })
     }
 
     const appointmentId = parseInt(req.params.id)
