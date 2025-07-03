@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { useLogout } from '../hooks/useLogout'
+import { useUser } from '../UserContext'
 import ClientSearchForm from '../DashComponents/ClientSearchForm'
 import ClientAppointments from '../DashComponents/ClientAppointments'
 import ClientReviews from '../DashComponents/ClientReviews'
+import CalendarStatus from '../DashComponents/CalendarStatus'
 
 function ClientDashPage() {
+    const user = useUser()
     const logout = useLogout()
     const [activeTab, setActiveTab] = useState('appointments')
 
@@ -21,6 +24,8 @@ function ClientDashPage() {
 
                 <button onClick={logout}>Logout</button>
             </div>
+            
+            <CalendarStatus googleConnected={user.googleConnected} />
 
             {activeTab === 'search' && <ClientSearchForm />}
             {activeTab === 'appointments' && <ClientAppointments />}

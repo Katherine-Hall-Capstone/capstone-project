@@ -75,7 +75,7 @@ router.put('/appointments/:id/book', async (req, res) => {
                 status: 'BOOKED', 
                 serviceType,
                 notes,
-                isNew: true
+                isUnread: true
             }
         })
 
@@ -166,7 +166,7 @@ router.put('/appointments/:id/read', async (req, res) => {
 
         const updated = await prisma.appointment.update({
             where: { id: appointmentId },
-            data: { isNew: !appointment.isNew }
+            data: { isUnread: !appointment.isUnread }
         })
         
         res.status(200).json(updated)

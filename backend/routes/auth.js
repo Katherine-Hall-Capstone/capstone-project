@@ -2,6 +2,8 @@ const { PrismaClient } = require('../generated/prisma')
 const prisma = new PrismaClient()
 const router = require('express').Router()
 const bcrypt = require("bcrypt");
+const { google } = require('googleapis')
+const { encrypt, decrypt } = require('../crypto')
 
 router.post('/auth/signup', async (req, res) => {
     const { username, password, name, role } = req.body
@@ -66,7 +68,6 @@ router.post("/auth/logout", async (req, res) => {
     });
 });
 
-
 // Checks who is currently logged in 
 router.get('/auth/me', async (req, res) => {
     if (!req.session.userId) {
@@ -75,12 +76,62 @@ router.get('/auth/me', async (req, res) => {
     try{
         const user = await prisma.user.findUnique({
             where: { id: req.session.userId },
-            select: { id: true, username: true, role: true } 
+            select: { id: true, username: true, role: true, googleConnected: true } 
         });
 
         res.json(user);
     } catch(error) {
         console.log(error);  
+        res.status(500).json({ error: 'Server error' });
+    }
+})
+
+// Initialize the OAuth client with credentials and redirect URI, in order to manage calendar access and handle tokens
+const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI
+)
+
+// This redirects user to Google's consent form for access to their Google Calendar
+router.get('/auth/google', (req, res) => {
+    const url = oauth2Client.generateAuthUrl({
+        access_type: 'offline',
+        prompt: 'consent',
+        scope: ['https://www.googleapis.com/auth/calendar']
+    })
+    
+    res.redirect(url)
+})
+
+// This handles the redirect after the user fills out Google's consent form
+router.get('/auth/google/callback', async (req, res) => {
+    const code = req.query.code
+    
+    try {
+        const { tokens } = await oauth2Client.getToken(code) // Gets the tokens for the given authorization code
+        oauth2Client.setCredentials(tokens)
+
+        if (!req.session.userId) {
+            return res.status(401).json({ message: 'Not logged in' });
+        }
+
+        const { encryptedToken, iv } = tokens.refresh_token ? encrypt(tokens.refresh_token) : { encryptedToken: null, iv: null }
+
+        // Updates the logged-in User model with their Google token information
+        await prisma.user.update({
+            where: { id: req.session.userId },
+            data: {
+                googleRefreshToken: encryptedToken,
+                googleRefreshIV: iv,
+                googleConnected: true
+            }
+        })
+        
+        // After Google authorization is successful, it redirects user to the dashboard
+        res.redirect('http://localhost:5173/dashboard')
+    } catch(error) {
+        console.log('OAuth error: ', error)
         res.status(500).json({ error: 'Server error' });
     }
 })

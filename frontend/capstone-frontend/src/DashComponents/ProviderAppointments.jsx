@@ -11,10 +11,10 @@ function ProviderAppointments() {
                 credentials: 'include'
             })
             if(res.ok) {
-                // Takes existing appointments array and finds the matching appointment, then changes isNew field if provider selected
+                // Takes existing appointments array and finds the matching appointment, then changes isUnread field if provider selected
                 setAppointments(prev => 
                     prev.map(appointment => 
-                        appointment.id === id ? { ...appointment, isNew: !appointment.isNew } : appointment
+                        appointment.id === id ? { ...appointment, isUnread: !appointment.isUnread } : appointment
                     )
                 )
             }
@@ -34,7 +34,7 @@ function ProviderAppointments() {
             <h2>Upcoming Appointments</h2>
             <div className="upcoming-appointment-grid">
                 {bookedAppointments.map(appointment => (
-                    <div key={appointment.id} className={`appointment-container ${appointment.isNew ? 'new-appointment' : ''}`}>
+                    <div key={appointment.id} className={`appointment-container ${appointment.isUnread ? 'new-appointment' : ''}`}>
                         <p>Date: {new Date(appointment.dateTime).toLocaleString(undefined, {
                                     month: 'short', 
                                     day: 'numeric',
@@ -47,7 +47,7 @@ function ProviderAppointments() {
                         <p>Client: {appointment.client.name}</p>
 
                         <button onClick={() => markReadUnread(appointment.id)}>
-                            {appointment.isNew ? "Mark as Read" : "Mark as Unread"}
+                            {appointment.isUnread ? "Mark as Read" : "Mark as Unread"}
                         </button>
                     </div>
                 ))}
