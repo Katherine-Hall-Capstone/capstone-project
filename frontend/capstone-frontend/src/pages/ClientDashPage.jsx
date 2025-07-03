@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLogout } from '../hooks/useLogout'
+import { useRefreshUser } from '../hooks/useRefreshUser'
 import { useUser } from '../UserContext'
 import ClientSearchForm from '../DashComponents/ClientSearchForm'
 import ClientAppointments from '../DashComponents/ClientAppointments'
@@ -7,9 +8,14 @@ import ClientReviews from '../DashComponents/ClientReviews'
 import CalendarStatus from '../DashComponents/CalendarStatus'
 
 function ClientDashPage() {
-    const user = useUser()
+    const { user } = useUser()
     const logout = useLogout()
     const [activeTab, setActiveTab] = useState('appointments')
+    const refreshUser = useRefreshUser()
+
+    useEffect(() => {
+        refreshUser()
+    }, [])
 
     return(
         <div>

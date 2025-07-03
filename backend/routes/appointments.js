@@ -1,6 +1,8 @@
 const { PrismaClient } = require('../generated/prisma')
 const prisma = new PrismaClient()
 const router = require('express').Router()
+const { getAccessToken } = require('../googleAuth')
+const { google } = require('googleapis')
 
 // GET all appointments 
 router.get('/appointments', async (req, res) => {
@@ -77,6 +79,34 @@ router.put('/appointments/:id/book', async (req, res) => {
                 notes,
                 isUnread: true
             }
+        })
+
+        // Create Google Calendar event process below
+        const appointment = await prisma.appointment.findUnique({
+            where: { id: appointmentId },
+            include: {
+                provider: true,
+                client: true
+            }
+        })
+
+        const { auth } = await getAccessToken(appointment.providerId)
+        const calendar = google.calendar({ version: 'v3', auth })
+
+        const event = {
+            summary: appointment.serviceType,
+            description: appointment.notes || '',
+            start: { dateTime: appointment.dateTime.toISOString() },
+            // Convert 30 mins to seconds then to milliseconds, since new Date is milliseconds
+            // getTime returns num of milliseconds since 1/1/1970 -> add this num to 30 minutes in milliseconds -> convert back to Date
+            end: { dateTime: new Date(new Date(appointment.dateTime).getTime() + (30 * 60 * 1000)).toISOString() }, 
+            // Sends Google Calendar invite request to client's email  
+            attendees: [{ email: appointment.client.email }]
+        }
+
+        await calendar.events.insert({
+            calendarId: 'primary',
+            resource: event
         })
 
         res.status(201).json(updatedAppointment)
