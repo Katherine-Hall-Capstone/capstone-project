@@ -5,6 +5,7 @@ import { useUser } from '../UserContext'
 import ProviderAvailability from '../DashComponents/ProviderAvailability'
 import ProviderAppointments from '../DashComponents/ProviderAppointments'
 import ProviderReviews from '../DashComponents/ProviderReviews'
+import CalendarStatus from '../DashComponents/CalendarStatus'
 
 function ProviderDashPage() {
     const user = useUser()
@@ -25,14 +26,7 @@ function ProviderDashPage() {
                 <button onClick={logout}>Logout</button>
             </div>
 
-            <div className="calendar-status">
-                {user.googleConnected ? 
-                    (<p>Calendar connected</p>) : 
-                    (<a href={`${import.meta.env.VITE_API_URL}/auth/google`}>
-                        <button>Connect Google Calendar</button>
-                    </a>)
-                }
-            </div>
+            <CalendarStatus googleConnected={user.googleConnected} />
 
             {activeTab === 'availability' && <ProviderAvailability />}
             {activeTab === 'appointments' && <ProviderAppointments />}

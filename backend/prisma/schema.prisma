@@ -25,9 +25,8 @@ model User {
   providerAppointments  Appointment[]   @relation("ProviderAppointments")
   reviewsWritten        Review[]        @relation("ClientReviews")
   reviewsRecieved       Review[]        @relation("ProviderReviews")
-  googleAccessToken     String?
   googleRefreshToken    String?
-  googleTokenExpiry     DateTime?
+  googleRefreshIV       String?
   googleConnected       Boolean         @default(false)
 }
 

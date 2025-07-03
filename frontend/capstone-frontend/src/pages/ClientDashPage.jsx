@@ -4,6 +4,7 @@ import { useUser } from '../UserContext'
 import ClientSearchForm from '../DashComponents/ClientSearchForm'
 import ClientAppointments from '../DashComponents/ClientAppointments'
 import ClientReviews from '../DashComponents/ClientReviews'
+import CalendarStatus from '../DashComponents/CalendarStatus'
 
 function ClientDashPage() {
     const user = useUser()
@@ -24,14 +25,7 @@ function ClientDashPage() {
                 <button onClick={logout}>Logout</button>
             </div>
             
-            <div className="calendar-status">
-                {user.googleConnected ? 
-                    (<p>Calendar connected</p>) : 
-                    (<a href={`${import.meta.env.VITE_API_URL}/auth/google`}>
-                        <button>Connect Google Calendar</button>
-                    </a>)
-                }
-            </div>
+            <CalendarStatus googleConnected={user.googleConnected} />
 
             {activeTab === 'search' && <ClientSearchForm />}
             {activeTab === 'appointments' && <ClientAppointments />}

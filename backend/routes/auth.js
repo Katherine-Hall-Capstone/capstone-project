@@ -3,6 +3,7 @@ const prisma = new PrismaClient()
 const router = require('express').Router()
 const bcrypt = require("bcrypt");
 const { google } = require('googleapis')
+const { encrypt, decrypt } = require('../crypto')
 
 router.post('/auth/signup', async (req, res) => {
     const { username, password, name, role } = req.body
@@ -115,16 +116,14 @@ router.get('/auth/google/callback', async (req, res) => {
             return res.status(401).json({ message: 'Not logged in' });
         }
 
-        const expiresIn = tokens.expires_in || 3600 // Uses token's expiry time from Google; if not provided, it defaults to 1 hour
-        const expiryDate = new Date(Date.now() + expiresIn * 1000) // Calculates the exact time the access token expires
+        const { encryptedToken, iv } = tokens.refresh_token ? encrypt(tokens.refresh_token) : { encryptedToken: null, iv: null }
 
         // Updates the logged-in User model with their Google token information
         await prisma.user.update({
             where: { id: req.session.userId },
             data: {
-                googleAccessToken: tokens.access_token,
-                googleRefreshToken: tokens.refresh_token,
-                googleTokenExpiry: expiryDate,
+                googleRefreshToken: encryptedToken,
+                googleRefreshIV: iv,
                 googleConnected: true
             }
         })
