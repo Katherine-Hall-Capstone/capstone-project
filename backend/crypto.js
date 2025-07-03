@@ -14,7 +14,7 @@ function decrypt(encryptedToken, ivHex) {
     const iv = Buffer.from(ivHex, 'hex')
     const decipher = crypto.createDecipheriv(algorithm, Buffer.from(secretKey), iv)
     let decrypted = decipher.update(encryptedToken, 'hex', 'utf8')
-    decrypted += decipher.final('hex')
+    decrypted += decipher.final('utf8')
     return decrypted
 }
 
