@@ -11,6 +11,7 @@ function ProviderAvailability() {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/providers/${user.id}/availability`, {
                 credentials: 'include'
             })
+
             if (res.ok) {
                 const data = await res.json()
                 setAvailabilities(data)
@@ -21,11 +22,6 @@ function ProviderAvailability() {
             console.error(error)
         }
     }
-
-    useEffect(() => {
-        fetchAvailabilities()
-    }, [])
-
 
     async function handleSubmit(event) {
         event.preventDefault()
@@ -48,6 +44,27 @@ function ProviderAvailability() {
             console.error(error)
         }
     }
+
+    async function handleDelete(availabilityId) {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/appointments/${availabilityId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            })
+
+            if (res.ok) {
+                fetchAvailabilities()
+            } else {
+                console.error('Failed to delete availability')
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchAvailabilities()
+    }, [])
 
     return(
         <div>
@@ -72,6 +89,10 @@ function ProviderAvailability() {
                             minute: '2-digit',
                             hour12: true  
                         })}
+                        
+                        <button onClick={() => handleDelete(availability.id)}>
+                            Delete
+                        </button>
                     </li>
                 ))}
             </ul>
