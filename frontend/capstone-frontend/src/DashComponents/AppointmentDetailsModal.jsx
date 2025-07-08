@@ -1,6 +1,24 @@
 import '../css/AppointmentDetailsModal.css'
 
 function AppointmentDetailsModal({ appointment, onClose }) {
+    async function handleCancel() {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/appointments/${appointment.id}/cancel`, {
+                method: 'PUT',
+                credentials: 'include',
+            })
+
+            if (res.ok) {
+                onClose()              
+            } else {
+                console.error('Failed to cancel appointment')
+            }
+        } catch (err) {
+            console.error('Error:', err)
+        }
+    }
+    
+    
     return (
         <div className="appt-modal-overlay">
             <div className="appt-modal-content">
@@ -18,6 +36,10 @@ function AppointmentDetailsModal({ appointment, onClose }) {
                 <p>Service: {appointment.serviceType}</p>
                 <p>Notes: {appointment.notes || 'No notes'}</p>
                 <p>Status: {appointment.status}</p>
+
+                <button className="cancel-appt-button" onClick={handleCancel}>
+                    Cancel Appointment
+                </button>
             </div>
         </div>
     )
