@@ -1,8 +1,22 @@
 import '../css/ClientAppointments.css';
 import { useAppointments } from '../hooks/useAppointments'
+import { useState } from 'react'
+import AppointmentDetailsModal from './AppointmentDetailsModal'
 
 function ClientAppointments() {
     const { appointments, status } = useAppointments()
+    const [selectedAppointment, setSelectedAppointment] = useState(null)
+    const [showModal, setShowModal] = useState(false)
+
+    function handleOpenModal(appointment) {
+        setSelectedAppointment(appointment)
+        setShowModal(true)
+    }
+
+    function handleCloseModal() {
+        setShowModal(false)
+        setSelectedAppointment(null)
+    }
 
     return(
         <div>
@@ -24,6 +38,17 @@ function ClientAppointments() {
                         </p>
                         <p>Service: {appointment.serviceType}</p>
                         <p>Provider: {appointment.provider.name}</p>
+
+                        <button onClick={() => handleOpenModal(appointment)}>View Details</button>
+
+                        <div>
+                            {showModal && selectedAppointment && (
+                                <AppointmentDetailsModal
+                                    appointment={selectedAppointment}
+                                    onClose={handleCloseModal}
+                                />
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
