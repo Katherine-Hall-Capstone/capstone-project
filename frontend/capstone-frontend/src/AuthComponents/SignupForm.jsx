@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 function SignupForm() {
-    const [formData, setFormData] = useState({ name: "", username: "", password: "", role: "" })
+    const [formData, setFormData] = useState({ name: "", username: "", password: "", role: "", email: "" })
     const [successMessage, setSuccessMessage] = useState('')
     const navigate = useNavigate()
 
@@ -32,7 +32,7 @@ function SignupForm() {
             })
             .then(data => {
                 setSuccessMessage("Signup successful! Redirecting you now...")
-                setFormData({ name: "", username: "", password: "", role: "" })
+                setFormData({ name: "", username: "", password: "", role: "", email: "" })
                 
                 // Waits 2 seconds to redirect user to Landing Page
                 setTimeout(() => {
@@ -49,6 +49,7 @@ function SignupForm() {
             <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name"/>
             <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username"/>
             <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" />
+            <input type="text" name="email" value={formData.email} onChange={handleChange} placeholder="Email"/>
             <select name="role" value={formData.role} onChange={handleChange}>
                 <option value="">Select a Role</option>
                 <option value="CLIENT">Client</option>

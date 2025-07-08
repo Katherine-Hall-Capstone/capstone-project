@@ -6,7 +6,7 @@ const { google } = require('googleapis')
 const { encrypt, decrypt } = require('../crypto')
 
 router.post('/auth/signup', async (req, res) => {
-    const { username, password, name, role } = req.body
+    const { username, password, name, role, email } = req.body
 
     if(!username || !password) {
         return res.status(400).json({ error: 'Username and password are required.' })
@@ -22,7 +22,7 @@ router.post('/auth/signup', async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10)
         const newUser = await prisma.user.create({
-            data: { username, password: hashedPassword, name, role }
+            data: { username, password: hashedPassword, name, role, email }
         })
         res.status(201).json({ message: 'User created successfully!' });
     } catch(error) {
@@ -136,4 +136,4 @@ router.get('/auth/google/callback', async (req, res) => {
     }
 })
 
-module.exports = router;
+module.exports = router
