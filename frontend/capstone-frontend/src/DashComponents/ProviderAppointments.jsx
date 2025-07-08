@@ -1,8 +1,12 @@
 import '../css/ProviderAppointments.css'
 import { useAppointments } from '../hooks/useAppointments'
+import { useState } from 'react'
+import AppointmentDetailsModal from './AppointmentDetailsModal'
 
 function ProviderAppointments() {
     const { appointments, setAppointments, status } = useAppointments()
+    const [selectedAppointment, setSelectedAppointment] = useState(null)
+    const [showModal, setShowModal] = useState(false)
 
     async function markReadUnread(id) {
         try {   
@@ -21,6 +25,16 @@ function ProviderAppointments() {
         } catch(error) {    
             console.error(error)
         }
+    }
+
+    function handleOpenModal(appointment) {
+        setSelectedAppointment(appointment)
+        setShowModal(true)
+    }
+
+    function handleCloseModal() {
+        setShowModal(false)
+        setSelectedAppointment(null)
     }
 
     const bookedAppointments = appointments.filter(appointment => appointment.status === 'BOOKED')
@@ -49,6 +63,17 @@ function ProviderAppointments() {
                         <button onClick={() => markReadUnread(appointment.id)}>
                             {appointment.isUnread ? "Mark as Read" : "Mark as Unread"}
                         </button>
+
+                        <button onClick={() => handleOpenModal(appointment)}>View Details</button>
+
+                        <div>
+                            {showModal && selectedAppointment && (
+                                <AppointmentDetailsModal
+                                    appointment={selectedAppointment}
+                                    onClose={handleCloseModal}
+                                />
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
