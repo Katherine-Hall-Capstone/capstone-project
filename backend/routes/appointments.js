@@ -103,10 +103,17 @@ router.put('/appointments/:id/book', async (req, res) => {
             // Sends Google Calendar invite request to client's email  
             attendees: [{ email: appointment.client.email }]
         }
-
-        await calendar.events.insert({
+        
+        // Add the event to Google Calendar
+        const newEvent = await calendar.events.insert({
             calendarId: 'primary',
             resource: event
+        })
+
+        // Save the Google Calendar event ID in database
+        await prisma.appointment.update({
+            where: { id: appointmentId },
+            data: { googleEventId: newEvent.data.id }
         })
 
         res.status(201).json(updatedAppointment)
@@ -218,6 +225,22 @@ router.put('/appointments/:id/cancel', async (req, res) => {
             return res.status(403).json({ error: 'Unauthorized' })
         }
 
+        // First, cancel in Google Calendar
+        if (appointment.googleEventId) {
+            const { auth } = await getAccessToken(appointment.providerId)
+            const calendar = google.calendar({ version: 'v3', auth })
+
+            try {
+                await calendar.events.delete({
+                    calendarId: 'primary',
+                    eventId: appointment.googleEventId
+                })
+            } catch (error) {
+                console.error('Failed to delete event in Google Calendar:', error)
+            }
+        }
+
+        // Then, adjust database 
         const updated = await prisma.appointment.update({
             where: { id: appointmentId },
             data: {
@@ -225,7 +248,8 @@ router.put('/appointments/:id/cancel', async (req, res) => {
                 clientId: null,
                 serviceType: '',
                 notes: null,
-                isUnread: true
+                isUnread: true,
+                googleEventId: null
             }
         })
 
