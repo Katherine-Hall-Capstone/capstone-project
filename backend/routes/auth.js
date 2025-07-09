@@ -8,16 +8,23 @@ const { encrypt, decrypt } = require('../crypto')
 router.post('/auth/signup', async (req, res) => {
     const { username, password, name, role, email } = req.body
 
-    if(!username || !password) {
-        return res.status(400).json({ error: 'Username and password are required.' })
+    if(!username || !password || !name || !role || !email ) {
+        return res.status(400).json({ error: 'All fields are required.' })
     }
     
     try {
-        const existingUser = await prisma.user.findUnique({
+        const existingUsername = await prisma.user.findUnique({
             where: { username }
         })
-        if(existingUser) {
+        if(existingUsername) {
             return res.status(400).json({ error: 'Username already taken.' });
+        }
+
+        const existingEmail = await prisma.user.findUnique({
+            where: { email }
+        })
+        if(existingEmail) {
+            return res.status(400).json({ error: 'Email already taken.' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10)
