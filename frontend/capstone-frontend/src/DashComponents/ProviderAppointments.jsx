@@ -6,7 +6,7 @@ import AppointmentDetailsModal from './AppointmentDetailsModal'
 function ProviderAppointments() {
     const { appointments, setAppointments, status } = useAppointments()
     const [selectedAppointment, setSelectedAppointment] = useState(null)
-    const [showModal, setShowModal] = useState(false)
+    const showModal = selectedAppointment !== null
 
     async function markReadUnread(id) {
         try {   
@@ -29,11 +29,9 @@ function ProviderAppointments() {
 
     function handleOpenModal(appointment) {
         setSelectedAppointment(appointment)
-        setShowModal(true)
     }
 
     function handleCloseModal() {
-        setShowModal(false)
         setSelectedAppointment(null)
     }
 

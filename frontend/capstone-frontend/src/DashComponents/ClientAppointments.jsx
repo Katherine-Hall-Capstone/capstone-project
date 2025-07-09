@@ -6,15 +6,13 @@ import AppointmentDetailsModal from './AppointmentDetailsModal'
 function ClientAppointments() {
     const { appointments, status } = useAppointments()
     const [selectedAppointment, setSelectedAppointment] = useState(null)
-    const [showModal, setShowModal] = useState(false)
+    const showModal = selectedAppointment !== null
 
     function handleOpenModal(appointment) {
         setSelectedAppointment(appointment)
-        setShowModal(true)
     }
 
     function handleCloseModal() {
-        setShowModal(false)
         setSelectedAppointment(null)
     }
 

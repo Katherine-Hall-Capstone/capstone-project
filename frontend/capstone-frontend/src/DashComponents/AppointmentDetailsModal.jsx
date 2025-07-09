@@ -9,7 +9,8 @@ function AppointmentDetailsModal({ appointment, onClose }) {
             })
 
             if (res.ok) {
-                onClose()              
+                onClose()
+                window.location.reload()              
             } else {
                 console.error('Failed to cancel appointment')
             }
