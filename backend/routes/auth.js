@@ -136,4 +136,32 @@ router.get('/auth/google/callback', async (req, res) => {
     }
 })
 
+// This handles disconnecting a user's Google account and calendar
+router.post('/auth/google/disconnect', async (req, res) => {
+    if(!req.session.userId) {
+        return res.status(401).json({ message: 'Not logged in' })
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.session.userId },
+            select: { googleRefreshToken: true }
+        })
+
+        await prisma.user.update({
+            where: { id: req.session.userId },
+            data: {
+                googleRefreshToken: null,
+                googleRefreshIV: null,
+                googleConnected: false
+            }
+        })
+
+        res.json({ message: 'Your Google Calendar has been disconnected' })
+    } catch(error) {
+        console.log('OAuth error: ', error)
+        res.status(500).json({ error: 'Server error' });
+    }
+})
+
 module.exports = router
