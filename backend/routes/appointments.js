@@ -117,7 +117,7 @@ router.put('/appointments/:id/book', async (req, res) => {
 })
 
 // EDIT single appointment
-router.put('/appointments/:id', async (req, res) => {
+router.put('/appointments/:id/edit', async (req, res) => {
     if(!req.session.userId) {
         return res.status(401).json({ error: 'Log in to edit an appointment!' })
     }
@@ -152,18 +152,6 @@ router.put('/appointments/:id', async (req, res) => {
             const updated = await prisma.appointment.update({
                 where: { id: appointmentId },
                 data: { ...newData }
-            })
-
-            return res.json(updated)
-        }
-        // Provider can edit appointment status (cancelling)
-        if(user.role === 'PROVIDER') {
-            if(appointment.providerId !== user.id) {
-                return res.status(403).json({ error: 'Unauthorized' })
-            }
-            const updated = await prisma.appointment.update({
-                where: { id: appointmentId },
-                data: { status }
             })
 
             return res.json(updated)
@@ -205,6 +193,48 @@ router.put('/appointments/:id/read', async (req, res) => {
         return res.status(500).json({ error: 'Server error' })
     }
 })
+
+// CANCEL single appointment (set back to available)
+router.put('/appointments/:id/cancel', async (req, res) => {
+    if(!req.session.userId) {
+        return res.status(401).json({ error: 'Log in to delete an appointment!' })
+    }
+
+    const appointmentId = parseInt(req.params.id)
+
+    try {
+        const appointment = await prisma.appointment.findUnique({
+            where: { id: appointmentId }
+        })
+        if(!appointment) {
+            return res.status(404).json({ error: 'Appointment not found' })
+        }
+
+        const user = await prisma.user.findUnique({ 
+            where: { id: req.session.userId } 
+        })
+
+        if(appointment.providerId !== user.id && appointment.clientId !== user.id) {
+            return res.status(403).json({ error: 'Unauthorized' })
+        }
+
+        const updated = await prisma.appointment.update({
+            where: { id: appointmentId },
+            data: {
+                status: 'AVAILABLE',
+                clientId: null,
+                serviceType: '',
+                notes: null,
+                isUnread: true
+            }
+        })
+
+        res.status(200).json(updated)
+    } catch(error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Server error' })
+    }
+}) 
 
 // DELETE single appointment
 router.delete('/appointments/:id', async (req, res) => {
