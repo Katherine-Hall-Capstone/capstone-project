@@ -34,7 +34,7 @@ function ClientAppointments() {
                                     hour12: true  
                                 })}
                         </p>
-                        <p>Service: {appointment.serviceType}</p>
+                        <p>Service: {appointment.service.name}</p>
                         <p>Provider: {appointment.provider.name}</p>
 
                         <button onClick={() => handleOpenModal(appointment)}>View Details</button>

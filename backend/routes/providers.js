@@ -108,7 +108,7 @@ router.post('/providers/:id/availability', async (req, res) => {
                 providerId: user.id,
                 dateTime: parsedDate, 
                 status: 'AVAILABLE',
-                serviceType: '',
+                serviceId: null,
                 isUnread: true
             }
         })
@@ -117,6 +117,27 @@ router.post('/providers/:id/availability', async (req, res) => {
     } catch(error) {
         console.log(error);
         return res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// GET all services for a single provider
+router.get('/providers/:id/services', async (req, res) => {
+    const providerId = parseInt(req.params.id)
+
+    try {
+        const services = await prisma.service.findMany({
+            where: { providerId },
+            select: {
+                id: true,
+                name: true,
+                duration: true
+            }
+        })
+
+        res.status(200).json(services)
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: 'Server error' })
     }
 })
 
@@ -131,10 +152,10 @@ router.post('/providers/:id/services', async (req, res) => {
         return res.status(403).json({ error: 'Unauthorized' })
     }
 
-    const { servicesOffered } = req.body
+    const { name, duration } = req.body
 
-    if(!Array.isArray(servicesOffered)) {
-        return res.status(400).json({ error: 'Services must be in an array '})
+    if(!name || !duration) {
+        return res.status(400).json({ error: 'Service name and duration required'})
     }
 
     try {
@@ -146,12 +167,26 @@ router.post('/providers/:id/services', async (req, res) => {
             return res.status(403).json({ error: 'Only service providers can add services' })
         }
 
-        const updatedProvider = await prisma.user.update({
-            where: { id: providerId },
-            data: { servicesOffered }
+        const existingService = await prisma.service.findFirst({
+            where: {
+                name: { equals: name, mode: 'insensitive' }, // makes search case-insensitive
+                providerId
+            }
         })
 
-        res.status(200).json({ message: 'Services updated'})
+        if(existingService) {
+            return res.status(400).json({ error: 'Service already exists'})
+        }
+
+        const newService = await prisma.service.create({
+            data: {
+                name,
+                duration,
+                providerId
+            }
+        })
+
+        res.status(200).json({ message: 'Service added'})
     } catch(error) {
         console.log(error);
         return res.status(500).json({ error: 'Server error' })

@@ -18,10 +18,10 @@ model User {
   id                    Int             @id @default(autoincrement())
   name                  String
   username              String          @unique
-  email                 String?         @unique 
+  email                 String          @unique 
   password              String
   role                  Role
-  servicesOffered       String[]
+  servicesOffered       Service[]
   clientAppointments    Appointment[]   @relation("ClientAppointments")
   providerAppointments  Appointment[]   @relation("ProviderAppointments")
   reviewsWritten        Review[]        @relation("ClientReviews")
@@ -29,6 +29,15 @@ model User {
   googleRefreshToken    String?
   googleRefreshIV       String?
   googleConnected       Boolean         @default(false)
+}
+
+model Service {
+  id                    Int             @id @default(autoincrement())
+  name                  String          
+  duration              Int 
+  provider              User            @relation(fields: [providerId], references: [id])
+  providerId            Int
+  appointments          Appointment[]
 }
 
 model Appointment {
@@ -40,7 +49,8 @@ model Appointment {
   googleEventId         String?
   dateTime              DateTime
   status                AppointmentStatus
-  serviceType           String
+  service               Service?        @relation(fields: [serviceId], references: [id])
+  serviceId             Int?
   notes                 String?
   isUnread              Boolean         @default(true)
 }

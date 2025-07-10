@@ -34,9 +34,9 @@ function AppointmentDetailsModal({ appointment, onClose }) {
                                     minute: '2-digit',
                                     hour12: true  
                                 })}</p>
-                <p>Service: {appointment.serviceType}</p>
-                <p>Notes: {appointment.notes || 'No notes'}</p>
-                <p>Status: {appointment.status}</p>
+                <p>Service: {appointment.service.name}</p>
+                <p>Duration: {appointment.service.duration} minutes</p>
+                <p>Notes: {appointment.notes || 'N/A'}</p>
 
                 <button className="cancel-appt-button" onClick={handleCancel}>
                     Cancel Appointment

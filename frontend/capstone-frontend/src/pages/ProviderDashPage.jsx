@@ -24,7 +24,7 @@ function ProviderDashPage() {
                 <p>[Logo]</p>
 
                 <nav>
-                    <button onClick={() => setActiveTab('availability')}>Set Availability</button>
+                    <button onClick={() => setActiveTab('details')}>My Service Details</button>
                     <button onClick={() => setActiveTab('appointments')}>Upcoming Appointments</button>
                     <button onClick={() => setActiveTab('reviews')}>My Reviews</button>
                 </nav>
@@ -34,7 +34,7 @@ function ProviderDashPage() {
 
             <CalendarStatus googleConnected={user.googleConnected} />
 
-            {activeTab === 'availability' && <ProviderAvailability />}
+            {activeTab === 'details' && <ProviderAvailability />}
             {activeTab === 'appointments' && <ProviderAppointments />}
             {activeTab === 'reviews' && <ProviderReviews />}
         </div>

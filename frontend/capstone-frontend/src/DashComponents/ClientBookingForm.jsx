@@ -2,7 +2,7 @@ import { useState } from 'react'
 import '../css/ClientBookingForm.css'
 
 function ClientBookingForm({ provider, selectedAppointment, onClose, onBookingSuccess }) {
-    const [formData, setFormData] = useState({ serviceType: '', notes: '' })
+    const [formData, setFormData] = useState({ serviceId: '', notes: '' })
     const [successMessage, setSuccessMessage] = useState('')
 
     function handleChange(event) {
@@ -25,7 +25,7 @@ function ClientBookingForm({ provider, selectedAppointment, onClose, onBookingSu
 
             if(res.ok) {
                 setSuccessMessage('Booking successful! See you soon.')
-                setFormData({ serviceType: '', notes: '' })
+                setFormData({ serviceId: '', notes: '' })
                 onBookingSuccess()
 
                 setTimeout(() => {
@@ -66,10 +66,10 @@ function ClientBookingForm({ provider, selectedAppointment, onClose, onBookingSu
 
                     <div>
                         <strong>Service Type: </strong>
-                        <select name="serviceType" value={formData.serviceType} onChange={handleChange} required>
+                        <select name="serviceId" value={formData.serviceId} onChange={handleChange} required>
                             <option value="">Select a service</option>
-                            {provider.servicesOffered.map((service, index) => (
-                                <option key={index} value={service}>{service}</option>
+                            {provider.servicesOffered.map(service => (
+                                <option key={service.id} value={service.id}>{service.name} ({service.duration} min)</option>
                             ))}
                         </select>
                     </div>

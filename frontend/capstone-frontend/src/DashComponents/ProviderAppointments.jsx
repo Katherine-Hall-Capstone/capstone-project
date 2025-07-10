@@ -55,7 +55,7 @@ function ProviderAppointments() {
                                     hour12: true  
                                 })}
                         </p>
-                        <p>Service: {appointment.serviceType}</p>
+                        <p>Service: {appointment.service.name}</p>
                         <p>Client: {appointment.client.name}</p>
 
                         <button onClick={() => markReadUnread(appointment.id)}>
