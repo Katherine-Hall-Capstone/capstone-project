@@ -84,7 +84,6 @@ router.put('/appointments/:id/book', async (req, res) => {
             }
         })
 
-        // Create Google Calendar event process below
         const appointment = await prisma.appointment.findUnique({
             where: { id: appointmentId },
             include: {
@@ -93,7 +92,17 @@ router.put('/appointments/:id/book', async (req, res) => {
                 service: true
             }
         })
-        
+
+        // getTime returns num of milliseconds since 1/1/1970 -> add this num to service duration in milliseconds -> convert back to Date
+        const calculatedEndDateTime = new Date(appointment.dateTime.getTime() + (appointment.service.duration * 60 * 1000))
+
+        // Update appointment's endDateTime in database 
+        await prisma.appointment.update({
+            where: { id: appointmentId },
+            data: { endDateTime: calculatedEndDateTime }
+        })
+
+        // Create Google Calendar event process below
         // Event is created by provider's Google Calendar's acount and invite the client to the event using their email
         if(appointment.provider.googleConnected) {
             const { auth } = await getAccessToken(appointment.providerId)
@@ -103,9 +112,7 @@ router.put('/appointments/:id/book', async (req, res) => {
                 summary: appointment.service.name,
                 description: appointment.notes || '',
                 start: { dateTime: appointment.dateTime.toISOString() },
-                // Convert 30 mins to seconds then to milliseconds, since new Date is milliseconds
-                // getTime returns num of milliseconds since 1/1/1970 -> add this num to 30 minutes in milliseconds -> convert back to Date
-                end: { dateTime: new Date(new Date(appointment.dateTime).getTime() + (appointment.service.duration * 60 * 1000)).toISOString() }, 
+                end: { dateTime: appointment.endDateTime.toISOString() }, 
                 // Sends Google Calendar invite request to client's email  
                 attendees: [{ email: appointment.client.email }]
             }
@@ -252,7 +259,8 @@ router.put('/appointments/:id/cancel', async (req, res) => {
                 serviceId: null,
                 notes: null,
                 isUnread: true,
-                googleEventId: null
+                googleEventId: null,
+                endDateTime: null
             }
         })
 

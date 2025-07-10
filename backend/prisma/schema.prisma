@@ -48,6 +48,7 @@ model Appointment {
   provider              User            @relation("ProviderAppointments", fields: [providerId], references: [id])
   googleEventId         String?
   dateTime              DateTime
+  endDateTime           DateTime?
   status                AppointmentStatus
   service               Service?        @relation(fields: [serviceId], references: [id])
   serviceId             Int?

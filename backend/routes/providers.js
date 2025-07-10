@@ -107,6 +107,7 @@ router.post('/providers/:id/availability', async (req, res) => {
             data: {
                 providerId: user.id,
                 dateTime: parsedDate, 
+                endDateTime: null,
                 status: 'AVAILABLE',
                 serviceId: null,
                 isUnread: true
