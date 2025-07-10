@@ -15,34 +15,34 @@ function LoginForm() {
         setFormData(prev => ({ ...prev, [name]: value }))
     }
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault()
         setErrorMessage('')
         
-        fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            credentials: "include",
-            body: JSON.stringify(formData)
-        })
-            .then(response => {
-                if(!response.ok) {
-                    throw new Error("Login failed")
-                }
-                return response.json()
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify(formData)
             })
-            .then(data => {
-                setUser(data)
-                setFormData({ username: "", password: "" })
-                console.log("Login Success!")
-                navigate('/dashboard') 
-            })
-            .catch(error => {
-                setErrorMessage("Invalid username or password")
-                console.error("Error:", error)
-            })
+
+            const data = await res.json()
+
+            if(!res.ok) {
+                throw new Error(data.error || "Login failed")
+            }
+
+            setUser(data)
+            setFormData({ username: "", password: "" })
+            console.log("Login Success!")
+            navigate('/dashboard') 
+        } catch(error) {
+            console.error("Error:", error)
+            setErrorMessage(error.message)
+        }
     }
 
     return (

@@ -34,9 +34,10 @@ model User {
 model Appointment {
   id                    Int             @id @default(autoincrement())
   clientId              Int?  
-  client                User?            @relation("ClientAppointments", fields: [clientId], references: [id]) 
+  client                User?           @relation("ClientAppointments", fields: [clientId], references: [id]) 
   providerId            Int 
   provider              User            @relation("ProviderAppointments", fields: [providerId], references: [id])
+  googleEventId         String?
   dateTime              DateTime
   status                AppointmentStatus
   serviceType           String
@@ -62,5 +63,4 @@ enum Role {
 enum AppointmentStatus {
   AVAILABLE
   BOOKED
-  CANCELLED
 }
