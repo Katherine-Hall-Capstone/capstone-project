@@ -61,7 +61,7 @@ function ClientSearchForm() {
                 <ul>
                     {results.map(provider => (
                     <li key={provider.id}>
-                        {provider.name} – {provider.servicesOffered?.join(', ')}
+                        {provider.name} – {provider.servicesOffered?.map(service => service.name).join(', ')}
                         <button onClick={() => navigate(`/providers/${provider.id}`)}>See More</button>
                     </li>
                     ))}
