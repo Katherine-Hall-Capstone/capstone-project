@@ -29,9 +29,6 @@ router.get('/appointments', async (req, res) => {
                             username: true,
                         }
                     }
-                },
-                orderBy: {
-                    dateTime: 'asc'
                 }
             })
         } else {
@@ -45,9 +42,6 @@ router.get('/appointments', async (req, res) => {
                             username: true
                         }
                     }
-                },
-                orderBy: {
-                    dateTime: 'asc'
                 }
             })
         }

@@ -15,7 +15,7 @@ function ProviderAvailability() {
 
             if (res.ok) {
                 const data = await res.json()
-                setAvailabilities(data)
+                setAvailabilities(data.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)))
             } else {
                 console.error('Failed to fetch available appointments')
             }
@@ -73,12 +73,12 @@ function ProviderAvailability() {
 
     function getLocalDateTime() {
         const dateNow = new Date()
-        // .getTimezoneOffset() returns difference between UTC and local time in minutes, so multiply by 6000 to get milliseconds
+        // .getTimezoneOffset() returns difference between UTC and local time in minutes, so multiply by 60000 to get milliseconds
         const timezoneOffset = dateNow.getTimezoneOffset() * 60000
-        // .getTime() is current time in milliseconds, subtract timezoneOffset to convert the UTC into user's local time 
+        // .getTime() is current time in milliseconds, subtract timezoneOffset to convert the UTC into user's local time
         const localTime = new Date(dateNow.getTime() - timezoneOffset)
         
-        // .toISOString() gives more information than "datetime-local" needs, so slice() to keep only relevant information
+        // .toISOString() gives more information than "datetime-local" needs, so slice() keeps only relevant information
         return localTime.toISOString().slice(0, 16)
     }
 

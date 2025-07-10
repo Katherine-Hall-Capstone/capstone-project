@@ -61,9 +61,6 @@ router.get('/providers/:id/availability', async (req, res) => {
             where: { 
                 providerId,
                 status: 'AVAILABLE' 
-            },
-            orderBy: {
-                dateTime: 'asc'  // sorts available appointments in order
             }
         })
 
