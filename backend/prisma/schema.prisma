@@ -30,7 +30,7 @@ model User {
   googleRefreshIV       String?
   googleConnected       Boolean         @default(false)
   clientPreferences     ClientPreferences[]
-  ProviderPreferences   ProviderPreferences?
+  providerPreferences   ProviderPreferences?
 }
 
 model Service {
