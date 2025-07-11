@@ -1,6 +1,7 @@
 import { useUser } from '../UserContext'
 import { useState, useEffect } from 'react'
 import ProviderServices from './ProviderServices'
+import ProviderPreferences from './ProviderPreferences'
 
 function ProviderAvailability() {
     const { user } = useUser()
@@ -121,6 +122,10 @@ function ProviderAvailability() {
 
             <div className="service-container">
                 <ProviderServices providerId={user.id} />
+            </div>
+
+            <div className="preferences-container">
+                <ProviderPreferences providerId={user.id} />
             </div>
             
         </div>

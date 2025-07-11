@@ -6,6 +6,7 @@ import ClientSearchForm from '../DashComponents/ClientSearchForm'
 import ClientAppointments from '../DashComponents/ClientAppointments'
 import ClientReviews from '../DashComponents/ClientReviews'
 import CalendarStatus from '../DashComponents/CalendarStatus'
+import ClientPreferences from '../DashComponents/ClientPreferences'
 
 function ClientDashPage() {
     const { user } = useUser()
@@ -26,6 +27,7 @@ function ClientDashPage() {
                     <button onClick={() => setActiveTab('search')}>Search</button>
                     <button onClick={() => setActiveTab('appointments')}>Upcoming Appointments</button>
                     <button onClick={() => setActiveTab('reviews')}>My Reviews</button>
+                    <button onClick={() => setActiveTab('preferences')}>My Preferences</button>
                 </nav>
 
                 <button onClick={logout}>Logout</button>
@@ -36,6 +38,7 @@ function ClientDashPage() {
             {activeTab === 'search' && <ClientSearchForm />}
             {activeTab === 'appointments' && <ClientAppointments />}
             {activeTab === 'reviews' && <ClientReviews />}
+            {activeTab === 'preferences' && <ClientPreferences />}
         </div>
     )
 }
