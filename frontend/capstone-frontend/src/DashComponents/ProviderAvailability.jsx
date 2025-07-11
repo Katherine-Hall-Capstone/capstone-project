@@ -1,5 +1,6 @@
 import { useUser } from '../UserContext'
 import { useState, useEffect } from 'react'
+import ProviderServices from './ProviderServices'
 
 function ProviderAvailability() {
     const { user } = useUser()
@@ -84,37 +85,44 @@ function ProviderAvailability() {
 
     return(
         <div>
-            <h3>Add Availability</h3>
-            <form onSubmit={handleSubmit}>
-                <input 
-                    type="datetime-local"
-                    value={dateTime}
-                    onChange={event => setDateTime(event.target.value)}
-                    min={getLocalDateTime()} // ensures provider cannot set date in past 
-                />
-                <button type="submit">Add Slot</button>
-            </form>
+            <div className="availability-container">
+                <h3>Add Availability</h3>
+                <form onSubmit={handleSubmit}>
+                    <input 
+                        type="datetime-local"
+                        value={dateTime}
+                        onChange={event => setDateTime(event.target.value)}
+                        min={getLocalDateTime()} // ensures provider cannot set date in past 
+                    />
+                    <button type="submit">Add Slot</button>
+                </form>
 
-            <h4>Available Appointments</h4>
-            <ul>
-                {availabilities.map(availability => (
-                    <li key={availability.id}>
-                        {new Date(availability.dateTime).toLocaleString(undefined, {
-                            month: 'short', 
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true  
-                        })}
-                        
-                        <button onClick={() => handleDelete(availability.id)}>
-                            Delete
-                        </button>
-                    </li>
-                ))}
-            </ul>
+                <h4>Available Appointments</h4>
+                <ul>
+                    {availabilities.map(availability => (
+                        <li key={availability.id}>
+                            {new Date(availability.dateTime).toLocaleString(undefined, {
+                                month: 'short', 
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true  
+                            })}
+                            
+                            <button onClick={() => handleDelete(availability.id)}>
+                                Delete
+                            </button>
+                        </li>
+                    ))}
+                </ul>
 
-            {errorMessage && (<p className="error-msg">{errorMessage}</p>)}
+                {errorMessage && (<p className="error-msg">{errorMessage}</p>)}
+            </div>
+
+            <div className="service-container">
+                <ProviderServices providerId={user.id} />
+            </div>
+            
         </div>
     )
 }

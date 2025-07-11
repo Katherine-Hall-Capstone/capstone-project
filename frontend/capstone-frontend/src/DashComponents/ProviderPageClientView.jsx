@@ -58,7 +58,7 @@ function ProviderPageClientView() {
         <div className="profile-page">
             <h2>Provider Profile</h2>
             <p>Name: {provider.name}</p>
-            <p>Services: {provider.servicesOffered?.join(', ')}</p>
+            <p>Services: {provider.servicesOffered?.map(service => service.name).join(', ')}</p>
 
             <h3>Available Appointments</h3>
             {appointments.length ===  0 ? (

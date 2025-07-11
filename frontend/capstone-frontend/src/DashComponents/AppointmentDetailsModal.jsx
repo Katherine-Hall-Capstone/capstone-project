@@ -27,16 +27,25 @@ function AppointmentDetailsModal({ appointment, onClose }) {
 
                 <h2>Appointment Details</h2>
 
-                <p>Date: {new Date(appointment.dateTime).toLocaleString(undefined, {
+                <p>Start: {new Date(appointment.dateTime).toLocaleString(undefined, {
                                     month: 'short', 
                                     day: 'numeric',
                                     hour: '2-digit',
                                     minute: '2-digit',
                                     hour12: true  
-                                })}</p>
-                <p>Service: {appointment.serviceType}</p>
-                <p>Notes: {appointment.notes || 'No notes'}</p>
-                <p>Status: {appointment.status}</p>
+                                    })}
+                </p>
+                <p>End: {new Date(appointment.endDateTime).toLocaleString(undefined, {
+                                    month: 'short', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    hour12: true  
+                                    })}
+                </p>
+                <p>Service: {appointment.service.name}</p>
+                <p>Duration: {appointment.service.duration} minutes</p>
+                <p>Notes: {appointment.notes || 'N/A'}</p>
 
                 <button className="cancel-appt-button" onClick={handleCancel}>
                     Cancel Appointment

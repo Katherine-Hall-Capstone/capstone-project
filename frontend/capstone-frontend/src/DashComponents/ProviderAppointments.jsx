@@ -47,7 +47,7 @@ function ProviderAppointments() {
             <div className="upcoming-appointment-grid">
                 {bookedAppointments.map(appointment => (
                     <div key={appointment.id} className={`appointment-container ${appointment.isUnread ? 'new-appointment' : ''}`}>
-                        <p>Date: {new Date(appointment.dateTime).toLocaleString(undefined, {
+                        <p>When: {new Date(appointment.dateTime).toLocaleString(undefined, {
                                     month: 'short', 
                                     day: 'numeric',
                                     hour: '2-digit',
@@ -55,7 +55,7 @@ function ProviderAppointments() {
                                     hour12: true  
                                 })}
                         </p>
-                        <p>Service: {appointment.serviceType}</p>
+                        <p>Service: {appointment.service.name}</p>
                         <p>Client: {appointment.client.name}</p>
 
                         <button onClick={() => markReadUnread(appointment.id)}>

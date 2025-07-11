@@ -26,7 +26,7 @@ function ClientAppointments() {
             <div className="upcoming-appointment-grid">
                 {appointments.map(appointment => (
                     <div key={appointment.id} className="appointment-container">
-                        <p>Date: {new Date(appointment.dateTime).toLocaleString(undefined, {
+                        <p>When: {new Date(appointment.dateTime).toLocaleString(undefined, {
                                     month: 'short', 
                                     day: 'numeric',
                                     hour: '2-digit',
@@ -34,7 +34,7 @@ function ClientAppointments() {
                                     hour12: true  
                                 })}
                         </p>
-                        <p>Service: {appointment.serviceType}</p>
+                        <p>Service: {appointment.service.name}</p>
                         <p>Provider: {appointment.provider.name}</p>
 
                         <button onClick={() => handleOpenModal(appointment)}>View Details</button>
