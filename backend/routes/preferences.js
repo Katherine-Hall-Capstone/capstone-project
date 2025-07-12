@@ -17,7 +17,7 @@ router.get('/preferences/providers/:id', async (req, res) => {
 
         res.json(preferences)
     } catch (error) {
-        console.error(error)
+        console.log(error)
         res.status(500).json({ error: 'Server error' })
     }
 })
@@ -92,7 +92,7 @@ router.delete('/preferences/provider/:id', async (req, res) => {
 
         res.status(200).json({ message: 'Preferences deleted successfully' })
     } catch (error) {
-        console.error(error)
+        console.log(error)
         res.status(500).json({ error: 'Server error' })
     }
 })
@@ -123,7 +123,7 @@ router.get('/preferences/clients/:id', async (req, res) => {
 
         res.json(preferences)
     } catch (error) {
-        console.error(error)
+        console.log(error)
         res.status(500).json({ error: 'Server error' })
     }
 })
@@ -220,7 +220,7 @@ router.delete('/preferences/clients/:id/time-window/:windowId', async (req, res)
 
         res.status(200).json({ message: 'Preferences deleted successfully' })
     } catch (error) {
-        console.error(error)
+        console.log(error)
         res.status(500).json({ error: 'Server error' })
     }
 })
