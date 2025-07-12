@@ -13,7 +13,7 @@ function ClientPreferences()  {
 
     async function fetchPreferences() {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/preferences/${user.id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/preferences/clients/${user.id}`, {
                 credentials: 'include'
             })
             if(res.ok) {

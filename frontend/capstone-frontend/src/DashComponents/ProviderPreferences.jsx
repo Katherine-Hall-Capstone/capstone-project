@@ -9,7 +9,7 @@ function ProviderPreferences({ providerId }) {
 
     async function fetchPreferences() {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/preferences/${providerId}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/preferences/providers/${providerId}`, {
                 credentials: 'include'
             })
 
@@ -100,7 +100,7 @@ function ProviderPreferences({ providerId }) {
                             value={maxHours}
                             onChange={event => setMaxHours(event.target.value)}
                             required
-                            min={0}
+                            min={1}
                         />
                     </div>
 
