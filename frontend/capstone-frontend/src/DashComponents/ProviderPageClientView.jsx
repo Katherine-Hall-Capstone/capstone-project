@@ -130,27 +130,36 @@ function ProviderPageClientView() {
     function filterByProviderHours(availableAppointments, bookedAppointments, serviceDuration, maxConsecutiveHours) {
         const maxHoursInMs = maxConsecutiveHours * 3600000 // -> 60 * 60 * 1000
 
+        /* For every available appointment check if any booked appointment that are directly consecutive and calculate the duration */
         return availableAppointments.filter(available => {
+            // Start time of the current available appointment
             let currentAvailStart = new Date(available.dateTime)
 
+            // Start the duration total with the service client is looking to book  
             let totalDurationInMs = serviceDuration * 60000
 
+            // Keeps looking back for booked appts that are consecutive; breaks when it reaches one not consecutive 
             while(true) {
                 const prevBookedAppt = bookedAppointments.find(booked => {
                     const bookedEnd = new Date(booked.endDateTime)
+                    // If a booked appointment ends exactly when an available appointment start, it's consecutive
                     return bookedEnd.getTime() === currentAvailStart.getTime()
                 })
 
                 if(prevBookedAppt) {
+                    // Calculate duration of the booked appointment just found
                     const bookedStart = new Date(prevBookedAppt.dateTime)
                     const bookedDuration = new Date(prevBookedAppt.endDateTime) - bookedStart
+                    // Add it to the total consecutive duration so far
                     totalDurationInMs += bookedDuration
+                    // Shift the start time up to include the booked appointment in the consecutive block -> continues finding more consecutive appts
                     currentAvailStart = bookedStart
                 } else {
                     break
                 }
             }
-
+            
+            // Only include this available appointment as an option if it doesn't exceed provider's max consecutive hours
             return totalDurationInMs <= maxHoursInMs
         })
     }
