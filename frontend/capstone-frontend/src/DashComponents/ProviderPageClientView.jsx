@@ -13,6 +13,7 @@ function ProviderPageClientView() {
     const [selectedAppointment, setSelectedAppointment] = useState(null)
     const [selectedService, setSelectedService] = useState(null)
     const [clientPreferences, setClientPreferences] = useState([])
+    const [providerPreferences, setProviderPreferences] = useState(null)
     const showModal = selectedAppointment !== null
 
     async function fetchProvider(){
@@ -68,10 +69,19 @@ function ProviderPageClientView() {
                 /* Recommended Appointments process below */
                 // 1) Filter for only available appointments within the client's windows
                 const filteredByClientWindows = filterByClientWindows(validAppointments)
-                // 2) Filter for if the appointment was booked, it would go past consecutive hours 
-                // 3) Rank Appointments  
+                // 2) Filter exluding appointments that would exceed provider's max hours
+                let filteredByProviderHours
+                if(providerPreferences?.maxConsecutiveHours) {
+                    filteredByProviderHours = filterByProviderHours(
+                        filteredByClientWindows, 
+                        bookedAppointments, 
+                        selectedService.duration, 
+                        providerPreferences.maxConsecutiveHours
+                    )
+                }
+                // TODO: 3) Rank Appointments  
 
-                setRecommendedAppointments(filteredByClientWindows)
+                setRecommendedAppointments(filteredByProviderHours.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)))
             } else {
                 console.error('Failed to fetch appointments')
             }
@@ -103,7 +113,7 @@ function ProviderPageClientView() {
 
     async function fetchClientPreferences() {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/preferences/${user.id}`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/preferences/clients/${user.id}`, {
                 credentials: 'include'
             })
             if (res.ok) {
@@ -116,6 +126,50 @@ function ProviderPageClientView() {
             console.error(error)
         }
     }
+
+    function filterByProviderHours(availableAppointments, bookedAppointments, serviceDuration, maxConsecutiveHours) {
+        const maxHoursInMs = maxConsecutiveHours * 3600000 // -> 60 * 60 * 1000
+
+        return availableAppointments.filter(available => {
+            let currentAvailStart = new Date(available.dateTime)
+
+            let totalDurationInMs = serviceDuration * 60000
+
+            while(true) {
+                const prevBookedAppt = bookedAppointments.find(booked => {
+                    const bookedEnd = new Date(booked.endDateTime)
+                    return bookedEnd.getTime() === currentAvailStart.getTime()
+                })
+
+                if(prevBookedAppt) {
+                    const bookedStart = new Date(prevBookedAppt.dateTime)
+                    const bookedDuration = new Date(prevBookedAppt.endDateTime) - bookedStart
+                    totalDurationInMs += bookedDuration
+                    currentAvailStart = bookedStart
+                } else {
+                    break
+                }
+            }
+
+            return totalDurationInMs <= maxHoursInMs
+        })
+    }
+
+    async function fetchProviderPreferences() {
+    try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/preferences/providers/${id}`, {
+            credentials: 'include'
+        })
+        if (res.ok) {
+            const data = await res.json()
+            if (data && data.maxConsecutiveHours !== undefined) {
+                setProviderPreferences(data)
+            }
+        }
+    } catch (error) {
+        console.error(error)
+    }
+}
 
     function handleOpenModal(appointment) {
         setSelectedAppointment(appointment)
@@ -141,6 +195,7 @@ function ProviderPageClientView() {
 
     useEffect(() => {
         fetchProvider()
+        fetchProviderPreferences() 
     }, [id])
 
     useEffect(() => {
@@ -150,7 +205,7 @@ function ProviderPageClientView() {
     }, [selectedService])
 
     useEffect(() => {
-        if (user?.role === 'CLIENT') {
+        if (user) {
             fetchClientPreferences()
         }
     }, [user])
