@@ -71,6 +71,29 @@ router.get('/providers/:id/availability', async (req, res) => {
     }
 })
 
+// GET single provider's booked appointments 
+router.get('/providers/:id/booked', async (req, res) => {
+    const providerId = parseInt(req.params.id)
+
+    try {
+        const bookedAppointments = await prisma.appointment.findMany({
+            where: { 
+                providerId,
+                status: 'BOOKED' 
+            },
+            select: {
+                dateTime: true,
+                endDateTime: true
+            }
+        })
+
+        res.status(200).json(bookedAppointments)
+    } catch(error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Server error' })
+    }
+})
+
 // ADD an available appointment 
 router.post('/providers/:id/availability', async (req, res) => {
     if(!req.session.userId) {

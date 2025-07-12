@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import '../css/ClientBookingForm.css'
 
-function ClientBookingForm({ provider, selectedAppointment, onClose, onBookingSuccess }) {
-    const [formData, setFormData] = useState({ serviceId: '', notes: '' })
+function ClientBookingForm({ provider, selectedAppointment, selectedService, onClose, onBookingSuccess }) {
+    const [formData, setFormData] = useState({ notes: '' })
     const [successMessage, setSuccessMessage] = useState('')
 
     function handleChange(event) {
@@ -20,12 +20,12 @@ function ClientBookingForm({ provider, selectedAppointment, onClose, onBookingSu
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify(formData)
+                body: JSON.stringify({ ...formData, serviceId: selectedService.id })
             })
 
             if(res.ok) {
                 setSuccessMessage('Booking successful! See you soon.')
-                setFormData({ serviceId: '', notes: '' })
+                setFormData({ notes: '' })
                 onBookingSuccess()
 
                 setTimeout(() => {
@@ -66,14 +66,9 @@ function ClientBookingForm({ provider, selectedAppointment, onClose, onBookingSu
 
                     <div>
                         <strong>Service Type: </strong>
-                        <select name="serviceId" value={formData.serviceId} onChange={handleChange} required>
-                            <option value="">Select a service</option>
-                            {provider.servicesOffered.map(service => (
-                                <option key={service.id} value={service.id}>{service.name} ({service.duration} min)</option>
-                            ))}
-                        </select>
+                        {selectedService.name} ({selectedService.duration} min)
                     </div>
-
+                
                     <div className="notes">
                         <strong>Notes (Optional):</strong>
                         <textarea name="notes" value={formData.notes} onChange={handleChange} />

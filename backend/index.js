@@ -28,12 +28,14 @@ const appointmentRouter = require('./routes/appointments')
 const providersRouter = require('./routes/providers')
 const reviewsRouter = require('./routes/reviews')
 const preferencesRouter = require('./routes/preferences')
+const recommendationsRouter = require('./routes/recommendations')
 
 app.use(authRouter)
 app.use(appointmentRouter)
 app.use(providersRouter)
 app.use(reviewsRouter)
 app.use(preferencesRouter)
+app.use(recommendationsRouter)
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)
