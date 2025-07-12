@@ -1,15 +1,18 @@
 import '../css/ProviderPageClientView.css'
 import { useParams } from 'react-router'
 import { useEffect, useState } from 'react'
+import { useUser } from '../UserContext'
 import ClientBookingForm from './ClientBookingForm'
 
 function ProviderPageClientView() {
     const { id } = useParams()
+    const { user } = useUser()
     const [provider, setProvider] = useState(null)
     const [appointments, setAppointments] = useState([])
     const [recommendedAppointments, setRecommendedAppointments] = useState([])
     const [selectedAppointment, setSelectedAppointment] = useState(null)
     const [selectedService, setSelectedService] = useState(null)
+    const [clientPreferences, setClientPreferences] = useState([])
     const showModal = selectedAppointment !== null
 
     async function fetchProvider(){
@@ -18,7 +21,7 @@ function ProviderPageClientView() {
 
             if(res.ok) {
                 const data = await res.json()
-                setProvider(data); 
+                setProvider(data) 
             } else {
                 console.error('Failed to fetch provider')
             }
@@ -27,12 +30,13 @@ function ProviderPageClientView() {
         }
     }
 
-    async function fetchAvailableAppointments() {
+    async function fetchAppointments() {
         if(!selectedService) {
             return
         }
 
         try {
+            /* When fetching appointments for the booking process, hide those that would occurr during already booked appointments */
             const resAvailable = await fetch(`${import.meta.env.VITE_API_URL}/providers/${id}/availability`)
             const resBooked = await fetch(`${import.meta.env.VITE_API_URL}/providers/${id}/booked`)
 
@@ -40,22 +44,34 @@ function ProviderPageClientView() {
                 const availableAppointments = await resAvailable.json()
                 const bookedAppointments = await resBooked.json()
 
-                const validAvailable = availableAppointments.filter(available => {
-                    const availableStart = new Date(available.dateTime);
-                    const availableEnd = new Date(availableStart.getTime() + selectedService.duration * 60000); // converts duration in ms since getTime is ms
-
+                const validAppointments = availableAppointments.filter(available => {
+                    // Determines the start and end of each potential appointment based on the service chosen
+                    const availableStart = new Date(available.dateTime)
+                    const availableEnd = new Date(availableStart.getTime() + selectedService.duration * 60000) // converts duration in ms since getTime is ms
+                    
+                    // Checks each provider's booked appointments to catch any conflicts with the potential available appointment
                     for(const booked of bookedAppointments) {
                         const bookedStart = new Date(booked.dateTime)
                         const bookedEnd = new Date(booked.endDateTime)
-
+                        
+                        // Condition where there is an overlap, so the available appointment would not be possible -> prevent it from being chosen
                         if((availableStart < bookedEnd) && (availableEnd > bookedStart)) {
                             return false 
                         }
                     }
+                    // Otherwise the potential appointment did not conflict with any of the booked appointments
                     return true 
                 })
-                
-                setAppointments(validAvailable.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime))); 
+                // For the "Available Appointments" section
+                setAppointments(validAppointments.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)))
+
+                /* Recommended Appointments process below */
+                // 1) Filter for only available appointments within the client's windows
+                const filteredByClientWindows = filterByClientWindows(validAppointments)
+                // 2) Filter for if the appointment was booked, it would go past consecutive hours 
+                // 3) Rank Appointments  
+
+                setRecommendedAppointments(filteredByClientWindows)
             } else {
                 console.error('Failed to fetch appointments')
             }
@@ -64,21 +80,37 @@ function ProviderPageClientView() {
         }
     }
 
-    async function fetchRecommendedAppointments() {    
-        if(!selectedService) {
-            return
-        }
+    function filterByClientWindows(validAppointments) {
+        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+        
+        return validAppointments.filter(appointment => {
+            // Gets the day of a potential Recommended appointment
+            const appointmentDayIndex = new Date(appointment.dateTime).getDay()
+            const appointmentDayString = daysOfWeek[appointmentDayIndex]            
+            
+            // Determines start and end of the appointment based on service chosen
+            const appointmentStartTime = new Date(appointment.dateTime).toTimeString().slice(0, 5) // .slice() to index 5 to limit time format to just hours and minutes
+            const appointmentEndTime = new Date(new Date(appointment.dateTime).getTime() + (selectedService.duration * 60000)).toTimeString().slice(0, 5) // calculates appointment's end
+            
+            // If the appointment's start and end falls between the client's preferred window, it should be Recommended
+            return(clientPreferences.some(preference => {
+                return preference.dayOfWeek === appointmentDayString 
+                        && preference.startTime <= appointmentStartTime 
+                        && preference.endTime >= appointmentEndTime
+            }))
+        })
+    }
 
+    async function fetchClientPreferences() {
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/providers/${id}/recommended`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/preferences/${user.id}`, {
                 credentials: 'include'
             })
-
             if (res.ok) {
                 const data = await res.json()
-                setRecommendedAppointments(data.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)))
+                setClientPreferences(data)
             } else {
-                console.error('Failed to fetch recommended appointments')
+                console.error('Failed to fetch preferences')
             }
         } catch (error) {
             console.error(error)
@@ -113,10 +145,15 @@ function ProviderPageClientView() {
 
     useEffect(() => {
         if(selectedService) {
-            fetchAvailableAppointments()
-            fetchRecommendedAppointments()
+            fetchAppointments()
         }
     }, [selectedService])
+
+    useEffect(() => {
+        if (user?.role === 'CLIENT') {
+            fetchClientPreferences()
+        }
+    }, [user])
 
     if (!provider) {
         return <p>Provider does not exist</p>
@@ -190,7 +227,7 @@ function ProviderPageClientView() {
                     selectedAppointment={selectedAppointment}
                     selectedService={selectedService}
                     onClose={handleCloseModal}
-                    onBookingSuccess={fetchAvailableAppointments}
+                    onBookingSuccess={fetchAppointments}
                 />
             )}
         </div>
