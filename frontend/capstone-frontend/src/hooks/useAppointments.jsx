@@ -12,7 +12,7 @@ export function useAppointments() {
             })
             if(res.ok) {
                 const data = await res.json()
-                setAppointments(data.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)))
+                setAppointments(data.sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime)))
                 setStatus('success')
             } else {
                 console.error('Failed to fetch appointments')

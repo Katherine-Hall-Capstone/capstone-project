@@ -54,7 +54,7 @@ function ClientBookingForm({ provider, selectedAppointment, selectedService, onC
 
                     <div>
                         <strong>When? </strong>
-                        {new Date(selectedAppointment.dateTime).toLocaleString(undefined, {
+                        {new Date(selectedAppointment.startDateTime).toLocaleString(undefined, {
                             year: 'numeric',
                             month: 'short', 
                             day: 'numeric',

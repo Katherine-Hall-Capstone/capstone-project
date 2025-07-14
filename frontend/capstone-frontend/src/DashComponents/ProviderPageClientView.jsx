@@ -47,12 +47,12 @@ function ProviderPageClientView() {
 
                 const validAppointments = availableAppointments.filter(available => {
                     // Determines the start and end of each potential appointment based on the service chosen
-                    const availableStart = new Date(available.dateTime)
+                    const availableStart = new Date(available.startDateTime)
                     const availableEnd = new Date(availableStart.getTime() + selectedService.duration * 60000) // converts duration in ms since getTime is ms
                     
                     // Checks each provider's booked appointments to catch any conflicts with the potential available appointment
                     for(const booked of bookedAppointments) {
-                        const bookedStart = new Date(booked.dateTime)
+                        const bookedStart = new Date(booked.startDateTime)
                         const bookedEnd = new Date(booked.endDateTime)
                         
                         // Condition where there is an overlap, so the available appointment would not be possible -> prevent it from being chosen
@@ -64,7 +64,7 @@ function ProviderPageClientView() {
                     return true 
                 })
                 // Display "Available Appointments" section
-                setAppointments(validAppointments.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)))
+                setAppointments(validAppointments.sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime)))
 
                 /* Handle Recommended Appointments */
                 let filtered = validAppointments
@@ -74,7 +74,7 @@ function ProviderPageClientView() {
                     filtered = filterByClientWindows(filtered)
                 }
                 
-                // 2) Filter exluding appointments that would exceed provider's max hours, if exists
+                // 2) Filter excluding appointments that would exceed provider's max hours, if exists
                 if(providerPreferences?.maxConsecutiveHours) {
                     filtered = filterByProviderHours(
                         filtered, 
@@ -109,12 +109,12 @@ function ProviderPageClientView() {
         
         return validAppointments.filter(appointment => {
             // Gets the day of a potential Recommended appointment
-            const appointmentDayIndex = new Date(appointment.dateTime).getDay()
+            const appointmentDayIndex = new Date(appointment.startDateTime).getDay()
             const appointmentDayString = daysOfWeek[appointmentDayIndex]            
             
             // Determines start and end of the appointment based on service chosen
-            const appointmentStartTime = new Date(appointment.dateTime).toTimeString().slice(0, 5) // .slice() to index 5 to limit time format to just hours and minutes
-            const appointmentEndTime = new Date(new Date(appointment.dateTime).getTime() + (selectedService.duration * 60000)).toTimeString().slice(0, 5) // calculates appointment's end
+            const appointmentStartTime = new Date(appointment.startDateTime).toTimeString().slice(0, 5) // .slice() to index 5 to limit time format to just hours and minutes
+            const appointmentEndTime = new Date(new Date(appointment.startDateTime).getTime() + (selectedService.duration * 60000)).toTimeString().slice(0, 5) // calculates appointment's end
             
             // If the appointment's start and end falls between the client's preferred window, it should be Recommended
             return(clientPreferences.some(preference => {
@@ -147,7 +147,7 @@ function ProviderPageClientView() {
         /* For every available appointment check if any booked appointment that are directly consecutive and calculate the duration */
         return availableAppointments.filter(available => {
             // Start time of the current available appointment
-            let currentAvailStart = new Date(available.dateTime)
+            let currentAvailStart = new Date(available.startDateTime)
 
             // Start the duration total with the service client is looking to book  
             let totalDurationInMs = serviceDuration * 60000
@@ -162,7 +162,7 @@ function ProviderPageClientView() {
 
                 if(prevBookedAppt) {
                     // Calculate duration of the booked appointment just found
-                    const bookedStart = new Date(prevBookedAppt.dateTime)
+                    const bookedStart = new Date(prevBookedAppt.startDateTime)
                     const bookedDuration = new Date(prevBookedAppt.endDateTime) - bookedStart
                     // Add it to the total consecutive duration so far
                     totalDurationInMs += bookedDuration
@@ -195,7 +195,7 @@ function ProviderPageClientView() {
     function rankAppointments(appointments, bookedAppointments, prefersEarly) {
         return appointments.map(appointment => {
             // Get each filtered available appointment's start time and end time based on service chosen
-            const appointmentStart = new Date(appointment.dateTime)
+            const appointmentStart = new Date(appointment.startDateTime)
             const appointmentEnd = new Date(appointmentStart.getTime() + selectedService.duration * 60000)
             
             /* Handle Gap Before */
@@ -209,12 +209,12 @@ function ProviderPageClientView() {
 
             /* Handle Gap After */
             const appointmentsAfter = bookedAppointments
-                .filter(booked => new Date(booked.dateTime) >= appointmentEnd) // Find booked appointments occurring AFTER potential appointment
-                .sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)) // Sort by putting closest after potential appointment in first position 
+                .filter(booked => new Date(booked.startDateTime) >= appointmentEnd) // Find booked appointments occurring AFTER potential appointment
+                .sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime)) // Sort by putting closest after potential appointment in first position 
             
             const mostUpcoming = appointmentsAfter[0] // Get the closest appointment after 
 
-            const gapAfter = mostUpcoming ? new Date(mostUpcoming.dateTime) - appointmentEnd : 0 // If appointment before exists, find gap before potential appointment; if not, use 0
+            const gapAfter = mostUpcoming ? new Date(mostUpcoming.startDateTime) - appointmentEnd : 0 // If appointment before exists, find gap before potential appointment; if not, use 0
             
             /* Put both gaps found in array */
             const bothGaps = [Math.min(gapBefore, gapAfter), Math.max(gapBefore, gapAfter)]
@@ -311,7 +311,7 @@ function ProviderPageClientView() {
                             onClick={() => handleOpenModal(appointment)}
                         >
                             <strong>{index + 1}.{' '}</strong>
-                            {new Date(appointment.dateTime).toLocaleString(undefined, {
+                            {new Date(appointment.startDateTime).toLocaleString(undefined, {
                                 year: 'numeric',
                                 month: 'short', 
                                 day: 'numeric',
@@ -331,7 +331,7 @@ function ProviderPageClientView() {
                 <div className="appointment-grid">
                     {appointments.map((appointment) => (
                         <button key={appointment.id} onClick={() => handleOpenModal(appointment)}>
-                            {new Date(appointment.dateTime).toLocaleString(undefined, {
+                            {new Date(appointment.startDateTime).toLocaleString(undefined, {
                                 year: 'numeric',
                                 month: 'short', 
                                 day: 'numeric',
