@@ -115,15 +115,31 @@ router.post('/providers/:id/availability', async (req, res) => {
             return res.status(403).json({ error: 'Only service providers can add availabilities' })
         }
 
-        // Checks if any appointment already exists, either booked or available
+        // Prevent exact duplicate time slots from being added 
         const existingAppointment = await prisma.appointment.findFirst({
             where: {
                 providerId: user.id,
+                status: 'AVAILABLE',
                 dateTime: parsedDate
             }
         })
+
         if (existingAppointment) {
-            return res.status(400).json({ error: 'This time is already available or you have a booked appointment at this time' });
+            return res.status(400).json({ error: 'This time is already available' });
+        }
+
+        // Prevent availabilities from being added during booked appointments
+        const overlappingAppointmnet = await prisma.appointment.findFirst({
+            where: {
+                providerId: user.id,
+                status: 'BOOKED',
+                dateTime: { lte: parsedDate },  // "less than or equal to"
+                endDateTime: { gt: parsedDate } // "greater than"
+            }
+        })
+
+        if (overlappingAppointmnet) {
+            return res.status(400).json({ error: 'You have a booked appointment at this time' })
         }
 
         const availableAppointment = await prisma.appointment.create({
