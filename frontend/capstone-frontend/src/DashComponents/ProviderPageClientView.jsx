@@ -71,7 +71,7 @@ function ProviderPageClientView() {
 
                 // 1) Filter for only available appointments within the client's windows, if exists 
                 if(clientPreferences.length > 0) {
-                    filtered = filterByClientWindows(validAppointments)
+                    filtered = filterByClientWindows(filtered)
                 }
                 
                 // 2) Filter exluding appointments that would exceed provider's max hours, if exists
@@ -83,12 +83,19 @@ function ProviderPageClientView() {
                         providerPreferences.maxConsecutiveHours
                     )
                 }
-                // TODO: 3) Rank Appointments  
+                // 3) Rank Appointments, if they exist 
+                if(filtered.length > 0) {
+                    filtered = rankAppointments(
+                        filtered, 
+                        bookedAppointments, 
+                        providerPreferences.prefersEarly
+                    )
+                }
 
-                // Display "Recommended Appointments" section (recommend nothing if no preferences exist)
+                // Display "Recommended Appointments" section (recommend nothing if both client and provider have no preferences)
                 const shouldRecommend = clientPreferences.length > 0 || providerPreferences?.maxConsecutiveHours
 
-                setRecommendedAppointments(shouldRecommend ? filtered.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)) : [])
+                setRecommendedAppointments(shouldRecommend ? filtered : []) // Recommended could either be empty because both no preferences or filtering left no appointments
             } else {
                 console.error('Failed to fetch appointments')
             }
@@ -172,18 +179,64 @@ function ProviderPageClientView() {
     }
 
     async function fetchProviderPreferences() {
-    try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/preferences/providers/${id}`, {
-            credentials: 'include'
-        })
-        if (res.ok) {
-            const data = await res.json()
-            setProviderPreferences(data || null)
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/preferences/providers/${id}`, {
+                credentials: 'include'
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setProviderPreferences(data || null)
+            }
+        } catch (error) {
+            console.error(error)
         }
-    } catch (error) {
-        console.error(error)
     }
-}
+
+    function rankAppointments(appointments, bookedAppointments, prefersEarly) {
+        return appointments.map(appointment => {
+            // Get each filtered available appointment's start time and end time based on service chosen
+            const appointmentStart = new Date(appointment.dateTime)
+            const appointmentEnd = new Date(appointmentStart.getTime() + selectedService.duration * 60000)
+            
+            /* Handle Gap Before */
+            const appointmentsBefore = bookedAppointments
+                .filter(booked => new Date(booked.endDateTime) <= appointmentStart) // Find booked appointments occurring BEFORE potential appointment
+                .sort((a, b) => new Date(b.endDateTime) - new Date(a.endDateTime)) // Sort by putting closest before potential appointment in first position 
+            
+            const mostPrevious = appointmentsBefore[0]  // Get the closest appointment before 
+
+            const gapBefore = mostPrevious ? appointmentStart - new Date(mostPrevious.endDateTime) : 0 // If appointment before exists, find gap before potential appointment; if not, use 0
+
+            /* Handle Gap After */
+            const appointmentsAfter = bookedAppointments
+                .filter(booked => new Date(booked.dateTime) >= appointmentEnd) // Find booked appointments occurring AFTER potential appointment
+                .sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)) // Sort by putting closest after potential appointment in first position 
+            
+            const mostUpcoming = appointmentsAfter[0] // Get the closest appointment after 
+
+            const gapAfter = mostUpcoming ? new Date(mostUpcoming.dateTime) - appointmentEnd : 0 // If appointment before exists, find gap before potential appointment; if not, use 0
+            
+            /* Put both gaps found in array */
+            const bothGaps = [Math.min(gapBefore, gapAfter), Math.max(gapBefore, gapAfter)]
+
+            // Each potential appointment now has the required information to rank
+            return {
+                ...appointment,
+                bothGaps,
+                appointmentStart
+            }
+        }).sort((a, b) => {
+            if(a.bothGaps[0] !== b.bothGaps[0]) {
+                return a.bothGaps[0] - b.bothGaps[0] // Ascending order with smallest gap time first
+            }
+            if(a.bothGaps[1] !== b.bothGaps[1]) {
+                return a.bothGaps[1] - b.bothGaps[1]
+            }
+
+            // If both equal gap times, rank by provider's preference of earlier/later appts
+            return prefersEarly ? a.appointmentStart - b.appointmentStart : b.appointmentStart - a.appointmentStart 
+        })
+    }
 
     function handleOpenModal(appointment) {
         setSelectedAppointment(appointment)
@@ -252,11 +305,12 @@ function ProviderPageClientView() {
                 <p>No recommended appointments</p>
             ) : (
                 <div className="appointment-grid">
-                    {recommendedAppointments.map((appointment) => (
+                    {recommendedAppointments.map((appointment, index) => (
                         <button 
                             key={appointment.id} 
                             onClick={() => handleOpenModal(appointment)}
                         >
+                            <strong>{index + 1}.{' '}</strong>
                             {new Date(appointment.dateTime).toLocaleString(undefined, {
                                 year: 'numeric',
                                 month: 'short', 
