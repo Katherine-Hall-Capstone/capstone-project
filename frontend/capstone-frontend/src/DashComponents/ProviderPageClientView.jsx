@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react'
 import { useUser } from '../UserContext'
 import ClientBookingForm from './ClientBookingForm'
 
+const MS_PER_MINUTE = 60000
+const MS_PER_HOUR = 3600000
+
 function ProviderPageClientView() {
     const { id } = useParams()
     const { user } = useUser()
@@ -41,14 +44,17 @@ function ProviderPageClientView() {
             const resAvailable = await fetch(`${import.meta.env.VITE_API_URL}/providers/${id}/availability`)
             const resBooked = await fetch(`${import.meta.env.VITE_API_URL}/providers/${id}/booked`)
 
-            if(resAvailable.ok && resBooked.ok) {
+            if(!(resAvailable.ok && resBooked.ok)) {
+                console.error('Failed to fetch appointments')
+            } else {
                 const availableAppointments = await resAvailable.json()
                 const bookedAppointments = await resBooked.json()
 
                 const validAppointments = availableAppointments.filter(available => {
                     // Determines the start and end of each potential appointment based on the service chosen
                     const availableStart = new Date(available.startDateTime)
-                    const availableEnd = new Date(availableStart.getTime() + selectedService.duration * 60000) // converts duration in ms since getTime is ms
+                    const serviceDurationInMins = selectedService.duration
+                    const availableEnd = new Date(availableStart.getTime() + serviceDurationInMins * MS_PER_MINUTE) // converts duration in ms since getTime is ms
                     
                     // Checks each provider's booked appointments to catch any conflicts with the potential available appointment
                     for(const booked of bookedAppointments) {
@@ -96,8 +102,6 @@ function ProviderPageClientView() {
                 const shouldRecommend = clientPreferences.length > 0 || providerPreferences?.maxConsecutiveHours
 
                 setRecommendedAppointments(shouldRecommend ? filtered : []) // Recommended could either be empty because both no preferences or filtering left no appointments
-            } else {
-                console.error('Failed to fetch appointments')
             }
         } catch(error) {
             console.error(error)
@@ -114,7 +118,8 @@ function ProviderPageClientView() {
             
             // Determines start and end of the appointment based on service chosen
             const appointmentStartTime = new Date(appointment.startDateTime).toTimeString().slice(0, 5) // .slice() to index 5 to limit time format to just hours and minutes
-            const appointmentEndTime = new Date(new Date(appointment.startDateTime).getTime() + (selectedService.duration * 60000)).toTimeString().slice(0, 5) // calculates appointment's end
+            const serviceDurationInMins = selectedService.duration
+            const appointmentEndTime = new Date(new Date(appointment.startDateTime).getTime() + (serviceDurationInMins * MS_PER_MINUTE)).toTimeString().slice(0, 5) // calculates appointment's end
             
             // If the appointment's start and end falls between the client's preferred window, it should be Recommended
             return(clientPreferences.some(preference => {
@@ -142,7 +147,7 @@ function ProviderPageClientView() {
     }
 
     function filterByProviderHours(availableAppointments, bookedAppointments, serviceDuration, maxConsecutiveHours) {
-        const maxHoursInMs = maxConsecutiveHours * 3600000 // -> 60 * 60 * 1000
+        const maxHoursInMs = maxConsecutiveHours * MS_PER_HOUR 
 
         /* For every available appointment check if any booked appointment that are directly consecutive and calculate the duration */
         return availableAppointments.filter(available => {
@@ -150,7 +155,8 @@ function ProviderPageClientView() {
             let currentAvailStart = new Date(available.startDateTime)
 
             // Start the duration total with the service client is looking to book  
-            let totalDurationInMs = serviceDuration * 60000
+            const serviceDurationInMins = serviceDuration
+            let totalDurationInMs = serviceDurationInMins * MS_PER_MINUTE
 
             // Keeps looking back for booked appts that are consecutive; breaks when it reaches one not consecutive 
             while(true) {
@@ -196,7 +202,8 @@ function ProviderPageClientView() {
         return appointments.map(appointment => {
             // Get each filtered available appointment's start time and end time based on service chosen
             const appointmentStart = new Date(appointment.startDateTime)
-            const appointmentEnd = new Date(appointmentStart.getTime() + selectedService.duration * 60000)
+            const serviceDurationInMins = selectedService.duration
+            const appointmentEnd = new Date(appointmentStart.getTime() + serviceDurationInMins * MS_PER_MINUTE)
             
             /* Handle Gap Before */
             const appointmentsBefore = bookedAppointments
