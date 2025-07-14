@@ -29,6 +29,8 @@ model User {
   googleRefreshToken    String?
   googleRefreshIV       String?
   googleConnected       Boolean         @default(false)
+  clientPreferences     ClientPreferences[]
+  providerPreferences   ProviderPreferences?
 }
 
 model Service {
@@ -64,6 +66,23 @@ model Review {
   provider              User            @relation("ProviderReviews", fields: [providerId], references: [id])
   rating                Int
   comment               String?         
+}
+
+model ClientPreferences {
+  id                    Int             @id @default(autoincrement())
+  clientId              Int
+  client                User            @relation(fields: [clientId], references: [id])
+  dayOfWeek             String
+  startTime             String
+  endTime               String
+}
+
+model ProviderPreferences {
+  id                    Int             @id @default(autoincrement())
+  providerId            Int             @unique
+  provider              User            @relation(fields: [providerId], references: [id])
+  maxConsecutiveHours   Int
+  prefersEarly          Boolean
 }
 
 enum Role {
