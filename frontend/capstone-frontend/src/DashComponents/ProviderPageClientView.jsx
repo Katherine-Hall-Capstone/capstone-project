@@ -63,18 +63,18 @@ function ProviderPageClientView() {
                     // Otherwise the potential appointment did not conflict with any of the booked appointments
                     return true 
                 })
-                // For the "Available Appointments" section
+                // Display "Available Appointments" section
                 setAppointments(validAppointments.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)))
 
                 /* Handle Recommended Appointments */
                 let filtered = validAppointments
 
-                // 1) Filter for only available appointments within the client's windows
+                // 1) Filter for only available appointments within the client's windows, if exists 
                 if(clientPreferences.length > 0) {
                     filtered = filterByClientWindows(validAppointments)
                 }
                 
-                // 2) Filter exluding appointments that would exceed provider's max hours
+                // 2) Filter exluding appointments that would exceed provider's max hours, if exists
                 if(providerPreferences?.maxConsecutiveHours) {
                     filtered = filterByProviderHours(
                         filtered, 
@@ -85,7 +85,7 @@ function ProviderPageClientView() {
                 }
                 // TODO: 3) Rank Appointments  
 
-                // Display Recommended 
+                // Display "Recommended Appointments" section (recommend nothing if no preferences exist)
                 const shouldRecommend = clientPreferences.length > 0 || providerPreferences?.maxConsecutiveHours
 
                 setRecommendedAppointments(shouldRecommend ? filtered.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)) : [])
