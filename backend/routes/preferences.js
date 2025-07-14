@@ -53,7 +53,7 @@ router.post('/preferences/providers/:id', async (req, res) => {
     }
 
     const { maxConsecutiveHours, prefersEarly } = req.body
-    if (maxConsecutiveHours == null || maxConsecutiveHours < 0 || prefersEarly == null) {
+    if (maxConsecutiveHours == null || maxConsecutiveHours <= 0 || prefersEarly == null) {
         return res.status(400).json({ error: 'All fields required and hours cannot be negative' })
     }
 

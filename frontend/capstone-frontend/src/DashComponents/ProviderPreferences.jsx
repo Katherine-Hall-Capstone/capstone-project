@@ -123,7 +123,7 @@ function ProviderPreferences({ providerId }) {
                     <p>Maximum Consecutive Hours: {maxHours}</p>
                     <p>Prefer: {prefersEarly === true ? 'Earlier' : 'Later'} Appointments</p>
 
-                    <button onClick={handleDelete}>Change Preferences</button>
+                    <button onClick={handleDelete}>Delete Preferences</button>
                 </div>
             )}
             

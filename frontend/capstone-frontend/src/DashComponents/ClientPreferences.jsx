@@ -1,6 +1,8 @@
 import { useUser } from '../UserContext'
 import { useState, useEffect } from 'react'
 
+const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
 function ClientPreferences()  {
     const { user } = useUser()
     const [day, setDay] = useState('')
@@ -8,8 +10,6 @@ function ClientPreferences()  {
     const [endTime, setEndTime] = useState('')
     const [preferences, setPreferences] = useState([])
     const [errorMessage, setErrorMessage] = useState('')
-
-    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesdsay', 'Thursday', 'Friday']
 
     async function fetchPreferences() {
         try {
