@@ -66,14 +66,18 @@ function ProviderPageClientView() {
                 // For the "Available Appointments" section
                 setAppointments(validAppointments.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)))
 
-                /* Recommended Appointments process below */
+                /* Handle Recommended Appointments */
+                let filtered = validAppointments
+
                 // 1) Filter for only available appointments within the client's windows
-                const filteredByClientWindows = filterByClientWindows(validAppointments)
+                if(clientPreferences.length > 0) {
+                    filtered = filterByClientWindows(validAppointments)
+                }
+                
                 // 2) Filter exluding appointments that would exceed provider's max hours
-                let filteredByProviderHours
                 if(providerPreferences?.maxConsecutiveHours) {
-                    filteredByProviderHours = filterByProviderHours(
-                        filteredByClientWindows, 
+                    filtered = filterByProviderHours(
+                        filtered, 
                         bookedAppointments, 
                         selectedService.duration, 
                         providerPreferences.maxConsecutiveHours
@@ -81,7 +85,10 @@ function ProviderPageClientView() {
                 }
                 // TODO: 3) Rank Appointments  
 
-                setRecommendedAppointments(filteredByProviderHours.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)))
+                // Display Recommended 
+                const shouldRecommend = clientPreferences.length > 0 || providerPreferences?.maxConsecutiveHours
+
+                setRecommendedAppointments(shouldRecommend ? filtered.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)) : [])
             } else {
                 console.error('Failed to fetch appointments')
             }
@@ -171,9 +178,7 @@ function ProviderPageClientView() {
         })
         if (res.ok) {
             const data = await res.json()
-            if (data && data.maxConsecutiveHours !== undefined) {
-                setProviderPreferences(data)
-            }
+            setProviderPreferences(data || null)
         }
     } catch (error) {
         console.error(error)
