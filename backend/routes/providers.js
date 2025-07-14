@@ -71,6 +71,29 @@ router.get('/providers/:id/availability', async (req, res) => {
     }
 })
 
+// GET single provider's booked appointments 
+router.get('/providers/:id/booked', async (req, res) => {
+    const providerId = parseInt(req.params.id)
+
+    try {
+        const bookedAppointments = await prisma.appointment.findMany({
+            where: { 
+                providerId,
+                status: 'BOOKED' 
+            },
+            select: {
+                dateTime: true,
+                endDateTime: true
+            }
+        })
+
+        res.status(200).json(bookedAppointments)
+    } catch(error) {
+        console.log(error);
+        return res.status(500).json({ error: 'Server error' })
+    }
+})
+
 // ADD an available appointment 
 router.post('/providers/:id/availability', async (req, res) => {
     if(!req.session.userId) {
@@ -92,15 +115,31 @@ router.post('/providers/:id/availability', async (req, res) => {
             return res.status(403).json({ error: 'Only service providers can add availabilities' })
         }
 
-        // Checks if any appointment already exists, either booked or available
+        // Prevent exact duplicate time slots from being added 
         const existingAppointment = await prisma.appointment.findFirst({
             where: {
                 providerId: user.id,
+                status: 'AVAILABLE',
                 dateTime: parsedDate
             }
         })
+
         if (existingAppointment) {
-            return res.status(400).json({ error: 'This time is already available or you have a booked appointment at this time' });
+            return res.status(400).json({ error: 'This time is already available' });
+        }
+
+        // Prevent availabilities from being added during booked appointments
+        const overlappingAppointmnet = await prisma.appointment.findFirst({
+            where: {
+                providerId: user.id,
+                status: 'BOOKED',
+                dateTime: { lte: parsedDate },  // "less than or equal to"
+                endDateTime: { gt: parsedDate } // "greater than"
+            }
+        })
+
+        if (overlappingAppointmnet) {
+            return res.status(400).json({ error: 'You have a booked appointment at this time' })
         }
 
         const availableAppointment = await prisma.appointment.create({

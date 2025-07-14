@@ -2,42 +2,23 @@ const { PrismaClient } = require('../generated/prisma')
 const prisma = new PrismaClient()
 const router = require('express').Router()
 
-// Get preference of a provider or client
-router.get('/preferences/:id', async (req, res) => {
-    if(!req.session.userId) {
-        return res.status(401).json({ error: 'Log in to see preferences!' })
-    }
-
-    const userId = parseInt(req.params.id)
-    if (req.session.userId !== userId) {
-        return res.status(403).json({ error: 'Unauthorized' })
-    }
+// Get preference of a provider 
+router.get('/preferences/providers/:id', async (req, res) => {
+    const providerId = parseInt(req.params.id)
 
     try {
-        const user = await prisma.user.findUnique({ 
-            where: { id: userId } 
+        const preferences = await prisma.providerPreferences.findUnique({
+            where: { providerId }
         })
-        if (!user) {
-            return res.status(403).json({ error: 'User does not exist' })
+
+        if (!preferences) {
+            return res.status(404).json({ error: 'Provider preferences not found' })
         }
 
-        let userPreferences
-
-        if(user.role === 'PROVIDER') {
-            userPreferences = await prisma.providerPreferences.findUnique({
-                where: { providerId: user.id }
-            })
-        } else if(user.role === 'CLIENT') {
-            userPreferences = await prisma.clientPreferences.findMany({
-                where: { clientId: user.id }
-            })
-        } else {
-            return res.status(400).json({ error: 'Invalid role' })
-        }
-        res.json(userPreferences)
+        res.json(preferences)
     } catch (error) {
         console.log(error)
-        return res.status(500).json({ error: 'Server error' })
+        res.status(500).json({ error: 'Server error' })
     }
 })
 
@@ -111,7 +92,38 @@ router.delete('/preferences/provider/:id', async (req, res) => {
 
         res.status(200).json({ message: 'Preferences deleted successfully' })
     } catch (error) {
-        console.error(error)
+        console.log(error)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// Get client's preferences 
+router.get('/preferences/clients/:id', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Log in to see preferences!' })
+    }
+
+    const clientId = parseInt(req.params.id)
+    if (req.session.userId !== clientId) {
+        return res.status(403).json({ error: 'Unauthorized' })
+    }
+
+    try {
+        const user = await prisma.user.findUnique({ 
+            where: { id: clientId }
+        })
+
+        if (!user || user.role !== 'CLIENT') {
+            return res.status(403).json({ error: 'Only clients can access' })
+        }
+
+        const preferences = await prisma.clientPreferences.findMany({
+            where: { clientId: user.id }
+        })
+
+        res.json(preferences)
+    } catch (error) {
+        console.log(error)
         res.status(500).json({ error: 'Server error' })
     }
 })
@@ -208,7 +220,7 @@ router.delete('/preferences/clients/:id/time-window/:windowId', async (req, res)
 
         res.status(200).json({ message: 'Preferences deleted successfully' })
     } catch (error) {
-        console.error(error)
+        console.log(error)
         res.status(500).json({ error: 'Server error' })
     }
 })
