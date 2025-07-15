@@ -170,7 +170,8 @@ router.get('/providers/:id/services', async (req, res) => {
             select: {
                 id: true,
                 name: true,
-                duration: true
+                duration: true,
+                details: true
             }
         })
 
@@ -192,7 +193,7 @@ router.post('/providers/:id/services', async (req, res) => {
         return res.status(403).json({ error: 'Unauthorized' })
     }
 
-    const { name, duration } = req.body
+    const { name, duration, details } = req.body
 
     if(!name || !duration) {
         return res.status(400).json({ error: 'Service name and duration required'})
@@ -222,6 +223,7 @@ router.post('/providers/:id/services', async (req, res) => {
             data: {
                 name,
                 duration,
+                details,
                 providerId
             }
         })

@@ -36,7 +36,8 @@ model User {
 model Service {
   id                    Int             @id @default(autoincrement())
   name                  String          
-  duration              Int 
+  duration              Int
+  details               String? 
   provider              User            @relation(fields: [providerId], references: [id])
   providerId            Int
   appointments          Appointment[]
@@ -82,7 +83,7 @@ model ProviderPreferences {
   providerId            Int             @unique
   provider              User            @relation(fields: [providerId], references: [id])
   maxConsecutiveHours   Int
-  prefersEarly          Boolean
+  prefersEarly          Boolean         @default(true)
 }
 
 enum Role {
