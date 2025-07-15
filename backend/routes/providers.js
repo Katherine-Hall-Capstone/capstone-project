@@ -82,7 +82,7 @@ router.get('/providers/:id/booked', async (req, res) => {
                 status: 'BOOKED' 
             },
             select: {
-                dateTime: true,
+                startDateTime: true,
                 endDateTime: true
             }
         })
@@ -100,8 +100,8 @@ router.post('/providers/:id/availability', async (req, res) => {
         return res.status(401).json({ error: 'Log in to add an availability!' })
     }
 
-    const { dateTime } = req.body
-    const parsedDate = new Date(dateTime)
+    const { startDateTime } = req.body
+    const parsedDate = new Date(startDateTime)
 
     if(parsedDate < new Date()) {
         return res.status(401).json({ error: 'Cannot add available appointments in the past' })
@@ -120,7 +120,7 @@ router.post('/providers/:id/availability', async (req, res) => {
             where: {
                 providerId: user.id,
                 status: 'AVAILABLE',
-                dateTime: parsedDate
+                startDateTime: parsedDate
             }
         })
 
@@ -133,7 +133,7 @@ router.post('/providers/:id/availability', async (req, res) => {
             where: {
                 providerId: user.id,
                 status: 'BOOKED',
-                dateTime: { lte: parsedDate },  // "less than or equal to"
+                startDateTime: { lte: parsedDate },  // "less than or equal to"
                 endDateTime: { gt: parsedDate } // "greater than"
             }
         })
@@ -145,7 +145,7 @@ router.post('/providers/:id/availability', async (req, res) => {
         const availableAppointment = await prisma.appointment.create({
             data: {
                 providerId: user.id,
-                dateTime: parsedDate, 
+                startDateTime: parsedDate, 
                 endDateTime: null,
                 status: 'AVAILABLE',
                 serviceId: null,

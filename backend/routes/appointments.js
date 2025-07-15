@@ -94,7 +94,7 @@ router.put('/appointments/:id/book', async (req, res) => {
         })
 
         // getTime returns num of milliseconds since 1/1/1970 -> add this num to service duration in milliseconds -> convert back to Date
-        const calculatedEndDateTime = new Date(appointment.dateTime.getTime() + (appointment.service.duration * 60 * 1000))
+        const calculatedEndDateTime = new Date(appointment.startDateTime.getTime() + (appointment.service.duration * 60 * 1000))
 
         // Update appointment's endDateTime in database 
         await prisma.appointment.update({
@@ -111,7 +111,7 @@ router.put('/appointments/:id/book', async (req, res) => {
             const event = {
                 summary: appointment.service.name,
                 description: appointment.notes || '',
-                start: { dateTime: appointment.dateTime.toISOString() },
+                start: { dateTime: appointment.startDateTime.toISOString() },
                 end: { dateTime: appointment.endDateTime.toISOString() }, 
                 // Sends Google Calendar invite request to client's email  
                 attendees: [{ email: appointment.client.email }]

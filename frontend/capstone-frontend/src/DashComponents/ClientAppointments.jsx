@@ -26,7 +26,7 @@ function ClientAppointments() {
             <div className="upcoming-appointment-grid">
                 {appointments.map(appointment => (
                     <div key={appointment.id} className="appointment-container">
-                        <p>When: {new Date(appointment.dateTime).toLocaleString(undefined, {
+                        <p>When: {new Date(appointment.startDateTime).toLocaleString(undefined, {
                                     month: 'short', 
                                     day: 'numeric',
                                     hour: '2-digit',

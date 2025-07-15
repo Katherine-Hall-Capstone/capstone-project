@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react'
 import { useUser } from '../UserContext'
 import ClientBookingForm from './ClientBookingForm'
 
+const MS_PER_MINUTE = 60000
+const MS_PER_HOUR = 3600000
+
 function ProviderPageClientView() {
     const { id } = useParams()
     const { user } = useUser()
@@ -41,18 +44,21 @@ function ProviderPageClientView() {
             const resAvailable = await fetch(`${import.meta.env.VITE_API_URL}/providers/${id}/availability`)
             const resBooked = await fetch(`${import.meta.env.VITE_API_URL}/providers/${id}/booked`)
 
-            if(resAvailable.ok && resBooked.ok) {
+            if(!(resAvailable.ok && resBooked.ok)) {
+                console.error('Failed to fetch appointments')
+            } else {
                 const availableAppointments = await resAvailable.json()
                 const bookedAppointments = await resBooked.json()
 
                 const validAppointments = availableAppointments.filter(available => {
                     // Determines the start and end of each potential appointment based on the service chosen
-                    const availableStart = new Date(available.dateTime)
-                    const availableEnd = new Date(availableStart.getTime() + selectedService.duration * 60000) // converts duration in ms since getTime is ms
+                    const availableStart = new Date(available.startDateTime)
+                    const serviceDurationInMins = selectedService.duration
+                    const availableEnd = new Date(availableStart.getTime() + serviceDurationInMins * MS_PER_MINUTE) // converts duration in ms since getTime is ms
                     
                     // Checks each provider's booked appointments to catch any conflicts with the potential available appointment
                     for(const booked of bookedAppointments) {
-                        const bookedStart = new Date(booked.dateTime)
+                        const bookedStart = new Date(booked.startDateTime)
                         const bookedEnd = new Date(booked.endDateTime)
                         
                         // Condition where there is an overlap, so the available appointment would not be possible -> prevent it from being chosen
@@ -64,17 +70,17 @@ function ProviderPageClientView() {
                     return true 
                 })
                 // Display "Available Appointments" section
-                setAppointments(validAppointments.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)))
+                setAppointments(validAppointments.sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime)))
 
                 /* Handle Recommended Appointments */
                 let filtered = validAppointments
 
                 // 1) Filter for only available appointments within the client's windows, if exists 
                 if(clientPreferences.length > 0) {
-                    filtered = filterByClientWindows(validAppointments)
+                    filtered = filterByClientWindows(filtered)
                 }
                 
-                // 2) Filter exluding appointments that would exceed provider's max hours, if exists
+                // 2) Filter excluding appointments that would exceed provider's max hours, if exists
                 if(providerPreferences?.maxConsecutiveHours) {
                     filtered = filterByProviderHours(
                         filtered, 
@@ -83,14 +89,19 @@ function ProviderPageClientView() {
                         providerPreferences.maxConsecutiveHours
                     )
                 }
-                // TODO: 3) Rank Appointments  
+                // 3) Rank Appointments, if they exist 
+                if(filtered.length > 0) {
+                    filtered = rankAppointments(
+                        filtered, 
+                        bookedAppointments, 
+                        providerPreferences.prefersEarly
+                    )
+                }
 
-                // Display "Recommended Appointments" section (recommend nothing if no preferences exist)
+                // Display "Recommended Appointments" section (recommend nothing if both client and provider have no preferences)
                 const shouldRecommend = clientPreferences.length > 0 || providerPreferences?.maxConsecutiveHours
 
-                setRecommendedAppointments(shouldRecommend ? filtered.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)) : [])
-            } else {
-                console.error('Failed to fetch appointments')
+                setRecommendedAppointments(shouldRecommend ? filtered : []) // Recommended could either be empty because both no preferences or filtering left no appointments
             }
         } catch(error) {
             console.error(error)
@@ -102,12 +113,13 @@ function ProviderPageClientView() {
         
         return validAppointments.filter(appointment => {
             // Gets the day of a potential Recommended appointment
-            const appointmentDayIndex = new Date(appointment.dateTime).getDay()
+            const appointmentDayIndex = new Date(appointment.startDateTime).getDay()
             const appointmentDayString = daysOfWeek[appointmentDayIndex]            
             
             // Determines start and end of the appointment based on service chosen
-            const appointmentStartTime = new Date(appointment.dateTime).toTimeString().slice(0, 5) // .slice() to index 5 to limit time format to just hours and minutes
-            const appointmentEndTime = new Date(new Date(appointment.dateTime).getTime() + (selectedService.duration * 60000)).toTimeString().slice(0, 5) // calculates appointment's end
+            const appointmentStartTime = new Date(appointment.startDateTime).toTimeString().slice(0, 5) // .slice() to index 5 to limit time format to just hours and minutes
+            const serviceDurationInMins = selectedService.duration
+            const appointmentEndTime = new Date(new Date(appointment.startDateTime).getTime() + (serviceDurationInMins * MS_PER_MINUTE)).toTimeString().slice(0, 5) // calculates appointment's end
             
             // If the appointment's start and end falls between the client's preferred window, it should be Recommended
             return(clientPreferences.some(preference => {
@@ -135,15 +147,16 @@ function ProviderPageClientView() {
     }
 
     function filterByProviderHours(availableAppointments, bookedAppointments, serviceDuration, maxConsecutiveHours) {
-        const maxHoursInMs = maxConsecutiveHours * 3600000 // -> 60 * 60 * 1000
+        const maxHoursInMs = maxConsecutiveHours * MS_PER_HOUR 
 
         /* For every available appointment check if any booked appointment that are directly consecutive and calculate the duration */
         return availableAppointments.filter(available => {
             // Start time of the current available appointment
-            let currentAvailStart = new Date(available.dateTime)
+            let currentAvailStart = new Date(available.startDateTime)
 
             // Start the duration total with the service client is looking to book  
-            let totalDurationInMs = serviceDuration * 60000
+            const serviceDurationInMins = serviceDuration
+            let totalDurationInMs = serviceDurationInMins * MS_PER_MINUTE
 
             // Keeps looking back for booked appts that are consecutive; breaks when it reaches one not consecutive 
             while(true) {
@@ -155,7 +168,7 @@ function ProviderPageClientView() {
 
                 if(prevBookedAppt) {
                     // Calculate duration of the booked appointment just found
-                    const bookedStart = new Date(prevBookedAppt.dateTime)
+                    const bookedStart = new Date(prevBookedAppt.startDateTime)
                     const bookedDuration = new Date(prevBookedAppt.endDateTime) - bookedStart
                     // Add it to the total consecutive duration so far
                     totalDurationInMs += bookedDuration
@@ -172,18 +185,65 @@ function ProviderPageClientView() {
     }
 
     async function fetchProviderPreferences() {
-    try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/preferences/providers/${id}`, {
-            credentials: 'include'
-        })
-        if (res.ok) {
-            const data = await res.json()
-            setProviderPreferences(data || null)
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/preferences/providers/${id}`, {
+                credentials: 'include'
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setProviderPreferences(data || null)
+            }
+        } catch (error) {
+            console.error(error)
         }
-    } catch (error) {
-        console.error(error)
     }
-}
+
+    function rankAppointments(appointments, bookedAppointments, prefersEarly) {
+        return appointments.map(appointment => {
+            // Get each filtered available appointment's start time and end time based on service chosen
+            const appointmentStart = new Date(appointment.startDateTime)
+            const serviceDurationInMins = selectedService.duration
+            const appointmentEnd = new Date(appointmentStart.getTime() + serviceDurationInMins * MS_PER_MINUTE)
+            
+            /* Handle Gap Before */
+            const appointmentsBefore = bookedAppointments
+                .filter(booked => new Date(booked.endDateTime) <= appointmentStart) // Find booked appointments occurring BEFORE potential appointment
+                .sort((a, b) => new Date(b.endDateTime) - new Date(a.endDateTime)) // Sort by putting closest before potential appointment in first position 
+            
+            const mostPrevious = appointmentsBefore[0]  // Get the closest appointment before 
+
+            const gapBefore = mostPrevious ? appointmentStart - new Date(mostPrevious.endDateTime) : 0 // If appointment before exists, find gap before potential appointment; if not, use 0
+
+            /* Handle Gap After */
+            const appointmentsAfter = bookedAppointments
+                .filter(booked => new Date(booked.startDateTime) >= appointmentEnd) // Find booked appointments occurring AFTER potential appointment
+                .sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime)) // Sort by putting closest after potential appointment in first position 
+            
+            const mostUpcoming = appointmentsAfter[0] // Get the closest appointment after 
+
+            const gapAfter = mostUpcoming ? new Date(mostUpcoming.startDateTime) - appointmentEnd : 0 // If appointment before exists, find gap before potential appointment; if not, use 0
+            
+            /* Put both gaps found in array */
+            const bothGaps = [Math.min(gapBefore, gapAfter), Math.max(gapBefore, gapAfter)]
+
+            // Each potential appointment now has the required information to rank
+            return {
+                ...appointment,
+                bothGaps,
+                appointmentStart
+            }
+        }).sort((a, b) => {
+            if(a.bothGaps[0] !== b.bothGaps[0]) {
+                return a.bothGaps[0] - b.bothGaps[0] // Ascending order with smallest gap time first
+            }
+            if(a.bothGaps[1] !== b.bothGaps[1]) {
+                return a.bothGaps[1] - b.bothGaps[1]
+            }
+
+            // If both equal gap times, rank by provider's preference of earlier/later appts
+            return prefersEarly ? a.appointmentStart - b.appointmentStart : b.appointmentStart - a.appointmentStart 
+        })
+    }
 
     function handleOpenModal(appointment) {
         setSelectedAppointment(appointment)
@@ -252,12 +312,13 @@ function ProviderPageClientView() {
                 <p>No recommended appointments</p>
             ) : (
                 <div className="appointment-grid">
-                    {recommendedAppointments.map((appointment) => (
+                    {recommendedAppointments.map((appointment, index) => (
                         <button 
                             key={appointment.id} 
                             onClick={() => handleOpenModal(appointment)}
                         >
-                            {new Date(appointment.dateTime).toLocaleString(undefined, {
+                            <strong>{index + 1}.{' '}</strong>
+                            {new Date(appointment.startDateTime).toLocaleString(undefined, {
                                 year: 'numeric',
                                 month: 'short', 
                                 day: 'numeric',
@@ -277,7 +338,7 @@ function ProviderPageClientView() {
                 <div className="appointment-grid">
                     {appointments.map((appointment) => (
                         <button key={appointment.id} onClick={() => handleOpenModal(appointment)}>
-                            {new Date(appointment.dateTime).toLocaleString(undefined, {
+                            {new Date(appointment.startDateTime).toLocaleString(undefined, {
                                 year: 'numeric',
                                 month: 'short', 
                                 day: 'numeric',

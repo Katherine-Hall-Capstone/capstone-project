@@ -27,7 +27,7 @@ function AppointmentDetailsModal({ appointment, onClose }) {
 
                 <h2>Appointment Details</h2>
 
-                <p>Start: {new Date(appointment.dateTime).toLocaleString(undefined, {
+                <p>Start: {new Date(appointment.startDateTime).toLocaleString(undefined, {
                                     month: 'short', 
                                     day: 'numeric',
                                     hour: '2-digit',

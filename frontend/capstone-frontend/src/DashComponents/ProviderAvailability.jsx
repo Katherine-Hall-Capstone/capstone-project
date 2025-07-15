@@ -17,7 +17,7 @@ function ProviderAvailability() {
 
             if (res.ok) {
                 const data = await res.json()
-                setAvailabilities(data.sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime)))
+                setAvailabilities(data.sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime)))
             } else {
                 console.error('Failed to fetch available appointments')
             }
@@ -39,7 +39,7 @@ function ProviderAvailability() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ dateTime })
+                body: JSON.stringify({startDateTime: dateTime })
             })
 
             const data = await res.json()
@@ -102,7 +102,7 @@ function ProviderAvailability() {
                 <ul>
                     {availabilities.map(availability => (
                         <li key={availability.id}>
-                            {new Date(availability.dateTime).toLocaleString(undefined, {
+                            {new Date(availability.startDateTime).toLocaleString(undefined, {
                                 month: 'short', 
                                 day: 'numeric',
                                 hour: '2-digit',
