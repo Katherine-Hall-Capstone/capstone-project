@@ -55,6 +55,23 @@ function ProviderServices({ providerId }) {
         }
     }
 
+    async function handleDeleteService(serviceId) {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/providers/${providerId}/services/${serviceId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            })
+
+            if (res.ok) {
+                fetchServices()
+            } else {
+                console.error('Failed to delete service')
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     return (
         <div className="service-container">
             <h3>Manage Services</h3>
@@ -81,6 +98,7 @@ function ProviderServices({ providerId }) {
                 {services.map(service => (
                     <li key={service.id}>
                         {service.name} ({service.duration} min)
+                        <button onClick={() => handleDeleteService(service.id)}>Delete</button>
                     </li>
                 ))}
             </ul>

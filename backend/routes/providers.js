@@ -233,6 +233,39 @@ router.post('/providers/:id/services', async (req, res) => {
     }
 })
 
+// DELETE provider's offered service
+router.delete('/providers/:providerId/services/:serviceId', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Log in to delete services!' })
+    }
+
+    const providerId = parseInt(req.params.providerId)
+    const serviceId = parseInt(req.params.serviceId)
+
+    if (req.session.userId !== providerId) {
+        return res.status(403).json({ error: 'Unauthorized' })
+    }
+
+    try {
+        const service = await prisma.service.findUnique({
+            where: { id: serviceId }
+        })
+
+        if (!service || service.providerId !== providerId) {
+            return res.status(404).json({ error: 'Service not found or not yours' })
+        }
+
+        await prisma.service.delete({
+            where: { id: serviceId }
+        })
+
+        res.status(200).json({ message: 'Service deleted' })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
 // GET provider's reviews 
 router.get('/providers/:id/reviews', async (req, res) => {
     const providerId = parseInt(req.params.id)
