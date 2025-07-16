@@ -249,6 +249,14 @@ router.delete('/providers/:providerId/services/:serviceId', async (req, res) => 
     }
 
     try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.session.userId }
+        })
+
+        if (!user || user.role !== 'PROVIDER') {
+            return res.status(403).json({ error: 'Only providers can delete services' })
+        }
+        
         const service = await prisma.service.findUnique({
             where: { id: serviceId }
         })
