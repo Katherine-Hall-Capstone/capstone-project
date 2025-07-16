@@ -65,13 +65,14 @@ function ProviderServices({ providerId }) {
                 credentials: 'include'
             })
 
-            if (res.ok) {
-                fetchServices()
-            } else {
-                console.error('Failed to delete service')
+            const data = await res.json()
+            if(!res.ok) {
+                throw new Error(data.error || 'Failed to delete service')
             }
+            fetchServices()
         } catch (error) {
             console.error(error)
+            setErrorMessage(error.message)
         }
     }
 

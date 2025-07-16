@@ -257,6 +257,14 @@ router.delete('/providers/:providerId/services/:serviceId', async (req, res) => 
             return res.status(404).json({ error: 'Service not found or not yours' })
         }
 
+        const appointmentsWithService = await prisma.appointment.findFirst({
+            where: { serviceId: serviceId }
+        })
+
+        if(appointmentsWithService) {
+            return res.status(400).json({ error: 'Appointments exist with this service. Cancel the appointment before deleting service!' })
+        }
+
         await prisma.service.delete({
             where: { id: serviceId }
         })
