@@ -26,7 +26,7 @@ router.get('/providers', async (req, res) => {
         })
 
         const bestMatchedProviders = providersScored
-            .filter(provider => provider.similarityScore >= 0.5) // ignore names with scores below 0.5
+            .filter(provider => provider.similarityScore >= 0.55) // ignore names with scores below 0.5
             .sort((a, b) => b.similarityScore - a.similarityScore)
 
         res.json(bestMatchedProviders)
@@ -38,7 +38,52 @@ router.get('/providers', async (req, res) => {
 
 // Fuzzy Search function
 function findSimilarityScore(input, target) {
-    return 0.5 
+    let i = 0
+    let j = 0
+    let prefixLength = 0
+
+    while(i < input.length && i < target.length && input[i] === target[i] && prefixLength < 4) {
+        prefixLength++
+        i++
+    }
+
+    let bonus = prefixLength * 0.05
+
+    let cost = 0
+    i = j = prefixLength
+
+    while(i < input.length && j < target.length) {
+        if(input[i] === target[j]) {
+            i++
+            j++
+        } else if(i + 1 < input.length && j + 1 < target.length && input[i] === target[j + 1] && input[i + 1] === target[j]) {
+            // Transposition
+            cost += 0.5
+            i += 2
+            j += 2
+        } else if(i + 1 < input.length && input[i + 1] === target[j]) {
+            // Simulates deleting character in input
+            cost += 1
+            i++
+        } else if(j + 1 < target.length && input[i] === target[j + 1]) {
+            // Simulates inserting character in input
+            cost += 1
+            j++
+        } else {
+            // Substitution
+            cost += 1
+            i++
+            j++
+        }
+    }
+
+    // If there were still remaining characters not compared
+    cost += (input.length - i) + (target.length - j)
+
+    const maxLength = Math.max(input.length, target.length)
+    const similarityScore = 1 - cost / maxLength + bonus
+
+    return similarityScore
 }
 
 // GET single provider
