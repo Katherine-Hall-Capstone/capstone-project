@@ -21,7 +21,7 @@ router.get('/providers', async (req, res) => {
         })
 
         const providersScored = providers.map(provider => {
-            const similarityScore = findSimilarityScore(search, provider.name)
+            const similarityScore = findSimilarityScore(search.toLowerCase(), provider.name.toLowerCase())
             return {...provider, similarityScore}
         })
 
