@@ -4,6 +4,7 @@ function ProviderServices({ providerId }) {
     const [services, setServices] = useState([])
     const [serviceName, setServiceName] = useState('')
     const [serviceDuration, setServiceDuration] = useState('')
+    const [serviceDetails, setServiceDetails] = useState('')
     const [errorMessage, setErrorMessage] = useState('')
 
     async function fetchServices() {
@@ -13,7 +14,7 @@ function ProviderServices({ providerId }) {
             })
             if (res.ok) {
                 const data = await res.json()
-                setServices(data)
+                setServices(data.sort((a, b) => a.name.localeCompare(b.name)))
             } else {
                 console.error('Failed to fetch services')
             }
@@ -37,7 +38,8 @@ function ProviderServices({ providerId }) {
                 credentials: 'include',
                 body: JSON.stringify({
                     name: serviceName,
-                    duration: parseInt(serviceDuration)
+                    duration: parseInt(serviceDuration),
+                    details: serviceDetails 
                 })
             })
 
@@ -49,6 +51,25 @@ function ProviderServices({ providerId }) {
             fetchServices()
             setServiceName('')
             setServiceDuration('')
+            setServiceDetails('')
+        } catch (error) {
+            console.error(error)
+            setErrorMessage(error.message)
+        }
+    }
+
+    async function handleDeleteService(serviceId) {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/providers/${providerId}/services/${serviceId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            })
+
+            const data = await res.json()
+            if(!res.ok) {
+                throw new Error(data.error || 'Failed to delete service')
+            }
+            fetchServices()
         } catch (error) {
             console.error(error)
             setErrorMessage(error.message)
@@ -74,13 +95,19 @@ function ProviderServices({ providerId }) {
                     required
                     min={1}
                 />
+                <textarea
+                    placeholder="Service Details"
+                    value={serviceDetails}
+                    onChange={event => setServiceDetails(event.target.value)}
+                />
                 <button type="submit">Add Service</button>
             </form>
 
             <ul>
                 {services.map(service => (
                     <li key={service.id}>
-                        {service.name} ({service.duration} min)
+                        {service.name} ({service.duration} min) - {service.details}
+                        <button onClick={() => handleDeleteService(service.id)}>Delete</button>
                     </li>
                 ))}
             </ul>

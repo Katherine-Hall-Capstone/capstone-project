@@ -170,7 +170,8 @@ router.get('/providers/:id/services', async (req, res) => {
             select: {
                 id: true,
                 name: true,
-                duration: true
+                duration: true,
+                details: true
             }
         })
 
@@ -192,7 +193,7 @@ router.post('/providers/:id/services', async (req, res) => {
         return res.status(403).json({ error: 'Unauthorized' })
     }
 
-    const { name, duration } = req.body
+    const { name, duration, details } = req.body
 
     if(!name || !duration) {
         return res.status(400).json({ error: 'Service name and duration required'})
@@ -222,6 +223,7 @@ router.post('/providers/:id/services', async (req, res) => {
             data: {
                 name,
                 duration,
+                details,
                 providerId
             }
         })
@@ -230,6 +232,55 @@ router.post('/providers/:id/services', async (req, res) => {
     } catch(error) {
         console.log(error);
         return res.status(500).json({ error: 'Server error' })
+    }
+})
+
+// DELETE provider's offered service
+router.delete('/providers/:providerId/services/:serviceId', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Log in to delete services!' })
+    }
+
+    const providerId = parseInt(req.params.providerId)
+    const serviceId = parseInt(req.params.serviceId)
+
+    if (req.session.userId !== providerId) {
+        return res.status(403).json({ error: 'Unauthorized' })
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.session.userId }
+        })
+
+        if (!user || user.role !== 'PROVIDER') {
+            return res.status(403).json({ error: 'Only providers can delete services' })
+        }
+        
+        const service = await prisma.service.findUnique({
+            where: { id: serviceId }
+        })
+
+        if (!service || service.providerId !== providerId) {
+            return res.status(404).json({ error: 'Service not found or not yours' })
+        }
+
+        const appointmentsWithService = await prisma.appointment.findFirst({
+            where: { serviceId: serviceId }
+        })
+
+        if(appointmentsWithService) {
+            return res.status(400).json({ error: 'Appointments exist with this service. Cancel the appointment before deleting service!' })
+        }
+
+        await prisma.service.delete({
+            where: { id: serviceId }
+        })
+
+        res.status(200).json({ message: 'Service deleted' })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ error: 'Server error' })
     }
 })
 

@@ -94,7 +94,7 @@ function ProviderPageClientView() {
                     filtered = rankAppointments(
                         filtered, 
                         bookedAppointments, 
-                        providerPreferences.prefersEarly
+                        providerPreferences ? providerPreferences.prefersEarly : true
                     )
                 }
 
@@ -291,8 +291,15 @@ function ProviderPageClientView() {
     return(
         <div className="profile-page">
             <h2>Provider Profile</h2>
-            <p>Name: {provider.name}</p>
-            <p>Services: {provider.servicesOffered?.map(service => service.name).join(', ')}</p>
+            <h3>Name: {provider.name}</h3>
+            <h3>Services Offered</h3>
+            <ul>
+                {provider.servicesOffered?.map(service => (
+                    <li key={service.id}>
+                        {service.name} ({service.duration} min) - {service.details}
+                    </li>
+                ))}
+            </ul>
 
             <label>Select a service: </label>
             <select
