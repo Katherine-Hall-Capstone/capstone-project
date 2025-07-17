@@ -26,7 +26,7 @@ router.get('/providers', async (req, res) => {
         })
 
         const bestMatchedProviders = providersScored
-            .filter(provider => provider.similarityScore >= 0.55) // ignore names with scores below 0.5
+            .filter(provider => provider.similarityScore >= 0.55) // ignore names with scores below 0.55
             .sort((a, b) => b.similarityScore - a.similarityScore)
 
         res.json(bestMatchedProviders)
