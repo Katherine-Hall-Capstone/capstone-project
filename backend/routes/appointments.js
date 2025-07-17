@@ -120,6 +120,7 @@ router.put('/appointments/:id/book', async (req, res) => {
         let providerEventId = null
         let clientEventId = null
 
+        // Event is created in provider's calendar if they connected it
         if(updatedAppointment.provider.googleConnected) {
             try {
                 const { auth } = await getAccessToken(updatedAppointment.provider.id)
@@ -136,6 +137,7 @@ router.put('/appointments/:id/book', async (req, res) => {
             }
         }
 
+        // Event is created in client's calendar if they connected it
         if(updatedAppointment.client.googleConnected) {
             try {
                 const { auth } = await getAccessToken(updatedAppointment.client.id)
