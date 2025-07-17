@@ -73,6 +73,24 @@ router.put('/appointments/:id/book', async (req, res) => {
             return res.status(403).json({ error: 'Only clients can book appointments' })
         }
 
+        const service = await prisma.service.findUnique({
+            where: { id: parsedServiceId }
+        })
+        if(!service) {
+            return res.status(400).json({ error: 'Invalid service selected' })
+        }
+
+        const originalAppointment = await prisma.appointment.findUnique({
+            where: { id: appointmentId },
+            include: {
+                provider: true,
+                client: true,
+            }
+        })
+
+        // getTime returns num of milliseconds since 1/1/1970 -> add this num to service duration in milliseconds -> convert back to Date
+        const endDateTime = new Date(originalAppointment.startDateTime.getTime() + (service.duration * 60 * 1000))
+
         const updatedAppointment = await prisma.appointment.update({
             where: { id: appointmentId },
             data: {
@@ -80,12 +98,9 @@ router.put('/appointments/:id/book', async (req, res) => {
                 status: 'BOOKED', 
                 serviceId: parsedServiceId,
                 notes,
-                isUnread: true
-            }
-        })
-
-        const appointment = await prisma.appointment.findUnique({
-            where: { id: appointmentId },
+                isUnread: true,
+                endDateTime
+            },
             include: {
                 provider: true,
                 client: true,
@@ -93,28 +108,19 @@ router.put('/appointments/:id/book', async (req, res) => {
             }
         })
 
-        // getTime returns num of milliseconds since 1/1/1970 -> add this num to service duration in milliseconds -> convert back to Date
-        const calculatedEndDateTime = new Date(appointment.startDateTime.getTime() + (appointment.service.duration * 60 * 1000))
-
-        // Update appointment's endDateTime in database 
-        await prisma.appointment.update({
-            where: { id: appointmentId },
-            data: { endDateTime: calculatedEndDateTime }
-        })
-
         // Create Google Calendar event process below
         // Event is created by provider's Google Calendar's acount and invite the client to the event using their email
-        if(appointment.provider.googleConnected) {
-            const { auth } = await getAccessToken(appointment.providerId)
+        if(updatedAppointment.provider.googleConnected) {
+            const { auth } = await getAccessToken(updatedAppointment.providerId)
             const calendar = google.calendar({ version: 'v3', auth })
 
             const event = {
-                summary: appointment.service.name,
-                description: appointment.notes || '',
-                start: { dateTime: appointment.startDateTime.toISOString() },
-                end: { dateTime: appointment.endDateTime.toISOString() }, 
+                summary: updatedAppointment.service.name,
+                description: updatedAppointment.notes || '',
+                start: { dateTime: updatedAppointment.startDateTime.toISOString() },
+                end: { dateTime: updatedAppointment.endDateTime.toISOString() }, 
                 // Sends Google Calendar invite request to client's email  
-                attendees: [{ email: appointment.client.email }]
+                attendees: [{ email: updatedAppointment.client.email }]
             }
             
             // Add the event to Google Calendar
