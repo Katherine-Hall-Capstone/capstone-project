@@ -6,24 +6,40 @@ const router = require('express').Router()
 router.get('/providers', async (req, res) => {
     const { search } = req.query
 
+    if(!search || search.trim() === '') {
+        return res.status(400).json({ error: 'No search query inputted' })
+    }
+
     try {
         const providers = await prisma.user.findMany({
-            where: {
-                role: 'PROVIDER',
-                name: { contains: search, mode: 'insensitive' }
-            },
+            where: { role: 'PROVIDER' },
             select: {
                 id: true,
                 name: true,
                 servicesOffered: true
             }
         })
-        res.json(providers)
+
+        const providersScored = providers.map(provider => {
+            const similarityScore = findSimilarityScore(search, provider.name)
+            return {...provider, similarityScore}
+        })
+
+        const bestMatchedProviders = providersScored
+            .filter(provider => provider.similarityScore >= 0.5) // ignore names with scores below 0.5
+            .sort((a, b) => b.similarityScore - a.similarityScore)
+
+        res.json(bestMatchedProviders)
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: 'Server error' })  
     }
 }) 
+
+// Fuzzy Search function
+function findSimilarityScore(input, target) {
+    return 0.5 
+}
 
 // GET single provider
 router.get('/providers/:id', async (req, res) => {
