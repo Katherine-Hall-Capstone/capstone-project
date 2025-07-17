@@ -1,5 +1,4 @@
 const { PrismaClient } = require('../generated/prisma')
-const { dmmfToRuntimeDataModel } = require('../generated/prisma/runtime/library')
 const prisma = new PrismaClient()
 const router = require('express').Router()
 const { getAccessToken } = require('../googleAuth')
