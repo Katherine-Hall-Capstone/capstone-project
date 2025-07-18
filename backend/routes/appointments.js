@@ -4,6 +4,9 @@ const router = require('express').Router()
 const { getAccessToken } = require('../googleAuth')
 const { google } = require('googleapis')
 
+const S_PER_MINUTE = 60
+const MS_PER_S = 1000
+
 // GET all appointments 
 router.get('/appointments', async (req, res) => {
     if(!req.session.userId) {
@@ -89,7 +92,7 @@ router.put('/appointments/:id/book', async (req, res) => {
         })
 
         // getTime returns num of milliseconds since 1/1/1970 -> add this num to service duration in milliseconds -> convert back to Date
-        const endDateTime = new Date(originalAppointment.startDateTime.getTime() + (service.duration * 60 * 1000))
+        const endDateTime = new Date(originalAppointment.startDateTime.getTime() + (service.duration * S_PER_MINUTE * MS_PER_S))
 
         const updatedAppointment = await prisma.appointment.update({
             where: { id: appointmentId },
