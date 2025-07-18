@@ -1,29 +1,91 @@
 const { PrismaClient } = require('../generated/prisma')
 const prisma = new PrismaClient()
 const router = require('express').Router()
+const BONUS_MULTIPLIER = 0.05
 
 // GET all providers
 router.get('/providers', async (req, res) => {
     const { search } = req.query
 
+    if(!search || search.trim() === '') {
+        return res.status(400).json({ error: 'No search query inputted' })
+    }
+
     try {
         const providers = await prisma.user.findMany({
-            where: {
-                role: 'PROVIDER',
-                name: { contains: search, mode: 'insensitive' }
-            },
+            where: { role: 'PROVIDER' },
             select: {
                 id: true,
                 name: true,
                 servicesOffered: true
             }
         })
-        res.json(providers)
+
+        const providersScored = providers.map(provider => {
+            const similarityScore = findSimilarityScore(search.toLowerCase(), provider.name.toLowerCase())
+            return {...provider, similarityScore}
+        })
+
+        const bestMatchedProviders = providersScored
+            .filter(provider => provider.similarityScore >= 0.55) // ignore names with scores below 0.55
+            .sort((a, b) => b.similarityScore - a.similarityScore)
+
+        res.json(bestMatchedProviders)
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: 'Server error' })  
     }
 }) 
+
+// Fuzzy Search function
+function findSimilarityScore(input, target) {
+    let i = 0
+    let j = 0
+    let prefixLength = 0
+
+    while(i < input.length && i < target.length && input[i] === target[i] && prefixLength < 4) {
+        prefixLength++
+        i++
+    }
+
+    let bonus = prefixLength * BONUS_MULTIPLIER
+
+    let cost = 0
+    i = j = prefixLength
+
+    while(i < input.length && j < target.length) {
+        if(input[i] === target[j]) {
+            i++
+            j++
+        } else if(i + 1 < input.length && j + 1 < target.length && input[i] === target[j + 1] && input[i + 1] === target[j]) {
+            // Transposition
+            cost += 0.5
+            i += 2
+            j += 2
+        } else if(i + 1 < input.length && input[i + 1] === target[j]) {
+            // Simulates deleting character in input
+            cost += 0.8
+            i++
+        } else if(j + 1 < target.length && input[i] === target[j + 1]) {
+            // Simulates inserting character in input
+            cost += 0.8
+            j++
+        } else {
+            // Substitution
+            cost += 1
+            i++
+            j++
+        }
+    }
+
+    // If there were still remaining characters not compared
+    cost += (input.length - i) + (target.length - j)
+
+    const maxLength = Math.max(input.length, target.length)
+    const similarityScore = 1 - cost / maxLength + bonus
+
+    return similarityScore
+}
 
 // GET single provider
 router.get('/providers/:id', async (req, res) => {
