@@ -34,6 +34,9 @@ function ClientBookingForm({ provider, selectedAppointment, selectedService, onC
                 }, 1000)
             } else {
                 console.error('Booking failed')
+                // Get backend error message and log it for debugging
+                const errorData = await res.json();
+                console.error('Booking failed:', errorData.error || 'Unknown error');
             }
         } catch(error) {
             console.error(error)

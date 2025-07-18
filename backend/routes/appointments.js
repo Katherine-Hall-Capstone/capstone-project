@@ -4,6 +4,9 @@ const router = require('express').Router()
 const { getAccessToken } = require('../googleAuth')
 const { google } = require('googleapis')
 
+const S_PER_MINUTE = 60
+const MS_PER_S = 1000
+
 // GET all appointments 
 router.get('/appointments', async (req, res) => {
     if(!req.session.userId) {
@@ -73,6 +76,24 @@ router.put('/appointments/:id/book', async (req, res) => {
             return res.status(403).json({ error: 'Only clients can book appointments' })
         }
 
+        const service = await prisma.service.findUnique({
+            where: { id: parsedServiceId }
+        })
+        if(!service) {
+            return res.status(400).json({ error: 'Invalid service selected' })
+        }
+
+        const originalAppointment = await prisma.appointment.findUnique({
+            where: { id: appointmentId },
+            include: {
+                provider: true,
+                client: true,
+            }
+        })
+
+        // getTime returns num of milliseconds since 1/1/1970 -> add this num to service duration in milliseconds -> convert back to Date
+        const endDateTime = new Date(originalAppointment.startDateTime.getTime() + (service.duration * S_PER_MINUTE * MS_PER_S))
+
         const updatedAppointment = await prisma.appointment.update({
             where: { id: appointmentId },
             data: {
@@ -80,12 +101,9 @@ router.put('/appointments/:id/book', async (req, res) => {
                 status: 'BOOKED', 
                 serviceId: parsedServiceId,
                 notes,
-                isUnread: true
-            }
-        })
-
-        const appointment = await prisma.appointment.findUnique({
-            where: { id: appointmentId },
+                isUnread: true,
+                endDateTime
+            },
             include: {
                 provider: true,
                 client: true,
@@ -93,42 +111,61 @@ router.put('/appointments/:id/book', async (req, res) => {
             }
         })
 
-        // getTime returns num of milliseconds since 1/1/1970 -> add this num to service duration in milliseconds -> convert back to Date
-        const calculatedEndDateTime = new Date(appointment.startDateTime.getTime() + (appointment.service.duration * 60 * 1000))
+        // Create Google Calendar event process below
+        // Event is created in both client and provider's calendar, if connected
+        const event = {
+            summary: updatedAppointment.service.name,
+            description: updatedAppointment.notes || '',
+            start: { dateTime: updatedAppointment.startDateTime.toISOString() },
+            end: { dateTime: updatedAppointment.endDateTime.toISOString() }
+        }
 
-        // Update appointment's endDateTime in database 
+        let providerEventId = null
+        let clientEventId = null
+
+        // Event is created in provider's calendar if they connected it
+        if(updatedAppointment.provider.googleConnected) {
+            try {
+                const { auth } = await getAccessToken(updatedAppointment.provider.id)
+                const calendar = google.calendar({ version: 'v3', auth }) 
+
+                const providerEvent = await calendar.events.insert({
+                    calendarId: 'primary',
+                    resource: event
+                })
+
+                providerEventId = providerEvent.data.id
+            } catch(error) {
+                console.error('Error adding event in provider calendar', error)
+            }
+        }
+
+        // Event is created in client's calendar if they connected it
+        if(updatedAppointment.client.googleConnected) {
+            try {
+                const { auth } = await getAccessToken(updatedAppointment.client.id)
+                const calendar = google.calendar({ version: 'v3', auth }) 
+
+                const clientEvent = await calendar.events.insert({
+                    calendarId: 'primary',
+                    resource: event
+                })
+
+                clientEventId = clientEvent.data.id
+            } catch(error) {
+                console.error('Error adding event in client calendar', error)
+            }
+        }
+
+        // Save the Google Calendar event ID in database
         await prisma.appointment.update({
             where: { id: appointmentId },
-            data: { endDateTime: calculatedEndDateTime }
-        })
-
-        // Create Google Calendar event process below
-        // Event is created by provider's Google Calendar's acount and invite the client to the event using their email
-        if(appointment.provider.googleConnected) {
-            const { auth } = await getAccessToken(appointment.providerId)
-            const calendar = google.calendar({ version: 'v3', auth })
-
-            const event = {
-                summary: appointment.service.name,
-                description: appointment.notes || '',
-                start: { dateTime: appointment.startDateTime.toISOString() },
-                end: { dateTime: appointment.endDateTime.toISOString() }, 
-                // Sends Google Calendar invite request to client's email  
-                attendees: [{ email: appointment.client.email }]
+            data: {
+                providerGoogleEventId: providerEventId,
+                clientGoogleEventId: clientEventId
             }
-            
-            // Add the event to Google Calendar
-            const newEvent = await calendar.events.insert({
-                calendarId: 'primary',
-                resource: event
-            })
-
-            // Save the Google Calendar event ID in database
-            await prisma.appointment.update({
-                where: { id: appointmentId },
-                data: { googleEventId: newEvent.data.id }
-            })
-        }
+        })
+    
         res.status(201).json(updatedAppointment)
     } catch(error) {
         console.log(error)
@@ -225,7 +262,10 @@ router.put('/appointments/:id/cancel', async (req, res) => {
     try {
         const appointment = await prisma.appointment.findUnique({
             where: { id: appointmentId },
-            include: { provider: true }
+            include: {
+                provider: true,
+                client: true
+            }
         })
         if(!appointment) {
             return res.status(404).json({ error: 'Appointment not found' })
@@ -239,15 +279,34 @@ router.put('/appointments/:id/cancel', async (req, res) => {
             return res.status(403).json({ error: 'Unauthorized' })
         }
 
-        // First, cancel in Google Calendar
-        if (appointment.googleEventId && appointment.provider.googleConnected) {
-            const { auth } = await getAccessToken(appointment.providerId)
-            const calendar = google.calendar({ version: 'v3', auth })
+        // Cancel in Google Calendar for provider
+        if (appointment.providerGoogleEventId && appointment.provider.googleConnected) {
+            try {   
+                const { auth } = await getAccessToken(appointment.providerId)
+                const calendar = google.calendar({ version: 'v3', auth })
+                
+                await calendar.events.delete({
+                    calendarId: 'primary',
+                    eventId: appointment.providerGoogleEventId
+                })
+            } catch(error) {
+                console.error('Error deleting provider event in Google Calendar', error)
+            }
+        }
 
-            await calendar.events.delete({
-                calendarId: 'primary',
-                eventId: appointment.googleEventId
-            })
+        // Cancel in Google Calendar for client 
+        if (appointment.clientGoogleEventId && appointment.client.googleConnected) {
+            try {   
+                const { auth } = await getAccessToken(appointment.clientId)
+                const calendar = google.calendar({ version: 'v3', auth })
+                
+                await calendar.events.delete({
+                    calendarId: 'primary',
+                    eventId: appointment.clientGoogleEventId
+                })
+            } catch(error) {
+                console.error('Error deleting client event in Google Calendar', error)
+            }
         }
 
         // Then, adjust database only if cancelling in Google Calendar was successful
@@ -259,8 +318,9 @@ router.put('/appointments/:id/cancel', async (req, res) => {
                 serviceId: null,
                 notes: null,
                 isUnread: true,
-                googleEventId: null,
-                endDateTime: null
+                endDateTime: null,
+                providerGoogleEventId: null,
+                clientGoogleEventId: null
             }
         })
 
