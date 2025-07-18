@@ -9,7 +9,7 @@ function LandingPage() {
                 <h2 className="text-xl font-bold text-slate-900">EasyPoint</h2>
                 <button 
                     onClick={() => navigate('/login')}
-                    className="bg-slate-900 hover:bg-slate-600 text-white font-semibold py-2 px-6 rounded-md cursor-pointer"
+                    className="bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold py-2 px-6 rounded-md cursor-pointer"
                 >
                     Log In
                 </button>
@@ -21,7 +21,7 @@ function LandingPage() {
                 <div className="landing-btns">
                     <button 
                         onClick={() => navigate('/signup')}
-                        className="bg-slate-900 hover:bg-slate-600 text-white font-semibold py-2 px-5 rounded-md cursor-pointer"
+                        className="bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold py-2 px-5 rounded-md cursor-pointer"
                     >
                         Sign Up
                     </button>
