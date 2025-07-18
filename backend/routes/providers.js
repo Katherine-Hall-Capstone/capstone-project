@@ -1,6 +1,7 @@
 const { PrismaClient } = require('../generated/prisma')
 const prisma = new PrismaClient()
 const router = require('express').Router()
+const BONUS_MULTIPLIER = 0.05
 
 // GET all providers
 router.get('/providers', async (req, res) => {
@@ -47,7 +48,7 @@ function findSimilarityScore(input, target) {
         i++
     }
 
-    let bonus = prefixLength * 0.05
+    let bonus = prefixLength * BONUS_MULTIPLIER
 
     let cost = 0
     i = j = prefixLength
@@ -63,11 +64,11 @@ function findSimilarityScore(input, target) {
             j += 2
         } else if(i + 1 < input.length && input[i + 1] === target[j]) {
             // Simulates deleting character in input
-            cost += 1
+            cost += 0.8
             i++
         } else if(j + 1 < target.length && input[i] === target[j + 1]) {
             // Simulates inserting character in input
-            cost += 1
+            cost += 0.8
             j++
         } else {
             // Substitution
