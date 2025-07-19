@@ -46,7 +46,7 @@ function LoginForm() {
     return (
         <form onSubmit={handleSubmit} className="bg-white max-w-md mx-auto mt-10 p-9 shadow-md rounded-lg flex flex-col gap-4">
             <div className="flex flex-col gap-1 mb-5" >
-                <h1 className="text-3xl font-bold text-center">Log in to your account</h1>
+                <h1 className="text-3xl font-bold text-center">Log in to EasyPoint</h1>
                 <p className="text-gray-400 text-center text-sm">Good to see you again.</p>
             </div>
             
