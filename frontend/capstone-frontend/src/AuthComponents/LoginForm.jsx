@@ -1,4 +1,3 @@
-import '../css/LoginForm.css'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useUser } from '../UserContext'
@@ -7,8 +6,8 @@ import { useUser } from '../UserContext'
 function LoginForm() {
     const [formData, setFormData] = useState({ username: "", password: "" })
     const [errorMessage, setErrorMessage] = useState('')
-    const navigate = useNavigate()
     const { setUser } = useUser()
+    const navigate = useNavigate()
 
     function handleChange(event) {
         const { name, value } = event.target
@@ -37,7 +36,6 @@ function LoginForm() {
 
             setUser(data)
             setFormData({ username: "", password: "" })
-            console.log("Login Success!")
             navigate('/dashboard') 
         } catch(error) {
             console.error("Error:", error)
@@ -46,15 +44,39 @@ function LoginForm() {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="login-form">
-            <input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username"/>
-            <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Password" />
+        <form onSubmit={handleSubmit} className="bg-white max-w-md mx-auto mt-10 p-9 shadow-md rounded-lg flex flex-col gap-4">
+            <div className="flex flex-col gap-1 mb-5" >
+                <h1 className="text-3xl font-bold text-center">Log in to EasyPoint</h1>
+                <p className="text-gray-400 text-center text-sm">Good to see you again.</p>
+            </div>
+            
+            <div>
+                <label className="font-semibold">Username</label>
+                <input 
+                    type="text" name="username" value={formData.username} onChange={handleChange}
+                    className="w-full border border-gray-300 rounded px-4 py-2 mt-2 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                />
+            </div>
+            
+            <div>
+                <label className="font-semibold">Password</label>
+                <input 
+                    type="password" name="password" value={formData.password} onChange={handleChange} 
+                    className="w-full border border-gray-300 rounded px-4 py-2 mt-2 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                />
+            </div>
+            
 
-            <button type="submit" className="submit-button">Log In</button>
+            <button 
+                type="submit" 
+                className="bg-slate-900 hover:bg-slate-500 transition duration-200 mt-2 text-white font-semibold py-2 px-5 rounded-md cursor-pointer"
+            >
+                Log In
+            </button>
 
-            {errorMessage && (<p className="error-msg">{errorMessage}</p>)}
-        </form>
-    );
+            <p className="text-red-600 text-center text-sm min-h-5">{errorMessage}</p>
+        </form>   
+    )
 
 }
 

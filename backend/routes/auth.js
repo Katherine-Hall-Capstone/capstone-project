@@ -136,7 +136,7 @@ router.get('/auth/google/callback', async (req, res) => {
         })
         
         // After Google authorization is successful, it redirects user to the dashboard
-        res.redirect('http://localhost:5173/dashboard')
+        res.redirect('http://localhost:5174/dashboard')
     } catch(error) {
         console.log('OAuth error: ', error)
         res.status(500).json({ error: 'Server error' });

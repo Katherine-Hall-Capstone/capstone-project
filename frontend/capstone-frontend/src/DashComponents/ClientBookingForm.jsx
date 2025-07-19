@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import '../css/ClientBookingForm.css'
 
 function ClientBookingForm({ provider, selectedAppointment, selectedService, onClose, onBookingSuccess }) {
     const [formData, setFormData] = useState({ notes: '' })

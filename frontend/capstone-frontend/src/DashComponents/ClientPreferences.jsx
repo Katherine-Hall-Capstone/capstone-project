@@ -1,5 +1,8 @@
 import { useUser } from '../UserContext'
 import { useState, useEffect } from 'react'
+import { useRefreshUser } from '../hooks/useRefreshUser'
+import CalendarStatus from '../DashComponents/CalendarStatus'
+import { FaTrashAlt } from "react-icons/fa"
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
@@ -27,8 +30,11 @@ function ClientPreferences()  {
         }
     }
 
+    const refreshUser = useRefreshUser()
+
     useEffect(() => {
         fetchPreferences()
+        refreshUser()
     }, [])
 
     async function handleAddWindow(event) {
@@ -76,60 +82,90 @@ function ClientPreferences()  {
     }
 
     return(
-        <div>
-            <h3>Preferred Time Windows</h3>
-            <form onSubmit={handleAddWindow}>
-                <label>
-                    Day:
-                    <select
-                        value={day} 
-                        onChange={event => setDay(event.target.value)} 
-                        required
-                    >
-                        <option value="">--</option>
-                        {daysOfWeek.map(day => (
-                            <option key={day} value={day}>{day}</option>
-                        ))}
-                    </select>
-                </label>
+        <div className="p-15">
+            <h3 className="text-4xl font-bold text-slate-900">Set Your Preferences</h3>
+            <div className="mt-8 ml-6 mr-170 flex flex-col gap-20">
+                <div>
+                    <p className="text-2xl font-semibold">Connect your Google Calendar?</p>
+                    <p className="italic text-gray-500">Allow your new appointments to also appear as events in your Google Calendar</p>
+                    <CalendarStatus googleConnected={user.googleConnected} />
+                </div>
 
-                <label>
-                    Start Time:
-                    <input 
-                        type="time" 
-                        value={startTime} 
-                        onChange={event => setStartTime(event.target.value)} 
-                        required 
-                    />
-                </label>
+                <div>
+                    <div className="flex flex-row justify-between items-start">
+                        <div>
+                            <h3 className="text-2xl font-semibold">Preferred Time Windows</h3>
+                            <p className="italic text-gray-500">Set your preferred time windows for appointments (up to 1 per day)</p>
+                            
+                            <form onSubmit={handleAddWindow} className="mt-6">
+                                <div className="flex gap-6">
+                                    <div className="flex flex-col justify-end">
+                                        <label>Day: </label>
+                                        <select
+                                            value={day} 
+                                            onChange={event => setDay(event.target.value)} 
+                                            required
+                                            className="border border-gray-300 rounded-md px-3 py-2"
+                                        >
+                                            <option value="">--</option>
+                                            {daysOfWeek.map(day => (
+                                                <option key={day} value={day}>{day}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    
+                                    <div className="flex flex-col">
+                                        <label>Start Time: </label>
+                                        <input 
+                                            type="time" 
+                                            value={startTime} 
+                                            onChange={event => setStartTime(event.target.value)} 
+                                            className="border border-gray-300 rounded-md px-3 py-2"
+                                            required 
+                                        />
+                                    </div>
+                                    
+                                    <div className="flex flex-col">
+                                        <label>End Time: </label>
+                                        <input 
+                                            type="time" 
+                                            value={endTime} 
+                                            onChange={event => setEndTime(event.target.value)} 
+                                            className="border border-gray-300 rounded-md px-3 py-2"
+                                            required 
+                                        />
+                                    </div>
+                                </div>
 
-                <label>
-                    End Time:
-                    <input 
-                        type="time" 
-                        value={endTime} 
-                        onChange={event => setEndTime(event.target.value)} 
-                        required 
-                    />
-                </label>
+                                <button                     
+                                    type="submit" 
+                                    className="bg-slate-900 hover:bg-slate-700 text-white font-semibold mt-4 px-3 py-2 rounded-md cursor-pointer"
+                                >
+                                    Add Time Window
+                                </button>
+                            </form>
 
-                <button type="submit">Add Time Window</button>
-            </form>
+                            {errorMessage && <p className="error-msg">{errorMessage}</p>}
+                        </div>
 
-            {errorMessage && <p className="error-msg">{errorMessage}</p>}
-
-            <ul>
-                {preferences.map(preference => (
-                    <li key={preference.id}>
-                        {/* Helps displays 24 hour time format as 12 hour */}
-                        {preference.dayOfWeek}: {new Date(`1970-01-01T${preference.startTime}`).toLocaleTimeString(undefined, { 
-                                                    hour: '2-digit', minute: '2-digit', hour12: true 
-                                                })} – {new Date(`1970-01-01T${preference.endTime}`).toLocaleTimeString(undefined, { 
-                                                        hour: '2-digit', minute: '2-digit', hour12: true })}
-                        <button onClick={() => handleDelete(preference.id)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+                        <div className="min-w-[300px]">
+                            <p className="text-center text-lg font-bold">Current Time Windows</p>
+                            <ul className="mt-6 space-y-4">
+                                {preferences.map(preference => (
+                                    <li key={preference.id} className="flex justify-between items-center bg-gray-100 p-4 rounded-md shadow-sm">
+                                        {/* Helps displays 24 hour time format as 12 hour */}
+                                        {preference.dayOfWeek}: {new Date(`1970-01-01T${preference.startTime}`).toLocaleTimeString(undefined, { 
+                                                                    hour: '2-digit', minute: '2-digit', hour12: true 
+                                                                })} – {new Date(`1970-01-01T${preference.endTime}`).toLocaleTimeString(undefined, { 
+                                                                        hour: '2-digit', minute: '2-digit', hour12: true })}
+                                        <button onClick={() => handleDelete(preference.id)} className="cursor-pointer"><FaTrashAlt /></button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>                 
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
