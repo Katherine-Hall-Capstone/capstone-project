@@ -50,7 +50,7 @@ function ClientSearchForm() {
                         placeholder="Search for Providers"
                         value={query}
                         onChange={(event) => setQuery(event.target.value)}
-                        className="focus:outline-none text-white w-80 px-2 placeholder-white"
+                        className="focus:outline-none text-white w-80 px-2"
                     />
                     <div className="flex flex-row gap-2">
                         <button type="button" onClick={handleClear} className="cursor-pointer">Clear</button>

@@ -6,15 +6,23 @@ export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null)
     const [loading , setLoading] = useState(true)
 
-    useEffect(() => {
-        fetch(`${import.meta.env.VITE_API_URL}/auth/me`, { credentials: "include" })
-        .then(response => response.json())
-        .then(data => {
-            if (data.id) {
-                setUser(data);
+    const fetchUser = async() => {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, { credentials: "include" })
+            const data = await res.json()
+
+            if(data.id) {
+                setUser(data)
             }
-        })
-        .finally(() => setLoading(false))
+        } catch(error) {
+            console.error("Failed to fetch user: ", error)
+        } finally {
+            setLoading(false)
+        }
+    }
+    
+    useEffect(() => {
+        fetchUser()
     }, [])
 
     return (
