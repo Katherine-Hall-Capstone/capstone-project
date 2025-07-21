@@ -1,40 +1,57 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useLogout } from '../hooks/useLogout'
-import { useRefreshUser } from '../hooks/useRefreshUser'
-import { useUser } from '../UserContext'
 import ClientSearchForm from '../DashComponents/ClientSearchForm'
 import ClientAppointments from '../DashComponents/ClientAppointments'
 import ClientReviews from '../DashComponents/ClientReviews'
-import CalendarStatus from '../DashComponents/CalendarStatus'
 import ClientPreferences from '../DashComponents/ClientPreferences'
 
 function ClientDashPage() {
-    const { user } = useUser()
     const logout = useLogout()
     const [activeTab, setActiveTab] = useState('appointments')
-    const refreshUser = useRefreshUser()
-
-    useEffect(() => {
-        refreshUser()
-    }, [])
 
     return(
         <div>
-            <div className="header-bar">
-                <p>[Logo]</p>
+            <div className="flex flex-row items-center justify-between mt-2 px-10 py-2">
+                <p className="text-xl font-bold text-slate-900">EasyPoint</p>
 
-                <nav>
-                    <button onClick={() => setActiveTab('search')}>Search</button>
-                    <button onClick={() => setActiveTab('appointments')}>Upcoming Appointments</button>
-                    <button onClick={() => setActiveTab('reviews')}>My Reviews</button>
-                    <button onClick={() => setActiveTab('preferences')}>My Preferences</button>
+                <nav className="flex items-center gap-1 bg-gray-100 rounded-full px-1 py-1">
+                    <button 
+                        onClick={() => setActiveTab('search')}
+                        className={`px-5 py-3 rounded-full cursor-pointer transition-colors duration-300 ${activeTab === 'search' ? 'bg-slate-900 text-white font-semibold' : 'text-gray-500'}`}
+                    >
+                        Search
+                    </button>
+
+                    <button 
+                        onClick={() => setActiveTab('appointments')}
+                        className={`px-5 py-3 rounded-full cursor-pointer transition-colors duration-300 ${activeTab === 'appointments' ? 'bg-slate-900 text-white font-semibold' : 'text-gray-500'}`}
+                    >
+                        Upcoming Appointments
+                    </button>
+
+                    <button 
+                        onClick={() => setActiveTab('reviews')}
+                        className={`px-5 py-3 rounded-full cursor-pointer transition-colors duration-300 ${activeTab === 'reviews' ? 'bg-slate-900 text-white font-semibold' : 'text-gray-500'}`}
+                    >
+                        My Reviews
+                    </button>
+
+                    <button 
+                        onClick={() => setActiveTab('preferences')}
+                        className={`px-5 py-3 rounded-full cursor-pointer transition-colors duration-300 ${activeTab === 'preferences' ? 'bg-slate-900 text-white font-semibold' : 'text-gray-500'}`}
+                    >
+                        My Preferences
+                    </button>
                 </nav>
 
-                <button onClick={logout}>Logout</button>
+                <button 
+                    onClick={logout}
+                    className="bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold py-2 px-5 rounded-md cursor-pointer"
+                >
+                    Logout
+                </button>
             </div>
             
-            <CalendarStatus googleConnected={user.googleConnected} />
-
             {activeTab === 'search' && <ClientSearchForm />}
             {activeTab === 'appointments' && <ClientAppointments />}
             {activeTab === 'reviews' && <ClientReviews />}
