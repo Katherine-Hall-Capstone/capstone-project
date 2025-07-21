@@ -11,7 +11,7 @@ export function useAppointments() {
                 credentials: 'include'
             })
 
-            await new Promise(resolve => setTimeout(resolve, 3000))  // Force a loading state
+            await new Promise(resolve => setTimeout(resolve, 3000))  // Force a 3 second loading state
 
             if(res.ok) {
                 const data = await res.json()

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { GoArrowRight } from 'react-icons/go'
+import LoadingSpinner from '../LoadingState'
 
 function ClientSearchForm() {
     const [query, setQuery] = useState('')
@@ -18,6 +19,8 @@ function ClientSearchForm() {
 
         try {   
             const res = await fetch(`${import.meta.env.VITE_API_URL}/providers?search=${encodeURIComponent(query)}`)
+
+            await new Promise(resolve => setTimeout(resolve, 3000))  // Force a 3 second loading state
             
             if(res.ok) {
                 const data = await res.json()
@@ -61,7 +64,7 @@ function ClientSearchForm() {
 
             <div className="flex justify-center mt-12">
                 {status === 'unrun' && <p>Search for providers.</p>}
-                {status === 'loading' && <p>Loading...</p>}
+                {status === 'loading' && <LoadingSpinner />}
                 {status === 'error' && <p>Something went wrong.</p>}
                 {status === 'success' && results.length === 0 && <p>No matches found.</p>}
                 {status === 'success' && results.length > 0 && (
