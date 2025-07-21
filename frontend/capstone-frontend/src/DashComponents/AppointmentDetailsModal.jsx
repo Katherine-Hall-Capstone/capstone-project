@@ -63,7 +63,6 @@ function AppointmentDetailsModal({ appointment, onClose }) {
                         Cancel Appointment
                     </button>
                 </div>
-                
             </div>
         </div>
     )

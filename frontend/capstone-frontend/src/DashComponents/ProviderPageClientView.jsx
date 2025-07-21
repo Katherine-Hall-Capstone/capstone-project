@@ -1,8 +1,8 @@
-import '../css/ProviderPageClientView.css'
-import { useParams } from 'react-router'
+import { useParams, useNavigate } from 'react-router'
 import { useEffect, useState } from 'react'
 import { useUser } from '../UserContext'
 import ClientBookingForm from './ClientBookingForm'
+import { TbArrowBackUp } from "react-icons/tb"
 
 const MS_PER_MINUTE = 60000
 const MS_PER_HOUR = 3600000
@@ -10,6 +10,7 @@ const MS_PER_HOUR = 3600000
 function ProviderPageClientView() {
     const { id } = useParams()
     const { user } = useUser()
+    const navigate = useNavigate()
     const [provider, setProvider] = useState(null)
     const [appointments, setAppointments] = useState([])
     const [recommendedAppointments, setRecommendedAppointments] = useState([])
@@ -289,40 +290,52 @@ function ProviderPageClientView() {
     }
 
     return(
-        <div className="profile-page">
-            <h2>Provider Profile</h2>
-            <h3>Name: {provider.name}</h3>
-            <h3>Services Offered</h3>
-            <ul>
+        <div className="max-w-6xl mx-auto px-6 pt-10 text-slate-900 text-center">
+            <div className="text-left">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center gap-1 hover:underline mb-4 cursor-pointer"
+                >
+                    <TbArrowBackUp className="text-xl"/>
+                    <span>Back to Dashboard</span>
+                </button>
+            </div>
+
+            <h3 className="text-4xl">Book with <span className="font-bold">{provider.name}</span>?</h3>
+            
+            <h3 className="text-xl mt-9 mb-2 font-semibold">Services Offered: </h3>
+            <ul className="list-disc list-inside mx-3 mb-6">
                 {provider.servicesOffered?.map(service => (
                     <li key={service.id}>
-                        {service.name} ({service.duration} min) - {service.details}
+                        {service.name} ({service.duration} min) - <span className="italic text-slate-500">{service.details}</span>
                     </li>
                 ))}
             </ul>
 
-            <label>Select a service: </label>
+            <label className="block mb-2 text-xl font-semibold">Select a Service: </label>
             <select
                 value={selectedService?.id || ''}
                 onChange={handleServiceSelect}
+                className="border border-gray-300 rounded px-3 py-1 mb-15"
             >   
                 <option value="">--</option>
                 {provider.servicesOffered?.map(service => (
                     <option key={service.id} value={service.id}>
-                        {service.name} ({service.duration} min)
+                        {service.name}
                     </option>
                 ))}
             </select>
 
-            <h3>Recommended Appointments</h3>
+            <h3 className="text-2xl font-bold mb-5 underline">Recommended Appointments</h3>
             {recommendedAppointments.length === 0 ? (
-                <p>No recommended appointments</p>
+                <p className="mb-6 text-gray-600 italic">No recommended appointments</p>
             ) : (
-                <div className="appointment-grid">
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-15">
                     {recommendedAppointments.map((appointment, index) => (
                         <button 
                             key={appointment.id} 
                             onClick={() => handleOpenModal(appointment)}
+                            className="p-4 border border-gray-300 bg-gray-200 rounded-xl shadow hover:shadow-lg duration-200 cursor-pointer"
                         >
                             <strong>{index + 1}.{' '}</strong>
                             {new Date(appointment.startDateTime).toLocaleString(undefined, {
@@ -338,13 +351,17 @@ function ProviderPageClientView() {
                 </div>
             )}
 
-            <h3>All Available Appointments</h3>
+            <h3 className="text-2xl font-bold mb-5 underline">All Available Appointments</h3>
             {appointments.length ===  0 ? (
-                <p>No available appointments</p>
+                <p className="text-gray-600 italic">No available appointments</p>
             ) : (
-                <div className="appointment-grid">
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
                     {appointments.map((appointment) => (
-                        <button key={appointment.id} onClick={() => handleOpenModal(appointment)}>
+                        <button 
+                            key={appointment.id} 
+                            onClick={() => handleOpenModal(appointment)}
+                            className="p-4 border border-slate-900 bg-slate-700 text-white rounded-xl shadow hover:shadow-lg duration-200 cursor-pointer"
+                        >
                             {new Date(appointment.startDateTime).toLocaleString(undefined, {
                                 year: 'numeric',
                                 month: 'short', 

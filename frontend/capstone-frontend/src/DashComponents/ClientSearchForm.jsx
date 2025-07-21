@@ -82,10 +82,6 @@ function ClientSearchForm() {
                             </div>
                         ))}
                     </div>
-
-                    
-                    
-                    
                 )} 
             </div> 
         </div>
