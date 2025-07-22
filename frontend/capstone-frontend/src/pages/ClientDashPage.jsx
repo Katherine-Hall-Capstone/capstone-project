@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useLogout } from '../hooks/useLogout'
 import ClientSearchForm from '../DashComponents/ClientSearchForm'
 import ClientAppointments from '../DashComponents/ClientAppointments'
@@ -8,6 +9,18 @@ import ClientPreferences from '../DashComponents/ClientPreferences'
 function ClientDashPage() {
     const logout = useLogout()
     const [activeTab, setActiveTab] = useState('appointments')
+    const [direction, setDirection] = useState(1)
+    const tabs = ['search', 'appointments', 'reviews', 'preferences']
+
+    function changeTab(newTab) {
+        if (newTab === activeTab) {
+            return
+        }
+        
+        // If new tab clicked is on right of current tab, it will slide in from the right (represented with direction = 1)
+        tabs.indexOf(newTab) > tabs.indexOf(activeTab) ? setDirection(1) : setDirection(-1)
+        setActiveTab(newTab)
+    }
 
     return(
         <div>
@@ -16,28 +29,28 @@ function ClientDashPage() {
 
                 <nav className="flex items-center gap-1 px-1 py-1 bg-gray-100 rounded-full">
                     <button 
-                        onClick={() => setActiveTab('search')}
+                        onClick={() => changeTab('search')}
                         className={`px-5 py-3 rounded-full cursor-pointer transition-colors duration-300 ${activeTab === 'search' ? 'bg-slate-900 text-white font-semibold' : 'text-gray-500'}`}
                     >
                         Search
                     </button>
 
                     <button 
-                        onClick={() => setActiveTab('appointments')}
+                        onClick={() => changeTab('appointments')}
                         className={`px-5 py-3 rounded-full cursor-pointer transition-colors duration-300 ${activeTab === 'appointments' ? 'bg-slate-900 text-white font-semibold' : 'text-gray-500'}`}
                     >
                         Upcoming Appointments
                     </button>
 
                     <button 
-                        onClick={() => setActiveTab('reviews')}
+                        onClick={() => changeTab('reviews')}
                         className={`px-5 py-3 rounded-full cursor-pointer transition-colors duration-300 ${activeTab === 'reviews' ? 'bg-slate-900 text-white font-semibold' : 'text-gray-500'}`}
                     >
                         My Reviews
                     </button>
 
                     <button 
-                        onClick={() => setActiveTab('preferences')}
+                        onClick={() => changeTab('preferences')}
                         className={`px-5 py-3 rounded-full cursor-pointer transition-colors duration-300 ${activeTab === 'preferences' ? 'bg-slate-900 text-white font-semibold' : 'text-gray-500'}`}
                     >
                         My Preferences
@@ -51,11 +64,65 @@ function ClientDashPage() {
                     Logout
                 </button>
             </div>
-            
-            {activeTab === 'search' && <ClientSearchForm />}
-            {activeTab === 'appointments' && <ClientAppointments />}
-            {activeTab === 'reviews' && <ClientReviews />}
-            {activeTab === 'preferences' && <ClientPreferences />}
+
+            {/* 
+            - AnimatePresence and mode=wait: allows for exit animations to happen before changing the activeTab
+            - motion.div: allows animations to be applied to divs 
+            - initial: determines that the div starts transparently 300px off the screen, either left or right based on direction (changeTab function)
+            - animate: places the div in view since x = 0 and is visible with opacity = 1
+            - exit: slides the tab out in the opposite direction it came from ('search' and 'preferences' are not opposite because they're on the edges)
+            - transition: determines the speed of the animations in seconds 
+            */}
+
+            <AnimatePresence mode="wait">
+                {activeTab === 'search' && (
+                    <motion.div
+                        key="search"
+                        initial={{ x: direction * 300, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: direction * 300, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <ClientSearchForm />
+                    </motion.div>
+                )}
+
+                {activeTab === 'appointments' && (
+                    <motion.div
+                        key="appointments"
+                        initial={{ x: direction * 300, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: direction * -300, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <ClientAppointments />
+                    </motion.div>
+                )}
+
+                {activeTab === 'reviews' && (
+                    <motion.div
+                        key="reviews"
+                        initial={{ x: direction * 300, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: direction * -300, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <ClientReviews />
+                    </motion.div>
+                )}
+
+                {activeTab === 'preferences' && (
+                    <motion.div
+                        key="preferences"
+                        initial={{ x: direction * 300, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: direction * 300, opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        <ClientPreferences />
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }

@@ -20,7 +20,7 @@ function ClientSearchForm() {
         try {   
             const res = await fetch(`${import.meta.env.VITE_API_URL}/providers?search=${encodeURIComponent(query)}`)
 
-            await new Promise(resolve => setTimeout(resolve, 3000))  // Force a 3 second loading state
+            await new Promise(resolve => setTimeout(resolve, 1000))  // Force a 1 second loading state
             
             if(res.ok) {
                 const data = await res.json()
