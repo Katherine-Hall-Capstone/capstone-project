@@ -10,6 +10,9 @@ export function useAppointments() {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/appointments`, {
                 credentials: 'include'
             })
+
+            await new Promise(resolve => setTimeout(resolve, 3000))  // Force a 3 second loading state
+
             if(res.ok) {
                 const data = await res.json()
                 setAppointments(data.sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime)))

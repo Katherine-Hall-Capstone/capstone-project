@@ -1,6 +1,7 @@
 import { useAppointments } from '../hooks/useAppointments'
 import { useState } from 'react'
 import AppointmentDetailsModal from './AppointmentDetailsModal'
+import LoadingSpinner from '../LoadingState'
 
 function ClientAppointments() {
     const { appointments, status } = useAppointments()
@@ -17,11 +18,12 @@ function ClientAppointments() {
 
     return(
         <div className="p-15">
-            {status === 'loading' && <p>Loading...</p>}
-            {status === 'error' && <p>Something went wrong.</p>}
-            {status === 'success' && appointments.length === 0 && <p>No upcoming appointments.</p>}
-            
             <h3 className="text-4xl font-bold text-slate-900">Upcoming Appointments</h3>
+
+            {status === 'loading' && <LoadingSpinner />}
+            {status === 'error' && <p className="mt-3">Something went wrong.</p>}
+            {status === 'success' && appointments.length === 0 && <p className="mt-3">No upcoming appointments.</p>}
+
             <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-center mt-8 mx-6">
                 {appointments.map(appointment => (
                     <div 
