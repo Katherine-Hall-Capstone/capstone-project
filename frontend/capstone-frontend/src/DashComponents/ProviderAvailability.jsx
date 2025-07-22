@@ -1,7 +1,9 @@
 import { useUser } from '../UserContext'
 import { useState, useEffect } from 'react'
+import { useRefreshUser } from '../hooks/useRefreshUser'
 import ProviderServices from './ProviderServices'
 import ProviderPreferences from './ProviderPreferences'
+import CalendarStatus from '../DashComponents/CalendarStatus'
 
 function ProviderAvailability() {
     const { user } = useUser()
@@ -26,8 +28,11 @@ function ProviderAvailability() {
         }
     }
     
+    const refreshUser = useRefreshUser()
+
     useEffect(() => {
         fetchAvailabilities()
+        refreshUser()
     }, [])
 
     async function handleSubmit(event) {
@@ -86,6 +91,12 @@ function ProviderAvailability() {
 
     return(
         <div>
+            <div>
+                <p className="text-2xl font-semibold">Connect your Google Calendar?</p>
+                <p className="italic text-gray-500">Allow your new appointments to also appear as events in your Google Calendar</p>
+                <CalendarStatus googleConnected={user.googleConnected} />
+            </div>
+
             <div className="availability-container">
                 <h3>Add Availability</h3>
                 <form onSubmit={handleSubmit}>
@@ -127,7 +138,6 @@ function ProviderAvailability() {
             <div className="preferences-container">
                 <ProviderPreferences providerId={user.id} />
             </div>
-            
         </div>
     )
 }

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import '../css/ProviderPreferences.css'
 
 function ProviderPreferences({ providerId }) {
     const [maxHours, setMaxHours] = useState('')

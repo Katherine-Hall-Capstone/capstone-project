@@ -1,4 +1,3 @@
-import '../css/ProviderAppointments.css'
 import { useAppointments } from '../hooks/useAppointments'
 import { useState } from 'react'
 import AppointmentDetailsModal from './AppointmentDetailsModal'
