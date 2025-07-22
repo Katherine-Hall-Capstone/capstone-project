@@ -24,13 +24,13 @@ function CalendarStatus({ googleConnected }) {
             {googleConnected ? 
                 (<button 
                     onClick={handleDisconnect}
-                    className="bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold mt-4 py-2 px-5 rounded-md cursor-pointer"
+                    className="mt-4 py-2 px-5 bg-slate-900 hover:bg-slate-600 duration-200 text-white font-semibold rounded-md cursor-pointer"
                 >
                     Disconnect Google Calendar
                 </button>) : 
                 (<a href={`${import.meta.env.VITE_API_URL}/auth/google`}>
                     <button 
-                        className="bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold mt-4 py-2 px-5 rounded-md cursor-pointer"
+                        className="mt-4 py-2 px-5 bg-slate-900 hover:bg-slate-600 duration-200 text-white font-semibold rounded-md cursor-pointer"
                     >
                         Connect
                     </button>

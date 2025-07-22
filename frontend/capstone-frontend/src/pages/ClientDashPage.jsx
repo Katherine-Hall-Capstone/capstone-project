@@ -12,9 +12,9 @@ function ClientDashPage() {
     return(
         <div>
             <div className="flex flex-row items-center justify-between mt-2 px-10 py-2">
-                <p className="text-xl font-bold text-slate-900">EasyPoint</p>
+                <p className="text-xl text-slate-900 font-bold">EasyPoint</p>
 
-                <nav className="flex items-center gap-1 bg-gray-100 rounded-full px-1 py-1">
+                <nav className="flex items-center gap-1 px-1 py-1 bg-gray-100 rounded-full">
                     <button 
                         onClick={() => setActiveTab('search')}
                         className={`px-5 py-3 rounded-full cursor-pointer transition-colors duration-300 ${activeTab === 'search' ? 'bg-slate-900 text-white font-semibold' : 'text-gray-500'}`}
@@ -46,7 +46,7 @@ function ClientDashPage() {
 
                 <button 
                     onClick={logout}
-                    className="bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold py-2 px-5 rounded-md cursor-pointer"
+                    className="px-5 py-2 bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold rounded-md cursor-pointer"
                 >
                     Logout
                 </button>

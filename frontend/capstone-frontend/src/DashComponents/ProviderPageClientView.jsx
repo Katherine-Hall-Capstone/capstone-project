@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useUser } from '../UserContext'
 import ClientBookingForm from './ClientBookingForm'
 import { TbArrowBackUp } from "react-icons/tb"
+import { IoMdInformationCircle } from "react-icons/io"
 
 const MS_PER_MINUTE = 60000
 const MS_PER_HOUR = 3600000
@@ -294,7 +295,7 @@ function ProviderPageClientView() {
             <div className="text-left">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-1 hover:underline mb-4 cursor-pointer"
+                    className="flex items-center gap-1 mb-4 hover:underline cursor-pointer"
                 >
                     <TbArrowBackUp className="text-xl"/>
                     <span>Back to Dashboard</span>
@@ -303,11 +304,11 @@ function ProviderPageClientView() {
 
             <h3 className="text-4xl">Book with <span className="font-bold">{provider.name}</span>?</h3>
             
-            <h3 className="text-xl mt-9 mb-2 font-semibold">Services Offered: </h3>
-            <ul className="list-disc list-inside mx-3 mb-6">
+            <h3 className="mt-9 mb-2 text-xl font-semibold">Services Offered: </h3>
+            <ul className="mb-6 list-disc list-inside">
                 {provider.servicesOffered?.map(service => (
                     <li key={service.id}>
-                        {service.name} ({service.duration} min) - <span className="italic text-slate-500">{service.details}</span>
+                        {service.name} ({service.duration} min) - <span className="text-slate-500 italic">{service.details}</span>
                     </li>
                 ))}
             </ul>
@@ -316,7 +317,7 @@ function ProviderPageClientView() {
             <select
                 value={selectedService?.id || ''}
                 onChange={handleServiceSelect}
-                className="border border-gray-300 rounded px-3 py-1 mb-15"
+                className="mb-15 px-3 py-1 border border-gray-300 focus:outline-none focus:ring-1 rounded"
             >   
                 <option value="">--</option>
                 {provider.servicesOffered?.map(service => (
@@ -325,8 +326,20 @@ function ProviderPageClientView() {
                     </option>
                 ))}
             </select>
+            
+            <div className="flex justify-center gap-2 mb-5">
+                <h3 className="text-2xl font-bold underline">Recommended Appointments</h3>
 
-            <h3 className="text-2xl font-bold mb-5 underline">Recommended Appointments</h3>
+                <div className="mt-2 relative group">
+                    <button className="text-xl hover:text-slate-600"><IoMdInformationCircle /></button>
+
+                    <div className="absolute left-full top-1/2 -translate-y-1/2 ml-2 w-64 p-3 bg-slate-900 text-sm text-white rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        Recommendations are determined and ranked by your preferences, the provider's preferences, and how well the appointment time fits in their schedule. 
+                        No appointments will be displayed if both you and the provider have no preferences, or there are no appointments that fit the preferences.
+                    </div>
+                </div>
+            </div>
+            
             {recommendedAppointments.length === 0 ? (
                 <p className="mb-6 text-gray-600 italic">No recommended appointments</p>
             ) : (
@@ -335,9 +348,9 @@ function ProviderPageClientView() {
                         <button 
                             key={appointment.id} 
                             onClick={() => handleOpenModal(appointment)}
-                            className="p-4 border border-gray-300 bg-gray-200 rounded-xl shadow hover:shadow-lg duration-200 cursor-pointer"
+                            className="p-4 bg-gray-200 border border-gray-300rounded-xl shadow hover:shadow-lg duration-200 cursor-pointer"
                         >
-                            <strong>{index + 1}.{' '}</strong>
+                            <strong>{index + 1}){' '}</strong>
                             {new Date(appointment.startDateTime).toLocaleString(undefined, {
                                 year: 'numeric',
                                 month: 'short', 
@@ -351,7 +364,7 @@ function ProviderPageClientView() {
                 </div>
             )}
 
-            <h3 className="text-2xl font-bold mb-5 underline">All Available Appointments</h3>
+            <h3 className="mb-5 text-2xl font-bold underline">All Available Appointments</h3>
             {appointments.length ===  0 ? (
                 <p className="text-gray-600 italic">No available appointments</p>
             ) : (
@@ -360,7 +373,7 @@ function ProviderPageClientView() {
                         <button 
                             key={appointment.id} 
                             onClick={() => handleOpenModal(appointment)}
-                            className="p-4 border border-slate-900 bg-slate-700 text-white rounded-xl shadow hover:shadow-lg duration-200 cursor-pointer"
+                            className="p-4 bg-slate-700 border border-slate-900 text-white rounded-xl shadow hover:shadow-lg duration-200 cursor-pointer"
                         >
                             {new Date(appointment.startDateTime).toLocaleString(undefined, {
                                 year: 'numeric',

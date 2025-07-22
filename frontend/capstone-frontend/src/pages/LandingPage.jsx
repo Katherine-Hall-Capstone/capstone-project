@@ -5,30 +5,30 @@ function LandingPage() {
 
     return(
         <>
-            <header className="border-b-2 border-gray-300 py-4 px-8 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-slate-900">EasyPoint</h2>
+            <header className="flex items-center justify-between py-4 px-8 border-b-2 border-gray-300">
+                <h2 className="text-xl text-slate-900 font-bold">EasyPoint</h2>
                 <button 
                     onClick={() => navigate('/login')}
-                    className="bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold py-2 px-6 rounded-md cursor-pointer"
+                    className="py-2 px-6 bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold rounded-md cursor-pointer"
                 >
                     Log In
                 </button>
             </header>
 
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-                <h1 className="text-4xl font-bold mb-8 text-slate-900">Welcome!</h1>
+                <h1 className="mb-8 text-4xl text-slate-900 font-bold">Welcome!</h1>
                 
                 <div className="landing-btns">
                     <button 
                         onClick={() => navigate('/signup')}
-                        className="bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold py-2 px-5 rounded-md cursor-pointer"
+                        className="py-2 px-5 bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold rounded-md cursor-pointer"
                     >
                         Sign Up
                     </button>
                 </div>
             </div>
 
-            <footer className="border-t-2 border-gray-300 py-4 px-8 flex flex-row justify-between">
+            <footer className="flex flex-row justify-between py-4 px-8 border-t-2 border-gray-300">
                 <h3>Est. 2025 @ Meta</h3>
                 <h3>Katherine Hall</h3>
             </footer>

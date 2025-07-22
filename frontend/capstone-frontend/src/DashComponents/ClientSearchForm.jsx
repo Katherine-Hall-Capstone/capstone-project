@@ -47,17 +47,17 @@ function ClientSearchForm() {
     return(
         <div>
             <div className="flex justify-center pt-12">
-                <form onSubmit={handleSearch} className="flex gap-4 text-white bg-slate-900 px-4 py-3 rounded-3xl w-120">
+                <form onSubmit={handleSearch} className="flex gap-4 px-4 py-3 bg-slate-900 w-120 text-white rounded-3xl">
                     <input 
                         type="text"
                         placeholder="Search for Providers"
                         value={query}
                         onChange={(event) => setQuery(event.target.value)}
-                        className="focus:outline-none text-white w-80 px-2"
+                        className="px-2 w-80 focus:outline-none text-white"
                     />
                     <div className="flex flex-row gap-2">
                         <button type="button" onClick={handleClear} className="cursor-pointer">Clear</button>
-                        <button type="submit" className="bg-white text-black px-3 py-2 rounded-2xl cursor-pointer">Search</button>
+                        <button type="submit" className="px-3 py-2 bg-white text-black rounded-2xl cursor-pointer">Search</button>
                     </div>
                 </form>
             </div>
@@ -72,10 +72,10 @@ function ClientSearchForm() {
                         {results.map(provider => (
                             <div 
                                 key={provider.id}
-                                className="bg-gray-100 p-4 rounded-xl w-160 flex flex-row justify-between"
+                                className="flex flex-row justify-between p-4 bg-gray-100 w-160 rounded-xl"
                             >
                                 <div className="space-y-2">
-                                    <p className="font-bold text-xl">{provider.name}</p>
+                                    <p className="text-xl font-bold">{provider.name}</p>
                                     <p className="italic"><span className="font-medium">Services: </span>{provider.servicesOffered?.map(service => service.name).join(', ')}</p>
                                 </div>
                                 <button onClick={() => navigate(`/providers/${provider.id}`)} className="flex items-center gap-2 cursor-pointer">See More <GoArrowRight /></button>

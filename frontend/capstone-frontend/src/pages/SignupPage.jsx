@@ -6,7 +6,7 @@ function SignupPage() {
 
     return(
         <div className="bg-gray-100 min-h-screen">
-            <header className="border-b-2 border-gray-300 bg-white py-4 px-8 flex items-center justify-between">
+            <header className="flex items-center justify-between py-4 px-8 bg-white border-b-2 border-gray-300">
                 <button
                     onClick={() => navigate('/')}
                     className="text-xl font-bold text-slate-900 cursor-pointer"
@@ -16,13 +16,13 @@ function SignupPage() {
 
                 <button 
                     onClick={() => navigate('/login')}
-                    className="bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold py-2 px-6 rounded-md cursor-pointer"
+                    className="py-2 px-6 bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold rounded-md cursor-pointer"
                 >
                     Log in instead?
                 </button>
             </header>
 
-            <div className="min-h-screen flex flex-col justify-center">
+            <div className="flex flex-col justify-center min-h-screen">
                 <SignupForm></SignupForm>
             </div>
         </div>

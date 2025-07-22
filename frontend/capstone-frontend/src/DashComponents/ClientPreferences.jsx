@@ -84,7 +84,7 @@ function ClientPreferences()  {
     return(
         <div className="p-15">
             <h3 className="text-4xl font-bold text-slate-900">Set Your Preferences</h3>
-            <div className="mt-8 ml-6 mr-170 flex flex-col gap-20">
+            <div className="flex flex-col gap-20 mt-8 ml-6 mr-170">
                 <div>
                     <p className="text-2xl font-semibold">Connect your Google Calendar?</p>
                     <p className="italic text-gray-500">Allow your new appointments to also appear as events in your Google Calendar</p>
@@ -95,7 +95,7 @@ function ClientPreferences()  {
                     <div className="flex flex-row justify-between items-start">
                         <div>
                             <h3 className="text-2xl font-semibold">Preferred Time Windows</h3>
-                            <p className="italic text-gray-500">Set your preferred time windows for appointments (up to 1 per day)</p>
+                            <p className="text-gray-500 italic">Set your preferred time windows for appointments (up to 1 per day)</p>
                             
                             <form onSubmit={handleAddWindow} className="mt-6">
                                 <div className="flex gap-6">
@@ -105,7 +105,7 @@ function ClientPreferences()  {
                                             value={day} 
                                             onChange={event => setDay(event.target.value)} 
                                             required
-                                            className="border border-gray-300 rounded-md px-3 py-2"
+                                            className="px-3 py-2 border border-gray-300 rounded-md"
                                         >
                                             <option value="">--</option>
                                             {daysOfWeek.map(day => (
@@ -120,7 +120,7 @@ function ClientPreferences()  {
                                             type="time" 
                                             value={startTime} 
                                             onChange={event => setStartTime(event.target.value)} 
-                                            className="border border-gray-300 rounded-md px-3 py-2"
+                                            className="px-3 py-2 border border-gray-300 rounded-md"
                                             required 
                                         />
                                     </div>
@@ -131,7 +131,7 @@ function ClientPreferences()  {
                                             type="time" 
                                             value={endTime} 
                                             onChange={event => setEndTime(event.target.value)} 
-                                            className="border border-gray-300 rounded-md px-3 py-2"
+                                            className="px-3 py-2 border border-gray-300 rounded-md"
                                             required 
                                         />
                                     </div>
@@ -139,7 +139,7 @@ function ClientPreferences()  {
 
                                 <button                     
                                     type="submit" 
-                                    className="bg-slate-900 hover:bg-slate-700 text-white font-semibold mt-4 px-3 py-2 rounded-md cursor-pointer"
+                                    className="mt-4 px-3 py-2 bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-md cursor-pointer"
                                 >
                                     Add Time Window
                                 </button>
@@ -152,7 +152,7 @@ function ClientPreferences()  {
                             <p className="text-center text-lg font-bold">Current Time Windows</p>
                             <ul className="mt-6 space-y-4">
                                 {preferences.map(preference => (
-                                    <li key={preference.id} className="flex justify-between items-center bg-gray-100 p-4 rounded-md shadow-sm">
+                                    <li key={preference.id} className="flex justify-between items-center p-4 bg-gray-100 shadow-sm rounded-md">
                                         {/* Helps displays 24 hour time format as 12 hour */}
                                         {preference.dayOfWeek}: {new Date(`1970-01-01T${preference.startTime}`).toLocaleTimeString(undefined, { 
                                                                     hour: '2-digit', minute: '2-digit', hour12: true 

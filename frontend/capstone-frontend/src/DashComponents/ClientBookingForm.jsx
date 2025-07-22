@@ -44,11 +44,11 @@ function ClientBookingForm({ provider, selectedAppointment, selectedService, onC
 
     return (
         <div 
-            className="fixed inset-0 bg-black/50 flex items-center justify-center"
+            className="flex items-center justify-center fixed inset-0 bg-black/50"
             onClick={onClose}
         >
             <div
-                className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full relative"
+                className="p-8 max-w-md w-full relative bg-white rounded-lg shadow-xl"
                 onClick={(event) => event.stopPropagation()}
             >
                 <button className="absolute top-3 left-3 text-black cursor-pointer" onClick={onClose}>x</button>
@@ -94,16 +94,14 @@ function ClientBookingForm({ provider, selectedAppointment, selectedService, onC
                         
                         <button 
                             type="submit"
-                            className="mt-6 bg-green-600 hover:bg-green-500 duration-200 w-50 text-white text-sm font-semibold px-4 py-2 rounded-md cursor-pointer"
+                            className="mt-6 px-4 py-2 bg-green-600 hover:bg-green-500 duration-200 w-50 text-white text-sm font-semibold rounded-md cursor-pointer"
                         >
                             Confirm Appointment
                         </button>
                         
-                        <p className="text-green-600 min-h-5">{successMessage}</p>
+                        <p className="min-h-5 text-green-600">{successMessage}</p>
                     </form>
                 </div>
-                
-                
             </div>
         </div>
     )
