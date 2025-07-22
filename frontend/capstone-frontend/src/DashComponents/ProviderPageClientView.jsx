@@ -348,7 +348,7 @@ function ProviderPageClientView() {
                         <button 
                             key={appointment.id} 
                             onClick={() => handleOpenModal(appointment)}
-                            className="p-4 bg-gray-200 border border-gray-300rounded-xl shadow hover:shadow-lg duration-200 cursor-pointer"
+                            className="p-4 bg-gray-200 border border-gray-300 rounded-xl shadow hover:shadow-lg duration-200 cursor-pointer"
                         >
                             <strong>{index + 1}){' '}</strong>
                             {new Date(appointment.startDateTime).toLocaleString(undefined, {
