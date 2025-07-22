@@ -1,0 +1,1 @@
+export const LOADING_IN_MS = 1000

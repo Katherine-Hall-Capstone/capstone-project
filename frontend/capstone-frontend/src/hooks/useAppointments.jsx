@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { LOADING_IN_MS } from '../constants'
 
 export function useAppointments() {
     const [appointments, setAppointments] = useState([])
@@ -11,7 +12,7 @@ export function useAppointments() {
                 credentials: 'include'
             })
 
-            await new Promise(resolve => setTimeout(resolve, 1000))  // Force a 1 second loading state
+            await new Promise(resolve => setTimeout(resolve, LOADING_IN_MS))  // Force loading state
 
             if(res.ok) {
                 const data = await res.json()
