@@ -19,11 +19,11 @@ function AppointmentDetailsModal({ appointment, onClose }) {
 
     return (
         <div 
-            className="fixed inset-0 bg-black/50 flex items-center justify-center" 
+            className="flex items-center justify-center fixed inset-0 bg-black/50" 
             onClick={onClose}
         >
             <div 
-                className="bg-white p-8 rounded-lg shadow-xl max-w-sm w-full relative"
+                className="bg-white p-8 max-w-sm w-full relative rounded-lg shadow-xl"
                 onClick={(event) => event.stopPropagation()}
             >
                 <button className="absolute top-3 left-3 text-black cursor-pointer" onClick={onClose}>×</button>
@@ -59,11 +59,10 @@ function AppointmentDetailsModal({ appointment, onClose }) {
                         
                     <p><span className="font-semibold">Notes: </span> {appointment.notes || 'N/A'}</p>
 
-                    <button className="mt-6 bg-red-400 hover:bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-md cursor-pointer" onClick={handleCancel}>
+                    <button className="mt-6 px-4 py-2 bg-red-400 hover:bg-red-500 duration-200 text-white text-sm font-semibold rounded-md cursor-pointer" onClick={handleCancel}>
                         Cancel Appointment
                     </button>
                 </div>
-                
             </div>
         </div>
     )

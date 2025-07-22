@@ -43,43 +43,65 @@ function ClientBookingForm({ provider, selectedAppointment, selectedService, onC
     }
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content">
-                <button className="close-button" onClick={onClose}>x</button>
+        <div 
+            className="flex items-center justify-center fixed inset-0 bg-black/50"
+            onClick={onClose}
+        >
+            <div
+                className="p-8 max-w-md w-full relative bg-white rounded-lg shadow-xl"
+                onClick={(event) => event.stopPropagation()}
+            >
+                <button className="absolute top-3 left-3 text-black cursor-pointer" onClick={onClose}>x</button>
 
-                <h3>Book Appointment</h3>
-                <form onSubmit={handleSubmit} className="booking-form">
-                    <div>
-                        <strong>Provider: </strong> 
-                        {provider.name}
-                    </div>
-
-                    <div>
-                        <strong>When? </strong>
-                        {new Date(selectedAppointment.startDateTime).toLocaleString(undefined, {
-                            year: 'numeric',
-                            month: 'short', 
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true  
-                        })}
-                    </div>
-
-                    <div>
-                        <strong>Service Type: </strong>
-                        {selectedService.name} ({selectedService.duration} min)
-                    </div>
-                
-                    <div className="notes">
-                        <strong>Notes (Optional):</strong>
-                        <textarea name="notes" value={formData.notes} onChange={handleChange} />
-                    </div>
+                <div className="flex flex-col items-center space-y-8 text-center">
+                    <h3 className="font-bold text-2xl">Book Appointment</h3>
                     
-                    <button type="submit">Confirm Appointment</button>
+                    <form 
+                        onSubmit={handleSubmit} 
+                        className="flex flex-col items-center gap-3"
+                    >
+                        <div>
+                            <span className="font-semibold">Provider: </span> 
+                            {provider.name}
+                        </div>
+
+                        <div>
+                            <span className="font-semibold">When? </span> 
+                            {new Date(selectedAppointment.startDateTime).toLocaleString(undefined, {
+                                year: 'numeric',
+                                month: 'short', 
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true  
+                            })}
+                        </div>
+
+                        <div>
+                            <span className="font-semibold">Service Type: </span> 
+                            {selectedService.name} ({selectedService.duration} min)
+                        </div>
                     
-                    {successMessage && <p>{successMessage}</p>}
-                </form>
+                        <div className="flex flex-col">
+                            <span className="font-semibold">Notes (Optional): </span> 
+                            <textarea 
+                                name="notes" 
+                                value={formData.notes} 
+                                onChange={handleChange} 
+                                className="mt-1 p-2 h-30 border border-gray-300 rounded-md focus:outline-none focus:ring-1 resize-none"
+                            />
+                        </div>
+                        
+                        <button 
+                            type="submit"
+                            className="mt-6 px-4 py-2 bg-green-600 hover:bg-green-500 duration-200 w-50 text-white text-sm font-semibold rounded-md cursor-pointer"
+                        >
+                            Confirm Appointment
+                        </button>
+                        
+                        <p className="min-h-5 text-green-600">{successMessage}</p>
+                    </form>
+                </div>
             </div>
         </div>
     )

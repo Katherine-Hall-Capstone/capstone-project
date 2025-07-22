@@ -24,11 +24,11 @@ function ClientAppointments() {
             {status === 'error' && <p className="mt-3">Something went wrong.</p>}
             {status === 'success' && appointments.length === 0 && <p className="mt-3">No upcoming appointments.</p>}
 
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-center mt-8 mx-6">
+            <div className="mt-8 mx-6 grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-center">
                 {appointments.map(appointment => (
                     <div 
                         key={appointment.id} 
-                        className="flex flex-col justify-between h-[300px] transition-transform duration-300 transform hover:scale-105 border-1 border-gray-200 shadow-md bg-white rounded-lg p-6 cursor-pointer" 
+                        className="flex flex-col justify-between h-[300px] p-6 transition-transform duration-300 transform hover:scale-105 border-1 border-gray-200 shadow-md bg-white rounded-lg cursor-pointer" 
                         onClick={() => handleOpenModal(appointment)}
                     >
                         <div className="flex flex-col gap-2"> 
@@ -43,14 +43,14 @@ function ClientAppointments() {
                                         })}
                             </p>
 
-                            <p className="text-gray-500 italic text-sm">{new Date(appointment.startDateTime).toLocaleString(undefined, {
+                            <p className="text-gray-500 text-sm italic">{new Date(appointment.startDateTime).toLocaleString(undefined, {
                                     month: 'short', 
                                     day: 'numeric'
                                 })}
                             </p>
                         </div>
                             
-                        <p className="text-slate-600 text-xl font-bold text-center">{appointment.service.name}</p>
+                        <p className="text-slate-600 text-xl text-center font-bold">{appointment.service.name}</p>
                         
                         <div>
                             <p className="text-md font-semibold">{appointment.provider.name}</p>
