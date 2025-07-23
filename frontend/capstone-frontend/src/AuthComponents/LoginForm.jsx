@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useUser } from '../UserContext'
 
-
 function LoginForm() {
     const [formData, setFormData] = useState({ username: "", password: "" })
     const [errorMessage, setErrorMessage] = useState('')
@@ -27,7 +26,7 @@ function LoginForm() {
                 credentials: "include",
                 body: JSON.stringify(formData)
             })
-
+            
             const data = await res.json()
 
             if(!res.ok) {

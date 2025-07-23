@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import '../css/ProviderPreferences.css'
 
 function ProviderPreferences({ providerId }) {
     const [maxHours, setMaxHours] = useState('')
@@ -87,47 +86,65 @@ function ProviderPreferences({ providerId }) {
 
     return(
         <div>
-            <h3>Manage Preferences</h3>
+            <h3 className="mb-4 text-2xl text-center font-semibold">Manage Preferences</h3>
 
             {!hasPreferences ? (
-                <form onSubmit={handleSubmit} className="provider-preference-form">
-                    <div className="hours">
-                        <label>
-                            What is the maximum amount of consecutive hours you'd like to work?
-                        </label>
-                        <input
-                            type="number"
-                            value={maxHours}
-                            onChange={event => setMaxHours(event.target.value)}
-                            required
-                            min={1}
-                        />
-                    </div>
+                <form onSubmit={handleSubmit} className="flex flex-col items-center">
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <label className="text-gray-500 italic">
+                                What is the maximum amount of consecutive hours you'd like to work?
+                            </label>
+                            <input
+                                type="number"
+                                value={maxHours}
+                                onChange={event => setMaxHours(event.target.value)}
+                                className="w-20 p-1 bg-white border border-gray-300 focus:outline-none focus:ring-1 rounded-md"
+                                required
+                                min={1}
+                            />
+                        </div>
 
-                    <div className="early-late">
-                        <label>
-                            Do you prefer earlier or later appointments? 
-                        </label>
-                        <select
-                            value={prefersEarly}
-                            onChange={event => setPrefersEarly(event.target.value === 'true')}  // If option chosen is 'true' (string), convert to boolean true
-                        >
-                            <option value="true">Earlier</option>
-                            <option value="false">Later</option>
-                        </select>
+                        <div className="flex items-center gap-2">
+                            <label className="text-gray-500 italic">
+                                Do you prefer earlier or later appointments? 
+                            </label>
+                            <select
+                                value={prefersEarly}
+                                onChange={event => setPrefersEarly(event.target.value === 'true')}  // If option chosen is 'true' (string), convert to boolean true
+                                className="w-20 p-1 bg-white 
+                                border border-gray-300 focus:outline-none focus:ring-1 rounded-md"
+                            >
+                                <option value="true">Earlier</option>
+                                <option value="false">Later</option>
+                            </select>
+                        </div>
                     </div>
-                    <button type="submit" className="submit-preferences">Set Preferences</button>
+                    
+                    <button 
+                        type="submit" 
+                        className="mt-4 px-3 py-2 bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-md cursor-pointer"
+                    >
+                        Set Preferences
+                    </button>
                 </form>
             ) : (
-                <div className="current-preferences">
-                    <p>Maximum Consecutive Hours: {maxHours}</p>
-                    <p>Prefer: {prefersEarly === true ? 'Earlier' : 'Later'} Appointments</p>
+                <div className="flex flex-col items-center">
+                    <div>
+                        <p className="mb-2"><span className="text-gray-500 italic">Maximum Consecutive Hours: </span>{maxHours}</p>
+                        <p><span className="text-gray-500 italic">Prefer: </span>{prefersEarly === true ? 'Earlier' : 'Later'} Appointments</p>
+                    </div>
 
-                    <button onClick={handleDelete}>Delete Preferences</button>
+                    <button 
+                        onClick={handleDelete}
+                        className="mt-4 px-3 py-2 bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-md cursor-pointer"
+                    >
+                        Delete Preferences
+                    </button>
                 </div>
             )}
             
-            {errorMessage && <p className="error-msg">{errorMessage}</p>}
+            <p className="mt-2 min-h-5 text-red-600 text-center text-sm">{errorMessage}</p>
         </div>
     )
 }

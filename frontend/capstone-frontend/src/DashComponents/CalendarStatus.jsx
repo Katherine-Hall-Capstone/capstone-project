@@ -20,7 +20,7 @@ function CalendarStatus({ googleConnected }) {
     }
 
     return(
-        <div className="calendar-status">
+        <div>
             {googleConnected ? 
                 (<button 
                     onClick={handleDisconnect}
