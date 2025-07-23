@@ -5,12 +5,14 @@ import ClientSearchForm from '../DashComponents/ClientSearchForm'
 import ClientAppointments from '../DashComponents/ClientAppointments'
 import ClientReviews from '../DashComponents/ClientReviews'
 import ClientPreferences from '../DashComponents/ClientPreferences'
+import { SLIDE_DISTANCE, SLIDE_DURATION } from '../constants'
+
+const tabs = ['search', 'appointments', 'reviews', 'preferences']
 
 function ClientDashPage() {
     const logout = useLogout()
     const [activeTab, setActiveTab] = useState('appointments')
     const [direction, setDirection] = useState(1)
-    const tabs = ['search', 'appointments', 'reviews', 'preferences']
 
     function changeTab(newTab) {
         if (newTab === activeTab) {
@@ -78,10 +80,10 @@ function ClientDashPage() {
                 {activeTab === 'search' && (
                     <motion.div
                         key="search"
-                        initial={{ x: direction * 300, opacity: 0 }}
+                        initial={{ x: direction * SLIDE_DISTANCE, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: direction * 300, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        exit={{ x: direction * SLIDE_DISTANCE, opacity: 0 }}
+                        transition={{ duration: SLIDE_DURATION }}
                     >
                         <ClientSearchForm />
                     </motion.div>
@@ -90,10 +92,10 @@ function ClientDashPage() {
                 {activeTab === 'appointments' && (
                     <motion.div
                         key="appointments"
-                        initial={{ x: direction * 300, opacity: 0 }}
+                        initial={{ x: direction * SLIDE_DISTANCE, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: direction * -300, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        exit={{ x: direction * -SLIDE_DISTANCE, opacity: 0 }}
+                        transition={{ duration: SLIDE_DURATION }}
                     >
                         <ClientAppointments />
                     </motion.div>
@@ -102,10 +104,10 @@ function ClientDashPage() {
                 {activeTab === 'reviews' && (
                     <motion.div
                         key="reviews"
-                        initial={{ x: direction * 300, opacity: 0 }}
+                        initial={{ x: direction * SLIDE_DISTANCE, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: direction * -300, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        exit={{ x: direction * -SLIDE_DISTANCE, opacity: 0 }}
+                        transition={{ duration: SLIDE_DURATION }}
                     >
                         <ClientReviews />
                     </motion.div>
@@ -114,10 +116,10 @@ function ClientDashPage() {
                 {activeTab === 'preferences' && (
                     <motion.div
                         key="preferences"
-                        initial={{ x: direction * 300, opacity: 0 }}
+                        initial={{ x: direction * SLIDE_DISTANCE, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: direction * 300, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        exit={{ x: direction * SLIDE_DISTANCE, opacity: 0 }}
+                        transition={{ duration: SLIDE_DURATION }}
                     >
                         <ClientPreferences />
                     </motion.div>
