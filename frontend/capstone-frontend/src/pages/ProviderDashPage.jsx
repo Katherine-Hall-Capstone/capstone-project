@@ -4,6 +4,7 @@ import { useLogout } from '../hooks/useLogout'
 import ProviderAvailability from '../DashComponents/ProviderAvailability'
 import ProviderAppointments from '../DashComponents/ProviderAppointments'
 import ProviderReviews from '../DashComponents/ProviderReviews'
+import { SLIDE_DISTANCE, SLIDE_DURATION } from '../constants'
 
 function ProviderDashPage() {
     const logout = useLogout()
@@ -60,10 +61,10 @@ function ProviderDashPage() {
                 {activeTab === 'details' && (
                     <motion.div
                         key="details"
-                        initial={{ x: direction * 300, opacity: 0 }}
+                        initial={{ x: direction * SLIDE_DISTANCE, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: direction * 300, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        exit={{ x: direction * SLIDE_DISTANCE, opacity: 0 }}
+                        transition={{ duration: SLIDE_DURATION }}
                     >
                         <ProviderAvailability />
                     </motion.div>
@@ -72,10 +73,10 @@ function ProviderDashPage() {
                 {activeTab === 'appointments' && (
                     <motion.div
                         key="appointments"
-                        initial={{ x: direction * 300, opacity: 0 }}
+                        initial={{ x: direction * SLIDE_DISTANCE, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: direction * -300, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        exit={{ x: direction * -SLIDE_DISTANCE, opacity: 0 }}
+                        transition={{ duration: SLIDE_DURATION }}
                     >
                         <ProviderAppointments />
                     </motion.div>
@@ -84,10 +85,10 @@ function ProviderDashPage() {
                 {activeTab === 'reviews' && (
                     <motion.div
                         key="ProviderAppointments"
-                        initial={{ x: direction * 300, opacity: 0 }}
+                        initial={{ x: direction * SLIDE_DISTANCE, opacity: 0 }}
                         animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: direction * 300, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
+                        exit={{ x: direction * SLIDE_DISTANCE, opacity: 0 }}
+                        transition={{ duration: SLIDE_DURATION }}
                     >
                         <ProviderReviews />
                     </motion.div>
