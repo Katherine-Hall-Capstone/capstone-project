@@ -79,11 +79,11 @@ function ProviderServices({ providerId }) {
 
     return (
         <div>
-            <h3 className="mb-4 text-2xl text-center font-semibold">Manage Services</h3>
+            <h3 className="provider-pref-title">Manage Services</h3>
 
             <div className="flex justify-around">
                 <div>
-                    <p className="text-xl text-center">Add Service:</p>
+                    <p className="provider-pref-header">Add Service:</p>
                     <form 
                         onSubmit={handleAddService}
                         className="flex flex-col gap-2 mt-3"
@@ -93,7 +93,7 @@ function ProviderServices({ providerId }) {
                             placeholder="Service Name"
                             value={serviceName}
                             onChange={event => setServiceName(event.target.value)}
-                            className="p-1 bg-white border border-gray-300 focus:outline-none focus:ring-1 rounded-md"
+                            className="provider-serv-text"
                             required
                         />
                         <input
@@ -101,7 +101,7 @@ function ProviderServices({ providerId }) {
                             placeholder="Duration (min)"
                             value={serviceDuration}
                             onChange={event => setServiceDuration(event.target.value)}
-                            className="p-1 bg-white border border-gray-300 focus:outline-none focus:ring-1 rounded-md"
+                            className="provider-serv-text"
                             required
                             min={1}
                         />
@@ -109,24 +109,24 @@ function ProviderServices({ providerId }) {
                             placeholder="Service Details"
                             value={serviceDetails}
                             onChange={event => setServiceDetails(event.target.value)}
-                            className="p-1 h-40 bg-white border border-gray-300 focus:outline-none focus:ring-1 rounded-md resize-none"
+                            className="provider-serv-text h-40 resize-none"
                         />
                         <button 
                             type="submit"
-                            className="mt-4 px-3 py-2 bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-md cursor-pointer"
+                            className="primary-btn mt-4"
                         >
                             Add Service
                         </button>
                     </form>
 
-                    <p className="mt-2 min-h-5 max-w-50 text-red-600 text-center text-sm">{errorMessage}</p>
+                    <p className="message mt-2 max-w-50 text-red-600">{errorMessage}</p>
                 </div>
 
                 <div>
-                    <p className="text-xl text-center">Services</p>
+                    <p className="provider-pref-header">Services</p>
                     <ul className="mt-3 w-70 space-y-4">
                         {services.map(service => (
-                            <li key={service.id} className="flex flex-col items-center p-4 bg-slate-500 border border-slate-600 text-white shadow-lg rounded-md">
+                            <li key={service.id} className="provider-pref-list flex-col">
                                 <div className="font-bold">{service.name} ({service.duration} min):</div> 
                                 <div className="w-full italic break-words text-center text-slate-200">{service.details}</div>
                                 <button 

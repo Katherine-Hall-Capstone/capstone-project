@@ -44,17 +44,17 @@ function ClientBookingForm({ provider, selectedAppointment, selectedService, onC
 
     return (
         <div 
-            className="flex items-center justify-center fixed inset-0 bg-black/50"
+            className="modal-overlay"
             onClick={onClose}
         >
             <div
-                className="p-8 max-w-md w-full relative bg-white rounded-lg shadow-xl"
+                className="modal-content"
                 onClick={(event) => event.stopPropagation()}
             >
-                <button className="absolute top-3 left-3 text-black cursor-pointer" onClick={onClose}>x</button>
+                <button className="modal-close" onClick={onClose}>x</button>
 
-                <div className="flex flex-col items-center space-y-8 text-center">
-                    <h3 className="font-bold text-2xl">Book Appointment</h3>
+                <div className="modal-text">
+                    <h3 className="modal-title">Book Appointment</h3>
                     
                     <form 
                         onSubmit={handleSubmit} 
@@ -88,18 +88,18 @@ function ClientBookingForm({ provider, selectedAppointment, selectedService, onC
                                 name="notes" 
                                 value={formData.notes} 
                                 onChange={handleChange} 
-                                className="mt-1 p-2 h-30 border border-gray-300 rounded-md focus:outline-none focus:ring-1 resize-none"
+                                className="provider-serv-text mt-1 h-30 resize-none"
                             />
                         </div>
                         
                         <button 
                             type="submit"
-                            className="mt-6 px-4 py-2 bg-green-600 hover:bg-green-500 duration-200 w-50 text-white text-sm font-semibold rounded-md cursor-pointer"
+                            className="modal-btn bg-green-600 hover:bg-green-500"
                         >
                             Confirm Appointment
                         </button>
                         
-                        <p className="min-h-5 text-green-600">{successMessage}</p>
+                        <p className="message text-green-600">{successMessage}</p>
                     </form>
                 </div>
             </div>

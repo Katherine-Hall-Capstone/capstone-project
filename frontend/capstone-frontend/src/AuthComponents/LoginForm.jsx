@@ -43,17 +43,17 @@ function LoginForm() {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white max-w-md mx-auto mt-10 p-9 shadow-md rounded-lg flex flex-col gap-4">
-            <div className="flex flex-col gap-1 mb-5" >
-                <h1 className="text-3xl font-bold text-center">Log in to EasyPoint</h1>
-                <p className="text-gray-400 text-center text-sm">Good to see you again.</p>
+        <form onSubmit={handleSubmit} className="auth-form">
+            <div className="auth-div">
+                <h1 className="auth-header">Log in to EasyPoint</h1>
+                <p className="auth-message">Good to see you again.</p>
             </div>
             
             <div>
                 <label className="font-semibold">Username</label>
                 <input 
                     type="text" name="username" value={formData.username} onChange={handleChange}
-                    className="w-full border border-gray-300 rounded px-4 py-2 mt-2 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="auth-textbox"
                 />
             </div>
             
@@ -61,19 +61,18 @@ function LoginForm() {
                 <label className="font-semibold">Password</label>
                 <input 
                     type="password" name="password" value={formData.password} onChange={handleChange} 
-                    className="w-full border border-gray-300 rounded px-4 py-2 mt-2 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="auth-textbox"
                 />
             </div>
             
-
             <button 
                 type="submit" 
-                className="bg-slate-900 hover:bg-slate-500 transition duration-200 mt-2 text-white font-semibold py-2 px-5 rounded-md cursor-pointer"
+                className="primary-btn"
             >
                 Log In
             </button>
 
-            <p className="text-red-600 text-center text-sm min-h-5">{errorMessage}</p>
+            <p className="message text-red-600">{errorMessage}</p>
         </form>   
     )
 

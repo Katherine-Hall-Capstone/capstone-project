@@ -69,17 +69,20 @@ function ClientSearchForm() {
                 {status === 'error' && <p>Something went wrong.</p>}
                 {status === 'success' && results.length === 0 && <p>No matches found.</p>}
                 {status === 'success' && results.length > 0 && (
-                    <div className="max-h-[600px] overflow-y-auto space-y-4">
+                    <div className="mb-4 max-h-[100vh] space-y-4">
                         {results.map(provider => (
                             <div 
                                 key={provider.id}
-                                className="flex flex-row justify-between p-4 bg-gray-100 w-160 rounded-xl"
+                                className="list bg-gray-100 w-160"
                             >
                                 <div className="space-y-2">
                                     <p className="text-xl font-bold">{provider.name}</p>
                                     <p className="italic"><span className="font-medium">Services: </span>{provider.servicesOffered?.map(service => service.name).join(', ')}</p>
                                 </div>
-                                <button onClick={() => navigate(`/providers/${provider.id}`)} className="flex items-center gap-2 cursor-pointer">See More <GoArrowRight /></button>
+                                <button onClick={() => navigate(`/providers/${provider.id}`)} className="flex items-center gap-2 cursor-pointer">
+                                    See More 
+                                    <GoArrowRight />
+                                </button>
                             </div>
                         ))}
                     </div>

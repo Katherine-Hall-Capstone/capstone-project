@@ -1,7 +1,7 @@
 function ProviderReviews() {
     return(
         <div className="p-15">
-            <h3 className="text-4xl font-bold text-slate-900">My Reviews</h3>
+            <h3 className="dash-title">My Reviews</h3>
         </div>
     )
 }

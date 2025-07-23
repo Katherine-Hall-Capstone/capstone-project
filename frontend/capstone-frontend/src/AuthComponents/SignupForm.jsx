@@ -45,17 +45,17 @@ function SignupForm() {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white max-w-md mx-auto mt-10 p-9 shadow-md rounded-lg flex flex-col gap-4">
-            <div className="flex flex-col gap-1 mb-5">
-                <h1 className="text-3xl font-bold text-center">Sign up for EasyPoint</h1>
-                <p className="text-gray-400 text-center text-sm">Nice to meet you.</p>
+        <form onSubmit={handleSubmit} className="auth-form">
+            <div className="auth-div">
+                <h1 className="auth-header">Sign up for EasyPoint</h1>
+                <p className="auth-message">Nice to meet you.</p>
             </div>
 
             <div>
                 <label className="font-semibold">Name</label>
                 <input 
                     type="text" name="name" value={formData.name} onChange={handleChange} 
-                    className="w-full border border-gray-300 rounded px-4 py-2 mt-2 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="auth-textbox"
                 />
             </div>
 
@@ -63,7 +63,7 @@ function SignupForm() {
                 <label className="font-semibold">Username</label>
                 <input 
                     type="text" name="username" value={formData.username} onChange={handleChange}
-                    className="w-full border border-gray-300 rounded px-4 py-2 mt-2 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="auth-textbox"
                 />
             </div>
 
@@ -71,7 +71,7 @@ function SignupForm() {
                 <label className="font-semibold">Password</label>
                 <input 
                     type="password" name="password" value={formData.password} onChange={handleChange}
-                    className="w-full border border-gray-300 rounded px-4 py-2 mt-2 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="auth-textbox"
                 />
             </div>
 
@@ -79,7 +79,7 @@ function SignupForm() {
                 <label className="font-semibold">Email</label>
                 <input 
                     type="text" name="email" value={formData.email} onChange={handleChange}
-                    className="w-full border border-gray-300 rounded px-4 py-2 mt-2 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                    className="auth-textbox"
                 />
             </div>
 
@@ -87,7 +87,7 @@ function SignupForm() {
                 <label className="font-semibold">Select a Role</label>
                 <select 
                     name="role" value={formData.role} onChange={handleChange}
-                    className="w-full border border-gray-300 rounded px-3 py-2 mt-2 focus:outline-none focus:ring-1 focus:ring-slate-900 cursor-pointer"
+                    className="auth-textbox cursor-pointer"
                 >
                     <option value="">-</option>
                     <option value="CLIENT">Client</option>
@@ -98,12 +98,12 @@ function SignupForm() {
 
             <button 
                 type="submit" 
-                className="bg-slate-900 hover:bg-slate-500 transition duration-200 mt-2 text-white font-semibold py-2 px-5 rounded-md cursor-pointer"
+                className="primary-btn"
             >
                 Sign Up
             </button>
 
-            <p className={`text-center text-sm min-h-5 ${message.type === 'error' ? 'text-red-600' : 'text-green-600'}`}>{message.text}</p>
+            <p className={`message ${message.type === 'error' ? 'text-red-600' : 'text-green-600'}`}>{message.text}</p>
         </form>
     )
 }

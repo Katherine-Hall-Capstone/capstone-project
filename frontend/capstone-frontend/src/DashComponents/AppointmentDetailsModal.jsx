@@ -19,17 +19,17 @@ function AppointmentDetailsModal({ appointment, onClose }) {
 
     return (
         <div 
-            className="flex items-center justify-center fixed inset-0 bg-black/50" 
+            className="modal-overlay" 
             onClick={onClose}
         >
             <div 
-                className="bg-white p-8 max-w-sm w-full relative rounded-lg shadow-xl"
+                className="modal-content"
                 onClick={(event) => event.stopPropagation()}
             >
-                <button className="absolute top-3 left-3 text-black cursor-pointer" onClick={onClose}>×</button>
+                <button className="modal-close" onClick={onClose}>×</button>
 
-                <div className="flex flex-col items-center space-y-8 text-center">
-                    <h2 className="font-bold text-2xl">Appointment Details</h2>
+                <div className="modal-text">
+                    <h2 className="modal-title">Appointment Details</h2>
 
                     <div>
                         <p><span className="font-semibold">On: </span> 
@@ -59,7 +59,7 @@ function AppointmentDetailsModal({ appointment, onClose }) {
                         
                     <p><span className="font-semibold">Notes: </span> {appointment.notes || 'N/A'}</p>
 
-                    <button className="mt-6 px-4 py-2 bg-red-400 hover:bg-red-500 duration-200 text-white text-sm font-semibold rounded-md cursor-pointer" onClick={handleCancel}>
+                    <button className="modal-btn bg-red-400 hover:bg-red-500 " onClick={handleCancel}>
                         Cancel Appointment
                     </button>
                 </div>

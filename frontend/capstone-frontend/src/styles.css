@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+.primary-btn {
+    @apply py-2 px-6 bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold rounded-md cursor-pointer
+}
+
+.logo {
+    @apply text-xl text-slate-900 font-bold
+}
+
+.message {
+    @apply text-center text-sm min-h-5
+}
+
+.auth-form {
+    @apply flex flex-col gap-4 bg-white max-w-md mx-auto mt-10 p-9 shadow-md rounded-lg;
+}
+
+.auth-textbox {
+    @apply w-full border border-gray-300 rounded px-4 py-2 mt-2 focus:outline-none focus:ring-1 focus:ring-slate-900
+}
+
+.auth-div {
+    @apply flex flex-col gap-1 mb-5
+}
+
+.auth-header {
+    @apply text-3xl font-bold text-center
+}
+
+.auth-message {
+    @apply text-gray-400 text-center text-sm
+}
+
+.dash-title {
+    @apply text-4xl font-bold text-slate-900
+}
+
+.dash-header {
+    @apply text-2xl font-semibold
+}
+
+.dash-message {
+    @apply italic text-gray-500
+}
+
+.list {
+    @apply flex justify-between items-center p-4 shadow-lg rounded-md
+}
+
+.client-pref-box {
+    @apply bg-white border border-gray-300 focus:outline-none focus:ring-1 rounded-md px-3 py-2
+}
+
+.client-pref-g {
+    @apply flex items-center gap-2 mt-3 py-2 px-6 bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold rounded-md cursor-pointer
+}
+
+.provider-pref-box {
+    @apply bg-white border border-gray-300 focus:outline-none focus:ring-1 rounded-md w-20 p-1
+}
+
+.provider-pref-cont {
+    @apply px-15 py-10 border border-gray-300 bg-gray-100 shadow-lg rounded-md
+} 
+
+.provider-pref-title {
+    @apply mb-4 text-2xl text-center font-semibold
+}
+
+.provider-pref-header {
+    @apply text-xl text-center
+}
+
+.provider-serv-text {
+    @apply p-1 bg-white border border-gray-300 focus:outline-none focus:ring-1 rounded-md
+}
+
+.provider-pref-list {
+    @apply flex justify-between items-center p-4 shadow-lg rounded-md bg-slate-500 border border-slate-600 text-white
+}
+
+.modal-overlay {
+    @apply flex items-center justify-center fixed inset-0 bg-black/50
+}
+
+.modal-content {
+    @apply p-8 max-w-md w-full relative bg-white rounded-lg shadow-xl
+}
+
+.modal-close {
+    @apply absolute top-3 left-3 text-black cursor-pointer
+}
+
+.modal-text {
+    @apply flex flex-col items-center space-y-8 text-center
+}
+
+.modal-title {
+    @apply font-bold text-2xl
+}
+
+.modal-btn {
+    @apply mt-6 px-4 py-2 duration-200 w-50 text-white text-sm font-semibold rounded-md cursor-pointer
+}
+
+.profile-serv {
+    @apply mb-2 text-xl font-semibold
+}
+
+.profile-grid {
+    @apply grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-15
+}
+
+.profile-appts {
+    @apply p-4 border rounded-xl shadow hover:shadow-lg duration-200 cursor-pointer
+}
+
+.profile-header {
+    @apply text-2xl font-bold underline
+}
