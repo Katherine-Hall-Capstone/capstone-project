@@ -92,25 +92,25 @@ function ProviderAvailability() {
 
     return(
         <div className="p-15">
-            <h3 className="text-4xl font-bold text-slate-900">Set Your Preferences</h3>
+            <h3 className="dash-title">Set Your Preferences</h3>
             
             <div className="mt-8 mx-6 grid md:grid-cols-1 lg:grid-cols-2 gap-8 ">
-                <div className="px-15 py-10 border border-gray-300 bg-gray-100 text-center shadow-lg rounded-md ">
-                    <p className="mb-4 text-2xl font-semibold">Connect your Google Calendar?</p>
-                    <p className="italic text-gray-500">Allow your new appointments to also appear as events in your Google Calendar</p>
+                <div className="provider-pref-cont text-center">
+                    <p className="provider-pref-title">Connect your Google Calendar?</p>
+                    <p className="dash-message">Allow your new appointments to also appear as events in your Google Calendar</p>
                     <CalendarStatus googleConnected={user.googleConnected} />
                 </div>
 
-                <div className="px-15 py-10 border border-gray-300 bg-gray-100 shadow-lg rounded-md">
+                <div className="provider-pref-cont">
                     <ProviderPreferences providerId={user.id} />
                 </div>
 
-                <div className="px-15 py-10 border border-gray-300 bg-gray-100 shadow-lg rounded-md">
-                    <p className="mb-4 text-2xl text-center font-semibold">Manage Availabilities</p>
+                <div className="provider-pref-cont">
+                    <p className="provider-pref-title">Manage Availabilities</p>
 
                     <div className="flex justify-around">
                         <div>
-                            <h3 className="text-xl text-center">Add Availability:</h3>
+                            <h3 className="provider-pref-header">Add Availability:</h3>
                             <form 
                                 onSubmit={handleSubmit}
                                 className="flex flex-col items-center mt-3"
@@ -120,26 +120,26 @@ function ProviderAvailability() {
                                     value={dateTime}
                                     onChange={event => setDateTime(event.target.value)}
                                     min={getLocalDateTime()} // ensures provider cannot set date in past
-                                    className="p-1 w-60 bg-white border border-gray-300 focus:outline-none focus:ring-1 rounded-md"
+                                    className="provider-serv-text w-60"
                                     required 
                                 />
 
                                 <button 
                                     type="submit"
-                                    className="mt-4 px-3 py-2 bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-md cursor-pointer"
+                                    className="primary-btn mt-4"
                                 >
                                     Add Slot
                                 </button>
 
-                                <p className="mt-2 min-h-5 max-w-50 text-red-600 text-center text-sm">{errorMessage}</p>
+                                <p className="message mt-2 max-w-50 text-red-600">{errorMessage}</p>
                             </form>
                         </div>
                         
                         <div>
-                            <h3 className="text-xl text-center">Available Appointments</h3>
+                            <h3 className="provider-pref-header">Available Appointments</h3>
                             <ul className="mt-3 space-y-4">
                                 {availabilities.map(availability => (
-                                    <li key={availability.id} className="flex justify-between items-center p-4 bg-slate-500 border border-slate-600 text-white shadow-lg rounded-md">
+                                    <li key={availability.id} className="provider-pref-list">
                                         {new Date(availability.startDateTime).toLocaleString(undefined, {
                                             month: 'short', 
                                             day: 'numeric',
@@ -158,7 +158,7 @@ function ProviderAvailability() {
                     </div>
                 </div>
 
-                <div className="px-15 py-10 border border-gray-300 bg-gray-100 shadow-lg rounded-md">
+                <div className="provider-pref-cont">
                     <ProviderServices providerId={user.id} />
                 </div>
             </div>

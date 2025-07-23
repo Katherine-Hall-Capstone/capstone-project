@@ -20,8 +20,8 @@ function SlidingTabs({ tabs, components }) {
 
     return(
         <div>
-            <div className="flex flex-row items-center justify-between mt-2 px-10 py-2">
-                <p className="text-xl text-slate-900 font-bold">EasyPoint</p>
+            <div className="flex items-center justify-between mt-2 px-10 py-2">
+                <p className="logo">EasyPoint</p>
 
                 <nav className="flex items-center gap-1 px-1 py-1 bg-gray-100 rounded-full">
                     {tabs.map(tab => (
@@ -37,7 +37,7 @@ function SlidingTabs({ tabs, components }) {
 
                 <button 
                     onClick={logout}
-                    className="px-5 py-2 bg-slate-900 hover:bg-slate-600 transition duration-200 text-white font-semibold rounded-md cursor-pointer"
+                    className="primary-btn"
                 >
                     Logout
                 </button>

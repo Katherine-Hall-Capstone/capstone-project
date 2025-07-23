@@ -304,20 +304,20 @@ function ProviderPageClientView() {
 
             <h3 className="text-4xl">Book with <span className="font-bold">{provider.name}</span>?</h3>
             
-            <h3 className="mt-9 mb-2 text-xl font-semibold">Services Offered: </h3>
+            <h3 className="profile-serv mt-9">Services Offered: </h3>
             <ul className="mb-6 list-disc list-inside">
                 {provider.servicesOffered?.map(service => (
                     <li key={service.id}>
-                        {service.name} ({service.duration} min) - <span className="text-slate-500 italic">{service.details}</span>
+                        {service.name} ({service.duration} min) - <span className="dash-message">{service.details}</span>
                     </li>
                 ))}
             </ul>
 
-            <label className="block mb-2 text-xl font-semibold">Select a Service: </label>
+            <label className="profile-serv block">Select a Service: </label>
             <select
                 value={selectedService?.id || ''}
                 onChange={handleServiceSelect}
-                className="mb-15 px-3 py-1 border border-gray-300 focus:outline-none focus:ring-1 rounded"
+                className="client-pref-box mb-15"
             >   
                 <option value="">--</option>
                 {provider.servicesOffered?.map(service => (
@@ -328,7 +328,7 @@ function ProviderPageClientView() {
             </select>
             
             <div className="flex justify-center gap-2 mb-5">
-                <h3 className="text-2xl font-bold underline">Recommended Appointments</h3>
+                <h3 className="profile-header">Recommended Appointments</h3>
 
                 <div className="mt-2 relative group">
                     <button className="text-xl hover:text-slate-600"><IoMdInformationCircle /></button>
@@ -341,14 +341,14 @@ function ProviderPageClientView() {
             </div>
             
             {recommendedAppointments.length === 0 ? (
-                <p className="mb-6 text-gray-600 italic">No recommended appointments</p>
+                <p className="dash-message mb-6">No recommended appointments</p>
             ) : (
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-15">
+                <div className="profile-grid">
                     {recommendedAppointments.map((appointment, index) => (
                         <button 
                             key={appointment.id} 
                             onClick={() => handleOpenModal(appointment)}
-                            className="p-4 bg-gray-200 border border-gray-300 rounded-xl shadow hover:shadow-lg duration-200 cursor-pointer"
+                            className="profile-appts bg-gray-200 border-gray-300"
                         >
                             <strong>{index + 1}){' '}</strong>
                             {new Date(appointment.startDateTime).toLocaleString(undefined, {
@@ -364,16 +364,16 @@ function ProviderPageClientView() {
                 </div>
             )}
 
-            <h3 className="mb-5 text-2xl font-bold underline">All Available Appointments</h3>
+            <h3 className="profile-header mb-5">All Available Appointments</h3>
             {appointments.length ===  0 ? (
-                <p className="text-gray-600 italic">No available appointments</p>
+                <p className="dash-message">No available appointments</p>
             ) : (
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                <div className="profile-grid">
                     {appointments.map((appointment) => (
                         <button 
                             key={appointment.id} 
                             onClick={() => handleOpenModal(appointment)}
-                            className="p-4 bg-slate-700 border border-slate-900 text-white rounded-xl shadow hover:shadow-lg duration-200 cursor-pointer"
+                            className="profile-appts bg-slate-700 border border-slate-900 text-white"
                         >
                             {new Date(appointment.startDateTime).toLocaleString(undefined, {
                                 year: 'numeric',

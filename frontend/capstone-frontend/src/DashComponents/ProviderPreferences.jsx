@@ -86,34 +86,33 @@ function ProviderPreferences({ providerId }) {
 
     return(
         <div>
-            <h3 className="mb-4 text-2xl text-center font-semibold">Manage Preferences</h3>
+            <h3 className="provider-pref-title">Manage Preferences</h3>
 
             {!hasPreferences ? (
                 <form onSubmit={handleSubmit} className="flex flex-col items-center">
                     <div>
                         <div className="flex items-center gap-2 mb-2">
-                            <label className="text-gray-500 italic">
+                            <label className="dash-message">
                                 What is the maximum amount of consecutive hours you'd like to work?
                             </label>
                             <input
                                 type="number"
                                 value={maxHours}
                                 onChange={event => setMaxHours(event.target.value)}
-                                className="w-20 p-1 bg-white border border-gray-300 focus:outline-none focus:ring-1 rounded-md"
+                                className="provider-pref-box"
                                 required
                                 min={1}
                             />
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <label className="text-gray-500 italic">
+                            <label className="dash-message">
                                 Do you prefer earlier or later appointments? 
                             </label>
                             <select
                                 value={prefersEarly}
                                 onChange={event => setPrefersEarly(event.target.value === 'true')}  // If option chosen is 'true' (string), convert to boolean true
-                                className="w-20 p-1 bg-white 
-                                border border-gray-300 focus:outline-none focus:ring-1 rounded-md"
+                                className="provider-pref-box"
                             >
                                 <option value="true">Earlier</option>
                                 <option value="false">Later</option>
@@ -123,7 +122,7 @@ function ProviderPreferences({ providerId }) {
                     
                     <button 
                         type="submit" 
-                        className="mt-4 px-3 py-2 bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-md cursor-pointer"
+                        className="primary-btn mt-4"
                     >
                         Set Preferences
                     </button>
@@ -131,20 +130,20 @@ function ProviderPreferences({ providerId }) {
             ) : (
                 <div className="flex flex-col items-center">
                     <div>
-                        <p className="mb-2"><span className="text-gray-500 italic">Maximum Consecutive Hours: </span>{maxHours}</p>
-                        <p><span className="text-gray-500 italic">Prefer: </span>{prefersEarly === true ? 'Earlier' : 'Later'} Appointments</p>
+                        <p className="mb-2"><span className="dash-message">Maximum Consecutive Hours: </span>{maxHours}</p>
+                        <p><span className="dash-message">Prefer: </span>{prefersEarly === true ? 'Earlier' : 'Later'} Appointments</p>
                     </div>
 
                     <button 
                         onClick={handleDelete}
-                        className="mt-4 px-3 py-2 bg-slate-900 hover:bg-slate-700 text-white font-semibold rounded-md cursor-pointer"
+                        className="primary-btn mt-4"
                     >
                         Delete Preferences
                     </button>
                 </div>
             )}
             
-            <p className="mt-2 min-h-5 text-red-600 text-center text-sm">{errorMessage}</p>
+            <p className="message mt-2 text-red-600">{errorMessage}</p>
         </div>
     )
 }
