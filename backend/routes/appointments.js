@@ -111,6 +111,27 @@ router.put('/appointments/:id/book', async (req, res) => {
             }
         })
 
+        let updatedBookingsWithProviders = []
+
+        if(user.bookingsWithProviders) {
+            updatedBookingsWithProviders = [...user.bookingsWithProviders]
+        }
+
+        const existingProvider = updatedBookingsWithProviders.find(provider => provider.providerId === updatedAppointment.providerId)
+
+        if(existingProvider) {
+            existingProvider.count += 1
+        } else {
+            updatedBookingsWithProviders.push({ providerId: updatedAppointment.providerId, count: 1 })
+        }
+
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                bookingsWithProviders: updatedBookingsWithProviders
+            }
+        })
+
         // Create Google Calendar event process below
         // Event is created in both client and provider's calendar, if connected
         const event = {
@@ -277,6 +298,29 @@ router.put('/appointments/:id/cancel', async (req, res) => {
 
         if(appointment.providerId !== user.id && appointment.clientId !== user.id) {
             return res.status(403).json({ error: 'Unauthorized' })
+        }
+
+        let updatedBookingsWithProviders = [...user.bookingsWithProviders]
+
+        const existingProvider = updatedBookingsWithProviders.find(provider => 
+            provider.providerId === appointment.providerId
+        )
+
+        if(existingProvider) {
+            existingProvider.count -= 1
+
+            if(existingProvider.count === 0) {
+                updatedBookingsWithProviders = updatedBookingsWithProviders.filter(provider => 
+                    provider.providerId !== appointment.providerId
+                )
+            }
+
+            await prisma.user.update({
+                where: { id: user.id },
+                data: {
+                    bookingsWithProviders: updatedBookingsWithProviders
+                }
+            })
         }
 
         // Cancel in Google Calendar for provider
