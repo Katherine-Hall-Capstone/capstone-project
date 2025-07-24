@@ -410,5 +410,36 @@ router.delete('/appointments/:id', async (req, res) => {
     }
 })
 
+// GET appointments valid for reviewing
+router.get('/appointments/review-valid', async (req, res) => {
+    if (!req.session.userId) {
+        return res.status(401).json({ error: 'Log in to view appointments to review!' })
+    }
+
+    try {
+        const validAppointments = await prisma.appointment.findMany({
+            where: {
+                clientId: req.session.userId,
+                endDateTime: {
+                    lt: new Date()
+                }
+            },
+            include: {
+                provider: {
+                    include: { 
+                        servicesOffered: true 
+                    }
+                }
+            }
+        })
+
+        res.json(validAppointments);
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
+
+
 
 module.exports = router

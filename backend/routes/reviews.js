@@ -10,7 +10,7 @@ router.post('/reviews', async (req, res) => {
         return res.status(401).json({ error: 'Log in to write a review!' })
     }
 
-    const { providerId, rating, comment } = req.body
+    const { providerId, serviceId, rating, comment } = req.body
 
     try {
         const user = await prisma.user.findUnique({
@@ -24,6 +24,7 @@ router.post('/reviews', async (req, res) => {
             data: {
                 clientId: user.id,
                 providerId,
+                serviceId, 
                 rating,
                 comment
             }
