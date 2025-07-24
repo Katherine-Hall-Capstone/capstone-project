@@ -4,6 +4,7 @@ const router = require('express').Router()
 const BONUS_MULTIPLIER = 0.05
 const SIMILARITY_SCORE_WEIGHT = 0.6
 const BOOKINGS_SCORE_WEIGHT = 0.4
+const SIMILARITY_THRESHOLD = 0.55
 
 // GET all providers
 router.get('/providers', async (req, res) => {
@@ -40,10 +41,10 @@ router.get('/providers', async (req, res) => {
             return { ...provider, similarityScore }
         })
 
-        // Filter out the names with similarity scores below 0.55
-        const similarProviders = providersSimilarityScore.filter(provider => provider.similarityScore >= 0.55) 
+        // Filter out the names with similarity scores below a defined threshold
+        const similarProviders = providersSimilarityScore.filter(provider => provider.similarityScore >= SIMILARITY_THRESHOLD) 
 
-        // Find the provider that the client most frequeuntly books with and the number of booked appointments client has with them 
+        // Find the provider that the client most frequeuntly books with and the number of booked appointments client has with them (defaulting to 1 avoids dividing by 0 issues)
         let mostBookedProviderCount = 1
 
         for (const provider of client.bookingsWithProviders) {
