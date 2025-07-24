@@ -111,6 +111,7 @@ router.put('/appointments/:id/book', async (req, res) => {
             }
         })
 
+        // Keeps track of the amount of times client books with a provider
         let updatedBookingsWithProviders = []
 
         if(user.bookingsWithProviders) {
@@ -300,6 +301,7 @@ router.put('/appointments/:id/cancel', async (req, res) => {
             return res.status(403).json({ error: 'Unauthorized' })
         }
 
+        // If appointment is cancelled, the amount of times client books with provider is decremented
         let updatedBookingsWithProviders = [...appointment.client.bookingsWithProviders]
 
         const existingProvider = updatedBookingsWithProviders.find(provider => 
