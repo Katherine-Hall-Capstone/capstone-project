@@ -300,7 +300,7 @@ router.put('/appointments/:id/cancel', async (req, res) => {
             return res.status(403).json({ error: 'Unauthorized' })
         }
 
-        let updatedBookingsWithProviders = [...user.bookingsWithProviders]
+        let updatedBookingsWithProviders = [...appointment.client.bookingsWithProviders]
 
         const existingProvider = updatedBookingsWithProviders.find(provider => 
             provider.providerId === appointment.providerId
@@ -316,7 +316,7 @@ router.put('/appointments/:id/cancel', async (req, res) => {
             }
 
             await prisma.user.update({
-                where: { id: user.id },
+                where: { id: appointment.clientId },
                 data: {
                     bookingsWithProviders: updatedBookingsWithProviders
                 }
