@@ -6,6 +6,7 @@ const { google } = require('googleapis')
 
 const S_PER_MINUTE = 60
 const MS_PER_S = 1000
+const MONTH_LIMIT = 3
 
 // GET all appointments 
 router.get('/appointments', async (req, res) => {
@@ -203,11 +204,10 @@ router.put('/appointments/:id/book', async (req, res) => {
 })
 
 function removeOldProviders(bookings) {
-    const today = new Date()
-    const threeMonthsAgo = today.getMonth() - 3
-    const todayThreeMonthsAgo = today.setMonth(threeMonthsAgo)
-
-    return bookings.filter(provider => new Date(provider.lastBookedAt) >= todayThreeMonthsAgo)
+    const threeMonthsAgo = new Date()
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - MONTH_LIMIT)
+    
+    return bookings.filter(provider => new Date(provider.lastBookedAt) >= threeMonthsAgo)
 }
 
 // EDIT single appointment
