@@ -37,6 +37,28 @@ function ClientReviews() {
         }
     }
 
+    async function fetchClientReviews() {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews`, {
+                credentials: 'include'
+            })
+
+            if (res.ok) {
+                const data = await res.json()
+                setClientReviews(data)
+            } else {
+                console.error('Failed to fetch client reviews')
+            }
+        } catch(error) {
+            console.error(error)
+        }
+    }
+
+    useEffect(() => {
+        fetchProviders()
+        fetchClientReviews()
+    }, [])
+
     function loadProviderServices(selectedProviderId, providers, setServices, setFormData) {
         if(!selectedProviderId) {
             setServices([])
@@ -52,10 +74,6 @@ function ClientReviews() {
             setServices([])
         }
     }
-
-    useEffect(() => {
-        fetchProviders()
-    }, [])
 
     useEffect(() => {
         loadProviderServices(selectedProviderId, providers, setServices, setFormData)
@@ -99,27 +117,6 @@ function ClientReviews() {
             console.error(error)
         }
     }
-
-    async function fetchClientReviews() {
-        try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews`, {
-                credentials: 'include'
-            })
-
-            if (res.ok) {
-                const data = await res.json()
-                setClientReviews(data)
-            } else {
-                console.error('Failed to fetch client reviews')
-            }
-        } catch(error) {
-            console.error(error)
-        }
-    }
-
-    useEffect(() => {
-        fetchClientReviews()
-    }, [])
     
     return(
         <div className="p-15">
