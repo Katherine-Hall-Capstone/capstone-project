@@ -69,7 +69,7 @@ model Review {
   providerId            Int
   provider              User            @relation("ProviderReviews", fields: [providerId], references: [id])
   serviceId             Int
-  service               Service         @relation(fields: [serviceId], references: [id])
+  service               Service         @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   rating                Int
   comment               String?         
 }
