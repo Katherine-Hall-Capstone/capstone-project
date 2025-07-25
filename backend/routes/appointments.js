@@ -122,9 +122,16 @@ router.put('/appointments/:id/book', async (req, res) => {
 
         if(existingProvider) {
             existingProvider.count += 1
+            existingProvider.lastBookedAt = new Date()
         } else {
-            updatedBookingsWithProviders.push({ providerId: updatedAppointment.providerId, count: 1 })
+            updatedBookingsWithProviders.push({ 
+                providerId: updatedAppointment.providerId, 
+                count: 1,
+                lastBookedAt: new Date()
+            })
         }
+
+        updatedBookingsWithProviders = removeOldProviders(updatedBookingsWithProviders)
 
         await prisma.user.update({
             where: { id: user.id },
@@ -194,6 +201,14 @@ router.put('/appointments/:id/book', async (req, res) => {
         res.status(500).json({ error: 'Server error' })
     } 
 })
+
+function removeOldProviders(bookings) {
+    const today = new Date()
+    const threeMonthsAgo = today.getMonth() - 3
+    const todayThreeMonthsAgo = today.setMonth(threeMonthsAgo)
+
+    return bookings.filter(provider => new Date(provider.lastBookedAt) >= todayThreeMonthsAgo)
+}
 
 // EDIT single appointment
 router.put('/appointments/:id/edit', async (req, res) => {
