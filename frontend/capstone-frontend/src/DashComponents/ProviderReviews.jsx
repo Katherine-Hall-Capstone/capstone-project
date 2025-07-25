@@ -16,7 +16,7 @@ function ProviderReviews() {
                 console.error('Failed to fetch provider reviews')
             }
         } catch(error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 

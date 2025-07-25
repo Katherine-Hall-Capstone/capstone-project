@@ -26,7 +26,7 @@ function ClientPreferences()  {
                 console.error('Failed to fetch preferences')
             }
         } catch(error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 
@@ -64,7 +64,7 @@ function ClientPreferences()  {
             setEndTime('')
             fetchPreferences()
         } catch (error) {
-            console.error(error)
+            console.error('Error: ', error)
             setErrorMessage(error.message)
         }
     }
@@ -77,7 +77,7 @@ function ClientPreferences()  {
             })
             fetchPreferences()
         } catch (error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 

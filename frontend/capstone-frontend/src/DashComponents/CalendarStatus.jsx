@@ -8,16 +8,13 @@ function CalendarStatus({ googleConnected }) {
                 credentials: 'include'
             })
 
-            if(!res.ok) {
-                throw new Error('Failed to disconnect Google Calendar')
+            if(res.ok) {
+                window.location.reload()
+            } else {
+                console.error('Failed to disconnect Google Calendar')
             }
-
-            const data = await res.json()
-            alert(data.message)
-            window.location.reload()
         } catch(error) {
             console.error('Error: ', error)
-            alert('Problem disconnect Google Calendar')
         }
     }
 

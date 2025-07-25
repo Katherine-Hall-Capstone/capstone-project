@@ -25,7 +25,7 @@ function ProviderPreferences({ providerId }) {
                 console.error('Failed to fetch preferences')
             }
         } catch (error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 
@@ -56,7 +56,7 @@ function ProviderPreferences({ providerId }) {
             }
             setHasPreferences(true)
         } catch (error) {
-            console.error(error)
+            console.error('Error: ', error)
             setErrorMessage(error.message)
         }
     }
@@ -79,7 +79,7 @@ function ProviderPreferences({ providerId }) {
             setPrefersEarly(true)
             setHasPreferences(false)
         } catch (error) {
-            console.error(error)
+            console.error('Error: ', error)
             setErrorMessage(error.message)
         }
     }

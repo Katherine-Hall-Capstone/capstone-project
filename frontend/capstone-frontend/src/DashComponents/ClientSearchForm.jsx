@@ -35,7 +35,7 @@ function ClientSearchForm() {
                 setStatus('error')
             }
         } catch(error) {
-            console.error(error)
+            console.error('Error: ', error)
             setResults([])
             setStatus('error')
         }
