@@ -6,6 +6,7 @@ const { google } = require('googleapis')
 
 const S_PER_MINUTE = 60
 const MS_PER_S = 1000
+const MONTH_LIMIT = 3
 
 // GET all appointments 
 router.get('/appointments', async (req, res) => {
@@ -122,9 +123,16 @@ router.put('/appointments/:id/book', async (req, res) => {
 
         if(existingProvider) {
             existingProvider.count += 1
+            existingProvider.lastBookedAt = new Date()
         } else {
-            updatedBookingsWithProviders.push({ providerId: updatedAppointment.providerId, count: 1 })
+            updatedBookingsWithProviders.push({ 
+                providerId: updatedAppointment.providerId, 
+                count: 1,
+                lastBookedAt: new Date()
+            })
         }
+
+        updatedBookingsWithProviders = removeOldProviders(updatedBookingsWithProviders)
 
         await prisma.user.update({
             where: { id: user.id },
@@ -194,6 +202,13 @@ router.put('/appointments/:id/book', async (req, res) => {
         res.status(500).json({ error: 'Server error' })
     } 
 })
+
+function removeOldProviders(bookings) {
+    const threeMonthsAgo = new Date()
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - MONTH_LIMIT)
+    
+    return bookings.filter(provider => new Date(provider.lastBookedAt) >= threeMonthsAgo)
+}
 
 // EDIT single appointment
 router.put('/appointments/:id/edit', async (req, res) => {
