@@ -34,44 +34,10 @@ router.get('/providers', async (req, res) => {
                 servicesOffered: true
             }
         })
-
-        // Get the similarity score of the input and each provider name
-        const providersSimilarityScore = providers.map(provider => {
-            const similarityScore = findSimilarityScore(search.toLowerCase(), provider.name.toLowerCase())
-            return { ...provider, similarityScore }
-        })
-
-        // Filter out the names with similarity scores below a defined threshold
-        const similarProviders = providersSimilarityScore.filter(provider => provider.similarityScore >= SIMILARITY_THRESHOLD) 
-
-        // Find the provider that the client most frequeuntly books with and the number of booked appointments client has with them
-        let mostBookedProviderCount = 0
-        
         // JSON being empty prevents it from being iterable, so change to empty array if needed 
         const bookings = Array.isArray(client.bookingsWithProviders) ? client.bookingsWithProviders : []
-
-        for (const provider of bookings) {
-            if (provider.count > mostBookedProviderCount) {
-                mostBookedProviderCount = provider.count
-            }
-        }
-        
-        // Of these filtered names, get the booking score by how frequently they are booked by the client
-        const scoredProviders = similarProviders.map(provider => {
-            const bookingsScore = findBookingsScore(
-                provider.id, 
-                client.bookingsWithProviders, 
-                mostBookedProviderCount
-            )
-            
-            // Compute a total score taking into account similarity score and booking score with varying weights
-            const totalScore = SIMILARITY_SCORE_WEIGHT * provider.similarityScore + BOOKINGS_SCORE_WEIGHT * bookingsScore
-
-            return {...provider, totalScore}
-        })  
-
-        // Sort results by the total score
-        const bestMatchedProviders = scoredProviders.sort((a, b) => b.totalScore - a.totalScore)
+        // Get providers ranked by similarity score and booking score
+        const bestMatchedProviders = getBestMatchedProviders(providers, bookings, search)
 
         res.json(bestMatchedProviders)
     } catch (error) {
@@ -79,6 +45,44 @@ router.get('/providers', async (req, res) => {
         return res.status(500).json({ error: 'Server error' })  
     }
 }) 
+
+function getBestMatchedProviders(providers, bookings, search) {
+    const lowercaseSearch = search.toLowerCase()
+
+    // Get the similarity score of the input and each provider name
+    const providersSimilarityScore = providers.map(provider => {
+        const similarityScore = findSimilarityScore(lowercaseSearch, provider.name.toLowerCase())
+        return { ...provider, similarityScore }
+    })
+
+    // Filter out the names with similarity scores below a defined threshold
+    const similarProviders = providersSimilarityScore.filter(provider => provider.similarityScore >= SIMILARITY_THRESHOLD) 
+
+    // Find the provider that the client most frequeuntly books with and the number of booked appointments client has with them
+    let mostBookedProviderCount = 0
+
+    for (const provider of bookings) {
+        if (provider.count > mostBookedProviderCount) {
+            mostBookedProviderCount = provider.count
+        }
+    }
+
+    // Of these filtered names, get the booking score by how frequently they are booked by the client
+    const scoredProviders = similarProviders.map(provider => {
+        const bookingsScore = findBookingsScore(
+            provider.id, 
+            bookings, 
+            mostBookedProviderCount
+        )
+        
+        // Compute a total score taking into account similarity score and booking score with varying weights
+        const totalScore = SIMILARITY_SCORE_WEIGHT * provider.similarityScore + BOOKINGS_SCORE_WEIGHT * bookingsScore
+
+        return {...provider, totalScore}
+    }) 
+    
+    return scoredProviders.sort((a, b) => b.totalScore - a.totalScore)
+}
 
 // Fuzzy Search: Similarity Score Function
 function findSimilarityScore(input, target) {
@@ -249,7 +253,7 @@ router.post('/providers/:id/availability', async (req, res) => {
         }
 
         // Prevent availabilities from being added during booked appointments
-        const overlappingAppointmnet = await prisma.appointment.findFirst({
+        const overlappingAppointment = await prisma.appointment.findFirst({
             where: {
                 providerId: user.id,
                 status: 'BOOKED',
@@ -258,7 +262,7 @@ router.post('/providers/:id/availability', async (req, res) => {
             }
         })
 
-        if (overlappingAppointmnet) {
+        if (overlappingAppointment) {
             return res.status(400).json({ error: 'You have a booked appointment at this time' })
         }
 
@@ -348,7 +352,7 @@ router.post('/providers/:id/services', async (req, res) => {
             }
         })
 
-        res.status(200).json({ message: 'Service added'})
+        res.status(201).json(newService)
     } catch(error) {
         console.log(error);
         return res.status(500).json({ error: 'Server error' })

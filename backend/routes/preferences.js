@@ -11,11 +11,7 @@ router.get('/preferences/providers/:id', async (req, res) => {
             where: { providerId }
         })
 
-        if (!preferences) {
-            return res.status(404).json({ error: 'Provider preferences not found' })
-        }
-
-        res.json(preferences)
+        res.json(preferences || null)
     } catch (error) {
         console.log(error)
         res.status(500).json({ error: 'Server error' })

@@ -111,27 +111,10 @@ router.put('/appointments/:id/book', async (req, res) => {
                 service: true
             }
         })
-
         // Keeps track of the amount of times client books with a provider
-        let updatedBookingsWithProviders = []
-
-        if(user.bookingsWithProviders) {
-            updatedBookingsWithProviders = [...user.bookingsWithProviders]
-        }
-
-        const existingProvider = updatedBookingsWithProviders.find(provider => provider.providerId === updatedAppointment.providerId)
-
-        if(existingProvider) {
-            existingProvider.count += 1
-            existingProvider.lastBookedAt = new Date()
-        } else {
-            updatedBookingsWithProviders.push({ 
-                providerId: updatedAppointment.providerId, 
-                count: 1,
-                lastBookedAt: new Date()
-            })
-        }
-
+        let updatedBookingsWithProviders = updateBookingsWithProviders(user.bookingsWithProviders, updatedAppointment.providerId)
+        
+        // Removes stale data
         updatedBookingsWithProviders = removeOldProviders(updatedBookingsWithProviders)
 
         await prisma.user.update({
@@ -141,8 +124,7 @@ router.put('/appointments/:id/book', async (req, res) => {
             }
         })
 
-        // Create Google Calendar event process below
-        // Event is created in both client and provider's calendar, if connected
+        // Create Google Calendar event process below:
         const event = {
             summary: updatedAppointment.service.name,
             description: updatedAppointment.notes || '',
@@ -203,58 +185,31 @@ router.put('/appointments/:id/book', async (req, res) => {
     } 
 })
 
+function updateBookingsWithProviders(bookings, providerId) {
+    let updated = bookings ? [...bookings] : []
+
+    const existingProvider = updated.find(provider => provider.providerId === providerId)
+
+    if(existingProvider) {
+        existingProvider.count += 1
+        existingProvider.lastBookedAt = new Date()
+    } else {
+        updated.push({ 
+            providerId, 
+            count: 1,
+            lastBookedAt: new Date()
+        })
+    }
+    
+    return updated
+}
+
 function removeOldProviders(bookings) {
     const threeMonthsAgo = new Date()
     threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - MONTH_LIMIT)
     
     return bookings.filter(provider => new Date(provider.lastBookedAt) >= threeMonthsAgo)
 }
-
-// EDIT single appointment
-router.put('/appointments/:id/edit', async (req, res) => {
-    if(!req.session.userId) {
-        return res.status(401).json({ error: 'Log in to edit an appointment!' })
-    }
-
-    const appointmentId = parseInt(req.params.id)
-    const { notes, serviceId } = req.body
-
-    try {
-        const appointment = await prisma.appointment.findUnique({
-            where: { id: appointmentId }
-        })
-        if(!appointment) {
-            return res.status(404).json({ error: 'Appointment not found' })
-        }
-
-        const user = await prisma.user.findUnique({ 
-            where: { id: req.session.userId } 
-        })
-        // Client can edit appointment 
-        if(user.role === 'CLIENT') {
-            if(appointment.clientId !== user.id) {
-                return res.status(403).json({ error: 'Unauthorized' })
-            }
-
-            const newData = {}
-            if(serviceId !== undefined) {
-                newData.serviceId = serviceId
-            }
-            if(notes !== undefined) {
-                newData.notes = notes
-            }
-            const updated = await prisma.appointment.update({
-                where: { id: appointmentId },
-                data: { ...newData }
-            })
-
-            return res.json(updated)
-        }
-    } catch(error) {
-        console.log(error);
-        return res.status(500).json({ error: 'Server error' })
-    }
-})
 
 // Provider marks appointment as read
 router.put('/appointments/:id/read', async (req, res) => {
@@ -317,30 +272,14 @@ router.put('/appointments/:id/cancel', async (req, res) => {
         }
 
         // If appointment is cancelled, the amount of times client books with provider is decremented
-        let updatedBookingsWithProviders = [...appointment.client.bookingsWithProviders]
+        let updatedBookingsWithProviders = removeBookingsWithProviders(appointment.client.bookingsWithProviders, appointment.providerId)
 
-        const existingProvider = updatedBookingsWithProviders.find(provider => 
-            provider.providerId === appointment.providerId
-        )
-
-        if(existingProvider) {
-            existingProvider.count -= 1
-
-            if(existingProvider.count === 0) {
-                updatedBookingsWithProviders = updatedBookingsWithProviders.filter(provider => 
-                    provider.providerId !== appointment.providerId
-                )
+        await prisma.user.update({
+            where: { id: appointment.clientId },
+            data: {
+                bookingsWithProviders: updatedBookingsWithProviders
             }
-
-            await prisma.user.update({
-                where: { id: appointment.clientId },
-                data: {
-                    bookingsWithProviders: updatedBookingsWithProviders
-                }
-            })
-        } else {
-            console.log('Provider not found')
-        }
+        })
 
         // Cancel in Google Calendar for provider
         if (appointment.providerGoogleEventId && appointment.provider.googleConnected) {
@@ -393,6 +332,24 @@ router.put('/appointments/:id/cancel', async (req, res) => {
         return res.status(500).json({ error: 'Server error' })
     }
 }) 
+
+function removeBookingsWithProviders(bookings, providerId) {
+    let updated = [...bookings]
+
+    const existingProvider = updated.find(provider => provider.providerId === providerId)
+
+    if(existingProvider) {
+        existingProvider.count -= 1
+
+        if(existingProvider.count === 0) {
+            updated = updated.filter(provider => provider.providerId !== providerId)
+        } else {
+            console.log('Provider not found')
+        }
+    } 
+
+    return updated
+}
 
 // DELETE single appointment
 router.delete('/appointments/:id', async (req, res) => {
