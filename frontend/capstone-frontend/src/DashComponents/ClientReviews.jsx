@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+const starRatings = [1, 2, 3, 4, 5]
+
 function ClientReviews() {
     const [providers, setProviders] = useState([])
     const [selectedProviderId, setSelectedProviderId] = useState(null)
@@ -172,7 +174,7 @@ function ClientReviews() {
                                         required
                                     >
                                         <option value="">--</option>
-                                        {[1, 2, 3, 4, 5].map(num => (
+                                        {starRatings.map(num => (
                                             <option key={num} value={num}>{num} Star</option>
                                         ))}
                                     </select>
