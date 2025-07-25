@@ -95,9 +95,9 @@ function ProviderAvailability() {
             <h3 className="dash-title">Set Your Preferences</h3>
             
             <div className="mt-8 mx-6 grid md:grid-cols-1 lg:grid-cols-2 gap-8 ">
-                <div className="provider-pref-cont text-center">
+                <div className="provider-pref-cont flex flex-col items-center">
                     <p className="provider-pref-title">Connect your Google Calendar?</p>
-                    <p className="dash-message">Allow your new appointments to also appear as events in your Google Calendar</p>
+                    <p className="dash-message mb-3">Allow your new appointments to also appear as events in your Google Calendar</p>
                     <CalendarStatus googleConnected={user.googleConnected} />
                 </div>
 

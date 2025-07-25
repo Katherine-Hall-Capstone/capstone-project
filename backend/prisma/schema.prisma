@@ -42,6 +42,7 @@ model Service {
   provider              User            @relation(fields: [providerId], references: [id])
   providerId            Int
   appointments          Appointment[]
+  reviews               Review[]
 }
 
 model Appointment {
@@ -67,6 +68,8 @@ model Review {
   client                User            @relation("ClientReviews", fields: [clientId], references: [id])
   providerId            Int
   provider              User            @relation("ProviderReviews", fields: [providerId], references: [id])
+  serviceId             Int
+  service               Service         @relation(fields: [serviceId], references: [id])
   rating                Int
   comment               String?         
 }

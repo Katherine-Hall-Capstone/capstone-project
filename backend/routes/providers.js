@@ -44,15 +44,18 @@ router.get('/providers', async (req, res) => {
         // Filter out the names with similarity scores below a defined threshold
         const similarProviders = providersSimilarityScore.filter(provider => provider.similarityScore >= SIMILARITY_THRESHOLD) 
 
-        // Find the provider that the client most frequeuntly books with and the number of booked appointments client has with them (defaulting to 1 avoids dividing by 0 issues)
-        let mostBookedProviderCount = 1
+        // Find the provider that the client most frequeuntly books with and the number of booked appointments client has with them
+        let mostBookedProviderCount = 0
+        
+        // JSON being empty prevents it from being iterable, so change to empty array if needed 
+        const bookings = Array.isArray(client.bookingsWithProviders) ? client.bookingsWithProviders : []
 
-        for (const provider of client.bookingsWithProviders) {
+        for (const provider of bookings) {
             if (provider.count > mostBookedProviderCount) {
                 mostBookedProviderCount = provider.count
             }
         }
-
+        
         // Of these filtered names, get the booking score by how frequently they are booked by the client
         const scoredProviders = similarProviders.map(provider => {
             const bookingsScore = findBookingsScore(
@@ -129,6 +132,10 @@ function findSimilarityScore(input, target) {
 
 // Fuzzy Search: Scoring providers by how often client book with them
 function findBookingsScore(providerId, bookingsWithProviders, mostBookedProviderCount) {
+    if (mostBookedProviderCount === 0) {
+        return 0 
+    }
+
     const existingProvider = bookingsWithProviders.find(provider => provider.providerId === providerId)
     if(!existingProvider) {
         return 0
