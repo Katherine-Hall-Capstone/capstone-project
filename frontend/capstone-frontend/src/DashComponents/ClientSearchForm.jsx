@@ -19,7 +19,9 @@ function ClientSearchForm() {
         setStatus('loading')
 
         try {   
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/providers?search=${encodeURIComponent(query)}`)
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/providers?search=${encodeURIComponent(query)}`, {
+                credentials: 'include'
+            })
 
             await new Promise(resolve => setTimeout(resolve, LOADING_IN_MS))  // Force loading state
             

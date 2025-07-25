@@ -111,6 +111,28 @@ router.put('/appointments/:id/book', async (req, res) => {
             }
         })
 
+        // Keeps track of the amount of times client books with a provider
+        let updatedBookingsWithProviders = []
+
+        if(user.bookingsWithProviders) {
+            updatedBookingsWithProviders = [...user.bookingsWithProviders]
+        }
+
+        const existingProvider = updatedBookingsWithProviders.find(provider => provider.providerId === updatedAppointment.providerId)
+
+        if(existingProvider) {
+            existingProvider.count += 1
+        } else {
+            updatedBookingsWithProviders.push({ providerId: updatedAppointment.providerId, count: 1 })
+        }
+
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                bookingsWithProviders: updatedBookingsWithProviders
+            }
+        })
+
         // Create Google Calendar event process below
         // Event is created in both client and provider's calendar, if connected
         const event = {
@@ -277,6 +299,32 @@ router.put('/appointments/:id/cancel', async (req, res) => {
 
         if(appointment.providerId !== user.id && appointment.clientId !== user.id) {
             return res.status(403).json({ error: 'Unauthorized' })
+        }
+
+        // If appointment is cancelled, the amount of times client books with provider is decremented
+        let updatedBookingsWithProviders = [...appointment.client.bookingsWithProviders]
+
+        const existingProvider = updatedBookingsWithProviders.find(provider => 
+            provider.providerId === appointment.providerId
+        )
+
+        if(existingProvider) {
+            existingProvider.count -= 1
+
+            if(existingProvider.count === 0) {
+                updatedBookingsWithProviders = updatedBookingsWithProviders.filter(provider => 
+                    provider.providerId !== appointment.providerId
+                )
+            }
+
+            await prisma.user.update({
+                where: { id: appointment.clientId },
+                data: {
+                    bookingsWithProviders: updatedBookingsWithProviders
+                }
+            })
+        } else {
+            console.log('Provider not found')
         }
 
         // Cancel in Google Calendar for provider
