@@ -25,7 +25,7 @@ function ProviderAvailability() {
                 console.error('Failed to fetch available appointments')
             }
         } catch(error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
     
@@ -57,7 +57,7 @@ function ProviderAvailability() {
             fetchAvailabilities()
             setDateTime('')
         } catch(error) {
-            console.error(error)
+            console.error('Error: ', error)
             setErrorMessage(error.message)
         }
     }
@@ -75,7 +75,7 @@ function ProviderAvailability() {
                 console.error('Failed to delete availability')
             }
         } catch (error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 

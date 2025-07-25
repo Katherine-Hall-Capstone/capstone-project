@@ -35,7 +35,7 @@ function ClientBookingForm({ provider, selectedAppointment, selectedService, onC
                 console.error('Booking failed')
             }
         } catch(error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 

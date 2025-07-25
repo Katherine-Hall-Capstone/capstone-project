@@ -33,7 +33,7 @@ function ClientReviews() {
                 setProviders(uniqueProviders)
             }
         } catch(error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 
@@ -50,7 +50,7 @@ function ClientReviews() {
                 console.error('Failed to fetch client reviews')
             }
         } catch(error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 

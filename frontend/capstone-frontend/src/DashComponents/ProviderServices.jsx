@@ -20,7 +20,7 @@ function ProviderServices({ providerId }) {
                 console.error('Failed to fetch services')
             }
         } catch (error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 
@@ -54,7 +54,7 @@ function ProviderServices({ providerId }) {
             setServiceDuration('')
             setServiceDetails('')
         } catch (error) {
-            console.error(error)
+            console.error('Error: ', error)
             setErrorMessage(error.message)
         }
     }
@@ -72,7 +72,7 @@ function ProviderServices({ providerId }) {
             }
             fetchServices()
         } catch (error) {
-            console.error(error)
+            console.error('Error: ', error)
             setErrorMessage(error.message)
         }
     }

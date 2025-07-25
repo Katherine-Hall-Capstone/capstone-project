@@ -23,7 +23,7 @@ export function useAppointments() {
                 setStatus('error')
             }
         } catch(error) {
-            console.error(error) 
+            console.error('Error: ', error)
             setStatus('error')
         } 
     }

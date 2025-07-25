@@ -32,7 +32,7 @@ function ProviderPageClientView() {
                 console.error('Failed to fetch provider')
             }
         } catch(error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 
@@ -42,7 +42,7 @@ function ProviderPageClientView() {
         }
 
         try {
-            /* When fetching appointments for the booking process, hide those that would occurr during already booked appointments */
+            /* When fetching appointments for the booking process, hide those that would occur during a provider's already booked appointments */
             const resAvailable = await fetch(`${import.meta.env.VITE_API_URL}/providers/${id}/availability`)
             const resBooked = await fetch(`${import.meta.env.VITE_API_URL}/providers/${id}/booked`)
 
@@ -52,36 +52,17 @@ function ProviderPageClientView() {
                 const availableAppointments = await resAvailable.json()
                 const bookedAppointments = await resBooked.json()
 
-                const validAppointments = availableAppointments.filter(available => {
-                    // Determines the start and end of each potential appointment based on the service chosen
-                    const availableStart = new Date(available.startDateTime)
-                    const serviceDurationInMins = selectedService.duration
-                    const availableEnd = new Date(availableStart.getTime() + serviceDurationInMins * MS_PER_MINUTE) // converts duration in ms since getTime is ms
-                    
-                    // Checks each provider's booked appointments to catch any conflicts with the potential available appointment
-                    for(const booked of bookedAppointments) {
-                        const bookedStart = new Date(booked.startDateTime)
-                        const bookedEnd = new Date(booked.endDateTime)
-                        
-                        // Condition where there is an overlap, so the available appointment would not be possible -> prevent it from being chosen
-                        if((availableStart < bookedEnd) && (availableEnd > bookedStart)) {
-                            return false 
-                        }
-                    }
-                    // Otherwise the potential appointment did not conflict with any of the booked appointments
-                    return true 
-                })
+                // The appointments that do not occur during already booked appointments:
+                const validAppointments = getValidAppointments(availableAppointments, bookedAppointments, selectedService.duration)
                 // Display "Available Appointments" section
-                setAppointments(validAppointments.sort((a, b) => new Date(a.startDateTime) - new Date(b.startDateTime)))
+                setAppointments(validAppointments.sort(sortByStartTime))
 
                 /* Handle Recommended Appointments */
                 let filtered = validAppointments
-
                 // 1) Filter for only available appointments within the client's windows, if exists 
                 if(clientPreferences.length > 0) {
                     filtered = filterByClientWindows(filtered)
                 }
-                
                 // 2) Filter excluding appointments that would exceed provider's max hours, if exists
                 if(providerPreferences?.maxConsecutiveHours) {
                     filtered = filterByProviderHours(
@@ -99,15 +80,39 @@ function ProviderPageClientView() {
                         providerPreferences ? providerPreferences.prefersEarly : true
                     )
                 }
-
                 // Display "Recommended Appointments" section (recommend nothing if both client and provider have no preferences)
                 const shouldRecommend = clientPreferences.length > 0 || providerPreferences?.maxConsecutiveHours
 
                 setRecommendedAppointments(shouldRecommend ? filtered : []) // Recommended could either be empty because both no preferences or filtering left no appointments
             }
         } catch(error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
+    }
+
+    function sortByStartTime(a, b) {
+        return new Date(a.startDateTime) - new Date(b.startDateTime)
+    }
+
+    function getValidAppointments(availableAppointments, bookedAppointments, serviceDurationInMins) {
+        return availableAppointments.filter(available => {
+            // Determines the start and end of each potential appointment based on the service chosen
+            const availableStart = new Date(available.startDateTime)
+            const availableEnd = new Date(availableStart.getTime() + serviceDurationInMins * MS_PER_MINUTE) // converts duration in ms since getTime is ms
+            
+            // Checks each provider's booked appointments to catch any conflicts with the potential available appointment
+            for(const booked of bookedAppointments) {
+                const bookedStart = new Date(booked.startDateTime)
+                const bookedEnd = new Date(booked.endDateTime)
+                
+                // Condition where there is an overlap, so the available appointment would not be possible -> prevent it from being chosen
+                if((availableStart < bookedEnd) && (availableEnd > bookedStart)) {
+                    return false 
+                }
+            }
+            // Otherwise the potential appointment did not conflict with any of the booked appointments
+            return true 
+        })
     }
 
     function filterByClientWindows(validAppointments) {
@@ -144,7 +149,7 @@ function ProviderPageClientView() {
                 console.error('Failed to fetch preferences')
             }
         } catch (error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 
@@ -196,7 +201,7 @@ function ProviderPageClientView() {
                 setProviderPreferences(data || null)
             }
         } catch (error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 

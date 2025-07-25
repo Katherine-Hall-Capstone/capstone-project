@@ -19,7 +19,7 @@ export function useLogout() {
                 console.error('Logout failed')
             }
         } catch(error) {
-            console.error(error)
+            console.error('Error: ', error)
         }
     }
 
