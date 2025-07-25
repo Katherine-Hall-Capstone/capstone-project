@@ -323,6 +323,8 @@ router.put('/appointments/:id/cancel', async (req, res) => {
                     bookingsWithProviders: updatedBookingsWithProviders
                 }
             })
+        } else {
+            console.log('Provider not found')
         }
 
         // Cancel in Google Calendar for provider
