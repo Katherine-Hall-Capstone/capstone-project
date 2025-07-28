@@ -4,10 +4,10 @@ import ClientReviews from '../DashComponents/ClientReviews'
 import ClientPreferences from '../DashComponents/ClientPreferences'
 import SlidingTabs from '../DashComponents/SlidingTabs'
 
-const tabs = ['Search', 'Upcoming Appointments', 'My Reviews', 'My Preferences']
+const tabs = ['Search', 'Appointments', 'My Reviews', 'My Preferences']
 const components = {
     'Search': <ClientSearchForm />, 
-    'Upcoming Appointments': <ClientAppointments />, 
+    'Appointments': <ClientAppointments />, 
     'My Reviews': <ClientReviews />, 
     'My Preferences': <ClientPreferences />
 }

@@ -71,7 +71,7 @@ function ClientSearchForm() {
                 {status === 'error' && <p>Something went wrong.</p>}
                 {status === 'success' && results.length === 0 && <p>No matches found.</p>}
                 {status === 'success' && results.length > 0 && (
-                    <div className="mb-4 max-h-[100vh] space-y-4">
+                    <div className="mb-4 mx-5 max-h-[100vh] space-y-4">
                         {results.map(provider => (
                             <div 
                                 key={provider.id}

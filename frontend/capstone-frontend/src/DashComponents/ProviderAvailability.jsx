@@ -94,7 +94,7 @@ function ProviderAvailability() {
         <div className="p-15">
             <h3 className="dash-title">Set Your Preferences</h3>
             
-            <div className="mt-8 mx-6 grid md:grid-cols-1 lg:grid-cols-2 gap-8 ">
+            <div className="mt-8 mx-6 grid sm:grid-cols-1 xl:grid-cols-2 gap-8 ">
                 <div className="provider-pref-cont flex flex-col items-center">
                     <p className="provider-pref-title">Connect your Google Calendar?</p>
                     <p className="dash-message mb-3">Allow your new appointments to also appear as events in your Google Calendar</p>
@@ -108,7 +108,7 @@ function ProviderAvailability() {
                 <div className="provider-pref-cont">
                     <p className="provider-pref-title">Manage Availabilities</p>
 
-                    <div className="flex justify-around">
+                    <div className="flex justify-around gap-2">
                         <div>
                             <h3 className="provider-pref-header">Add Availability:</h3>
                             <form 

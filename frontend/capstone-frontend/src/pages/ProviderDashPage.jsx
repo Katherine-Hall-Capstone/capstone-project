@@ -3,10 +3,10 @@ import ProviderAppointments from '../DashComponents/ProviderAppointments'
 import ProviderReviews from '../DashComponents/ProviderReviews'
 import SlidingTabs from '../DashComponents/SlidingTabs'
 
-const tabs = ['My Service Details', 'Upcoming Appointments', 'My Reviews']
+const tabs = ['My Service Details', 'Appointments', 'My Reviews']
 const components = {
     'My Service Details': <ProviderAvailability />, 
-    'Upcoming Appointments': <ProviderAppointments />, 
+    'Appointments': <ProviderAppointments />, 
     'My Reviews': <ProviderReviews />, 
 }
 
