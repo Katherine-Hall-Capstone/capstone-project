@@ -111,3 +111,27 @@ router.delete('/reviews/:id', async (req, res) => {
         res.status(500).json({ error: 'Server error' })
     }
 })
+
+// GET reviews (to public)
+router.get('/reviews/:providerId', async (req, res) => {
+    if(!req.session.userId) {
+        return res.status(401).json({ error: 'Log in to see your reviews!' })
+    }
+
+    const providerId = parseInt(req.params.providerId)
+
+    try {
+        const reviews = await prisma.review.findMany({
+            where: { providerId },
+            include: {
+                client: true,
+                service: true
+            }
+        })
+        
+        res.json(reviews)
+    } catch(error) {
+        console.log(error)
+        res.status(500).json({ error: 'Server error' })
+    }
+})
