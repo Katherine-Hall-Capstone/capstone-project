@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SLIDE_DISTANCE, SLIDE_DURATION } from '../constants'
 import { useLogout } from '../hooks/useLogout'
+import { RxDropdownMenu } from "react-icons/rx"
 
 function SlidingTabs({ tabs, components }) {
     const [activeTab, setActiveTab] = useState(tabs[1])
     const [direction, setDirection] = useState(1)
+    const [dropdownOpen, setDropdownOpen] = useState(false)
     const logout = useLogout()
 
     function changeTab(newTab) {
@@ -23,17 +25,45 @@ function SlidingTabs({ tabs, components }) {
             <div className="flex items-center justify-between mt-2 px-10 py-2">
                 <p className="logo">EasyPoint</p>
 
-                <nav className="flex items-center gap-1 px-1 py-1 bg-gray-100 rounded-full">
-                    {tabs.map(tab => (
+                <div className="relative">
+                    <nav className="hidden lg:flex items-center gap-1 px-1 py-1 bg-gray-100 rounded-full">
+                        {tabs.map(tab => (
+                            <button 
+                                key={tab}
+                                onClick={() => changeTab(tab)}
+                                className={`px-5 py-3 rounded-full cursor-pointer transition-colors duration-300 ${activeTab === tab ? 'bg-slate-900 text-white font-semibold' : 'text-gray-500'}`}
+                            >
+                                {tab}
+                            </button>
+                        ))}
+                    </nav>
+
+                    <div className="lg:hidden">
                         <button 
-                            key={tab}
-                            onClick={() => changeTab(tab)}
-                            className={`px-5 py-3 rounded-full cursor-pointer transition-colors duration-300 ${activeTab === tab ? 'bg-slate-900 text-white font-semibold' : 'text-gray-500'}`}
+                            onClick={() => setDropdownOpen(prev => !prev)} 
+                            className="px-4 py-2 bg-gray-100 rounded-full text-gray-700 text-2xl"
                         >
-                            {tab}
+                            <RxDropdownMenu />
                         </button>
-                    ))}
-                </nav>
+                        
+                        {dropdownOpen && (
+                            <div className="absolute mt-2 w-40 bg-white rounded-md shadow-md z-10">
+                                {tabs.map(tab => (
+                                    <button
+                                        key={tab}
+                                        onClick={() => {
+                                            changeTab(tab)
+                                            setDropdownOpen(false)
+                                        }}
+                                        className={`block w-full text-center px-4 py-2 hover:bg-gray-200 ${activeTab === tab ? 'font-semibold' : ''}`}
+                                    >
+                                        {tab}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
 
                 <button 
                     onClick={logout}

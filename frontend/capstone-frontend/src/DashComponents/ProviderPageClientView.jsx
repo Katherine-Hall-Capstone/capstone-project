@@ -53,7 +53,9 @@ function ProviderPageClientView() {
                 const bookedAppointments = await resBooked.json()
 
                 // The appointments that do not occur during already booked appointments:
-                const validAppointments = getValidAppointments(availableAppointments, bookedAppointments, selectedService.duration)
+                let validAppointments = getValidAppointments(availableAppointments, bookedAppointments, selectedService.duration)
+                // Only show availabilities upcoming (not ones in the past)
+                validAppointments = validAppointments.filter(appointment => new Date(appointment.startDateTime) > new Date())
                 // Display "Available Appointments" section
                 setAppointments(validAppointments.sort(sortByStartTime))
 

@@ -122,7 +122,7 @@ function ClientReviews() {
         <div className="p-15">
             <h3 className="dash-title">My Reviews</h3>
 
-            <div className="flex justify-around mt-8 mx-6 ">
+            <div className="flex flex-col gap-10 md:flex-row justify-around mt-8 mx-6 ">
                 <div>
                     <p className="dash-header">Write a Review</p>
                     <div className="flex flex-col gap-4 w-100 mt-5 p-7 bg-gray-100 border border-gray-300 shadow-xl rounded-lg">
@@ -195,7 +195,7 @@ function ClientReviews() {
                 
                 <div>
                     <p className="dash-header">Past Reviews</p>
-                    <div className="mt-5 p-5 w-150 border border-gray-300 bg-gray-100 shadow-xl rounded-md">
+                    <div className="mt-5 p-5 w-125 border border-gray-300 bg-gray-100 shadow-xl rounded-md">
                         {clientReviews.length === 0 ? (
                             <p>No reviews yet.</p>
                         ) : (

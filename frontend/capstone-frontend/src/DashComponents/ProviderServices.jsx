@@ -81,7 +81,7 @@ function ProviderServices({ providerId }) {
         <div>
             <h3 className="provider-pref-title">Manage Services</h3>
 
-            <div className="flex justify-around">
+            <div className="flex justify-around gap-2">
                 <div>
                     <p className="provider-pref-header">Add Service:</p>
                     <form 

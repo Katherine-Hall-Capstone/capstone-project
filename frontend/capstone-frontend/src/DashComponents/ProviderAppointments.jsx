@@ -27,7 +27,7 @@ function ProviderAppointments() {
 
     return(
         <div className="p-15">
-            <h3 className="dash-title">Upcoming Appointments</h3>
+            <h3 className="dash-title">Appointments</h3>
 
             {status === 'loading' && <LoadingSpinner />}
             {status === 'error' && <p className="mt-3">Something went wrong.</p>}
