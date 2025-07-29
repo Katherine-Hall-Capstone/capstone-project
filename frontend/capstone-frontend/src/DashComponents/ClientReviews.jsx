@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { FaTrashAlt } from "react-icons/fa"
 
 const starRatings = [1, 2, 3, 4, 5]
 
@@ -117,6 +118,23 @@ function ClientReviews() {
             console.error(error)
         }
     }
+
+    async function handleDelete(reviewId) {
+        try {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${reviewId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            })
+
+            if (res.ok) {
+                fetchClientReviews()
+            } else {
+                console.error('Failed to delete availability')
+            }
+        } catch (error) {
+            console.error('Error: ', error)
+        }
+    }
     
     return(
         <div className="p-15">
@@ -201,11 +219,17 @@ function ClientReviews() {
                         ) : (
                             <ul className="space-y-5">
                                 {clientReviews.map(review => (
-                                    <li key={review.id} className="flex flex-col gap-1 p-2 bg-gray-200 border border-gray-400 shadow-md rounded-md">
-                                        <p><span className="font-semibold">Provider: </span>{review.provider.name}</p>
-                                        <p><span className="font-semibold">Service: </span>{review.service.name}</p>
-                                        <p><span className="font-semibold">Rating: </span>{review.rating}/5</p>
-                                        <p className="break-words"><span className="font-semibold">Comment: </span>{review.comment || 'N/A'}</p>
+                                    <li key={review.id} className="flex justify-between bg-gray-200 border border-gray-400 shadow-md rounded-md">
+                                        <div className="flex flex-col gap-1 p-2">
+                                            <p><span className="font-semibold">Provider: </span>{review.provider.name}</p>
+                                            <p><span className="font-semibold">Service: </span>{review.service.name}</p>
+                                            <p><span className="font-semibold">Rating: </span>{review.rating}/5</p>
+                                            <p className="break-words"><span className="font-semibold">Comment: </span>{review.comment || 'N/A'}</p>
+                                        </div>
+                                
+                                        <button onClick={() => handleDelete(review.id)} className="cursor-pointer px-4">
+                                            <FaTrashAlt />
+                                        </button>
                                     </li>
                                 ))}
                             </ul>
