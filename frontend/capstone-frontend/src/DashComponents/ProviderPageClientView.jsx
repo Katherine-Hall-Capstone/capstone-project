@@ -4,6 +4,7 @@ import { useUser } from '../UserContext'
 import ClientBookingForm from './ClientBookingForm'
 import { TbArrowBackUp } from "react-icons/tb"
 import { IoMdInformationCircle } from "react-icons/io"
+import { GoArrowRight } from 'react-icons/go'
 
 const MS_PER_MINUTE = 60000
 const MS_PER_HOUR = 3600000
@@ -302,7 +303,7 @@ function ProviderPageClientView() {
             <div className="text-left">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-1 mb-4 hover:underline cursor-pointer"
+                    className="flex items-center gap-1 mb-4 hover:underline hover:font-semibold cursor-pointer"
                 >
                     <TbArrowBackUp className="text-xl"/>
                     <span>Back to Dashboard</span>
@@ -310,6 +311,16 @@ function ProviderPageClientView() {
             </div>
 
             <h3 className="text-4xl">Book with <span className="font-bold">{provider.name}</span>?</h3>
+            
+            <div className="flex justify-center mt-7">
+                <button 
+                    onClick={() => navigate(`/reviews/${id}`)} 
+                    className="flex items-center gap-2 text-xl font-semibold hover:underline hover:text-slate-600 cursor-pointer"
+                >
+                    <span>See Reviews</span> 
+                    <GoArrowRight />
+                </button>
+            </div>
             
             <h3 className="profile-serv mt-9">Services Offered: </h3>
             <ul className="mb-6 list-disc list-inside">

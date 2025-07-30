@@ -5,6 +5,7 @@ import SignupPage from './pages/SignupPage'
 import DashPage from './pages/DashPage'
 import ProtectedRoute from './ProtectedRoute'
 import ProviderPageClientView from './DashComponents/ProviderPageClientView'
+import ProviderPageReviews from './DashComponents/ProviderPageReviews'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         </ProtectedRoute>
       } />
       <Route path="/providers/:id" element={<ProviderPageClientView />} />
+      <Route path="/reviews/:id" element={<ProviderPageReviews />} />
     </Routes>
   )
 }

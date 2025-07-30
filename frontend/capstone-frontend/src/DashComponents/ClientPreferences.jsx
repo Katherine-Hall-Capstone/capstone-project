@@ -157,7 +157,7 @@ function ClientPreferences()  {
                                                                     hour: '2-digit', minute: '2-digit', hour12: true 
                                                                 })} – {new Date(`1970-01-01T${preference.endTime}`).toLocaleTimeString(undefined, { 
                                                                         hour: '2-digit', minute: '2-digit', hour12: true })}
-                                        <button onClick={() => handleDelete(preference.id)} className="cursor-pointer"><FaTrashAlt /></button>
+                                        <button onClick={() => handleDelete(preference.id)} className="cursor-pointer ml-3"><FaTrashAlt /></button>
                                     </li>
                                 ))}
                             </ul>
