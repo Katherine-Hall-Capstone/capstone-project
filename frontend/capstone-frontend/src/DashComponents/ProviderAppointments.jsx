@@ -32,7 +32,7 @@ function ProviderAppointments() {
             {status === 'loading' && <LoadingSpinner />}
             {status === 'error' && <p className="mt-3">Something went wrong.</p>}
             {status === 'success' && appointments.length === 0 && <p className="mt-3">No upcoming appointments.</p>}
-            {status === 'success' && (
+            {status === 'success' && appointments.length !== 0 && (
                 <AppointmentsGrid
                     appointments={bookedAppointments}
                     role="provider"
