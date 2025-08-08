@@ -10,5 +10,5 @@ Project Plan: https://docs.google.com/document/d/1W98HMI8hWYZbXDVptceYyLL0Xtlvsf
 - Complex Visual Styling: https://github.com/Katherine-Hall-Capstone/capstone-project/pull/25
 - Loading State: https://github.com/Katherine-Hall-Capstone/capstone-project/pull/23
 
-# Video
-https://youtu.be/1pBVQKRL1hI
+# Demo Video
+https://www.loom.com/share/f58e0c8caf33473eac2447bba6fd8ecf?sid=014a031d-d0aa-4c49-9e86-2d64c08edf34
